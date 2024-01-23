@@ -1,65 +1,136 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>Dialog</class>
- <widget class="QDialog" name="Dialog">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>400</width>
-    <height>300</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>Dialog</string>
-  </property>
-  <widget class="QLineEdit" name="filename">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>130</y>
-     <width>211</width>
-     <height>22</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="browse">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>130</y>
-     <width>93</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Browse Folder</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="options">
-  <property name="geometry">
-    <rect>
-    <x>20</x>
-    <y>200</y>
-    <width>211</width>
-    <height>28</height>
-    </rect>
-  </property>
-  </widget>
-  <widget class="QPushButton" name="plotbtn">
-   <property name="geometry">
-    <rect>
-     <x>240</x>
-     <y>200</y>
-     <width>93</width>
-     <height>28</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Plot</string>
-   </property>
-  </widget>
- </widget>
- <resources/>
- <connections/>
+    <class>Dialog</class>
+    <widget class="QDialog" name="Dialog">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>817</width>
+                <height>599</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>Dialog</string>
+        </property>
+        <widget class="QLineEdit" name="filename">
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>130</y>
+                    <width>321</width>
+                    <height>22</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QPushButton" name="browse">
+            <property name="geometry">
+                <rect>
+                    <x>360</x>
+                    <y>120</y>
+                    <width>93</width>
+                    <height>28</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Browse Folder</string>
+            </property>
+        </widget>
+        <widget class="QComboBox" name="options">
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>200</y>
+                    <width>211</width>
+                    <height>28</height>
+                </rect>
+            </property>
+        </widget>
+        <widget class="QButtonGroup" name="checkboxes">
+            <widget class="QCheckBox" name="check1">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>250</y>
+                        <width>200</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+            </widget>
+            <widget class="QCheckBox" name="check2">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>290</y>
+                        <width>200</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+            </widget>
+            <widget class="QCheckBox" name="check3">
+                <property name="geometry">
+                    <rect>
+                        <x>20</x>
+                        <y>330</y>
+                        <width>200</width>
+                        <height>20</height>
+                    </rect>
+                </property>
+            </widget>
+        </widget>
+        <widget class="QPushButton" name="selectbtn">
+            <property name="geometry">
+                <rect>
+                    <x>240</x>
+                    <y>200</y>
+                    <width>93</width>
+                    <height>28</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Select</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" name="mergeplotbtn">
+            <property name="geometry">
+                <rect>
+                    <x>260</x>
+                    <y>400</y>
+                    <width>93</width>
+                    <height>28</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Merge</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" name="subplotbtn">
+            <property name="geometry">
+                <rect>
+                    <x>140</x>
+                    <y>400</y>
+                    <width>93</width>
+                    <height>28</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Sub Plot</string>
+            </property>
+        </widget>
+        <widget class="QPushButton" name="plotbtn">
+            <property name="geometry">
+                <rect>
+                    <x>20</x>
+                    <y>400</y>
+                    <width>93</width>
+                    <height>28</height>
+                </rect>
+            </property>
+            <property name="text">
+                <string>Plot</string>
+            </property>
+        </widget>
+    </widget>
+    <resources/>
+    <connections/>
 </ui>
