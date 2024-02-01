@@ -31,6 +31,7 @@ class MainWindow(QDialog):
         self.check3.setEnabled(False)
         self.file_paths = []
         self.checkedButtons = []
+        self.file_names = []
 
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
@@ -51,18 +52,17 @@ class MainWindow(QDialog):
         self.check3.setEnabled(False)
         file_paths_local = self.findFiles(self.options.currentText())
         self.file_paths = file_paths_local
-        file_names = []
         for i in range(0, len(file_paths_local)):
-            file_names.append(os.path.basename(
+            self.file_names.append(os.path.basename(
                 file_paths_local[i]).split('/')[-1])
-        for i in range(0, len(file_names)):
-            if (self.check1.text() in file_names[i]):
+        for i in range(0, len(self.file_names)):
+            if (self.check1.text() in self.file_names[i]):
                 self.check1.setEnabled(True)
-        for i in range(0, len(file_names)):
-            if (self.check2.text() in file_names[i]):
+        for i in range(0, len(self.file_names)):
+            if (self.check2.text() in self.file_names[i]):
                 self.check2.setEnabled(True)
-        for i in range(0, len(file_names)):
-            if (self.check3.text() in file_names[i]):
+        for i in range(0, len(self.file_names)):
+            if (self.check3.text() in self.file_names[i]):
                 self.check3.setEnabled(True)
 
     def current_text_changed(self, text):
@@ -87,6 +87,7 @@ class MainWindow(QDialog):
                 self.checkedButtons.append(2)
 
     def plot(self):
+        print(self.file_names[0])
         for i in range(0, len(self.checkedButtons)):
             if (self.file_paths[self.checkedButtons[i]].endswith(".xlsx")):
                 file = pd.read_excel(
@@ -99,7 +100,8 @@ class MainWindow(QDialog):
                 X_axis = file["a"]
                 Y_axis = file["b"]
             plt.figure(i)
-            plt.plot(X_axis, Y_axis)
+            plt.plot(X_axis, Y_axis, label=self.file_names[i].split(".")[0])
+            plt.legend()
             plt.show()
 
     def subplot(self):
@@ -115,7 +117,9 @@ class MainWindow(QDialog):
                     file_name=self.file_paths[self.checkedButtons[i]])
                 X_axis = file["a"]
                 Y_axis = file["b"]
-            axis[i].plot(X_axis, Y_axis)
+            axis[i].plot(X_axis, Y_axis,
+                         label=self.file_names[i].split(".")[0])
+        plt.legend()
         plt.show()
 
     def mergeplot(self):
@@ -131,7 +135,8 @@ class MainWindow(QDialog):
                     file_name=self.file_paths[self.checkedButtons[i]])
                 X_axis = file["a"]
                 Y_axis.append(file["b"])
-            plt.plot(X_axis, Y_axis[i])
+            plt.plot(X_axis, Y_axis[i], label=self.file_names[i].split(".")[0])
+            plt.legend()
         plt.show()
 
     def findFolders(self, start_dir):
