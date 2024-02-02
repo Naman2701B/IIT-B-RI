@@ -19,16 +19,16 @@ class MainWindow(QDialog):
         self.mergeplotbtn.clicked.connect(self.mergeplot)
         self.selectbtn.clicked.connect(self.showCheckBoxOpt)
         self.options.currentTextChanged.connect(self.current_text_changed)
+        self.check0.clicked.connect(self.stateChange)
         self.check1.clicked.connect(self.stateChange)
         self.check2.clicked.connect(self.stateChange)
-        self.check3.clicked.connect(self.stateChange)
         self.checkboxes.setExclusive(False)
-        self.checkboxes.addButton(self.check1, 0)
-        self.checkboxes.addButton(self.check2, 1)
-        self.checkboxes.addButton(self.check3, 2)
+        self.checkboxes.addButton(self.check0, 0)
+        self.checkboxes.addButton(self.check1, 1)
+        self.checkboxes.addButton(self.check2, 2)
+        self.check0.setEnabled(False)
         self.check1.setEnabled(False)
         self.check2.setEnabled(False)
-        self.check3.setEnabled(False)
         self.file_paths = []
         self.checkedButtons = []
         self.file_names = []
@@ -47,35 +47,36 @@ class MainWindow(QDialog):
             self.options.addItem(path)
 
     def showCheckBoxOpt(self):
+        self.file_names.clear()
+        self.check0.setEnabled(False)
         self.check1.setEnabled(False)
         self.check2.setEnabled(False)
-        self.check3.setEnabled(False)
         file_paths_local = self.findFiles(self.options.currentText())
         self.file_paths = file_paths_local
         for i in range(0, len(file_paths_local)):
             self.file_names.append(os.path.basename(
                 file_paths_local[i]).split('/')[-1])
         for i in range(0, len(self.file_names)):
+            if (self.check0.text() in self.file_names[i]):
+                self.check0.setEnabled(True)
+        for i in range(0, len(self.file_names)):
             if (self.check1.text() in self.file_names[i]):
                 self.check1.setEnabled(True)
         for i in range(0, len(self.file_names)):
             if (self.check2.text() in self.file_names[i]):
                 self.check2.setEnabled(True)
-        for i in range(0, len(self.file_names)):
-            if (self.check3.text() in self.file_names[i]):
-                self.check3.setEnabled(True)
 
     def current_text_changed(self, text):
         return text
 
     def stateChange(self):
         sender = self.sender()
-        if (sender == self.check1):
+        if (sender == self.check0):
             if (0 in self.checkedButtons):
                 self.checkedButtons.remove(0)
             else:
                 self.checkedButtons.append(0)
-        elif (sender == self.check2):
+        elif (sender == self.check1):
             if (1 in self.checkedButtons):
                 self.checkedButtons.remove(1)
             else:
@@ -87,7 +88,7 @@ class MainWindow(QDialog):
                 self.checkedButtons.append(2)
 
     def plot(self):
-        print(self.file_names[0])
+        print()
         for i in range(0, len(self.checkedButtons)):
             if (self.file_paths[self.checkedButtons[i]].endswith(".xlsx")):
                 file = pd.read_excel(
@@ -100,7 +101,8 @@ class MainWindow(QDialog):
                 X_axis = file["a"]
                 Y_axis = file["b"]
             plt.figure(i)
-            plt.plot(X_axis, Y_axis, label=self.file_names[i].split(".")[0])
+            plt.plot(X_axis, Y_axis, label=self.checkboxes.button(
+                self.checkedButtons[i]).text())
             plt.legend()
             plt.show()
 
@@ -118,7 +120,7 @@ class MainWindow(QDialog):
                 X_axis = file["a"]
                 Y_axis = file["b"]
             axis[i].plot(X_axis, Y_axis,
-                         label=self.file_names[i].split(".")[0])
+                         label=self.checkboxes.button(self.checkedButtons[i]).text())
         plt.legend()
         plt.show()
 
@@ -135,7 +137,8 @@ class MainWindow(QDialog):
                     file_name=self.file_paths[self.checkedButtons[i]])
                 X_axis = file["a"]
                 Y_axis.append(file["b"])
-            plt.plot(X_axis, Y_axis[i], label=self.file_names[i].split(".")[0])
+            plt.plot(X_axis, Y_axis[i], label=self.checkboxes.button(
+                self.checkedButtons[i]).text())
             plt.legend()
         plt.show()
 

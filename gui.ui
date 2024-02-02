@@ -44,7 +44,7 @@
             </property>
         </widget>
         <widget class="QButtonGroup" name="checkboxes">
-            <widget class="QCheckBox" name="check1">
+            <widget class="QCheckBox" name="check0">
                 <property name="geometry">
                     <rect>
                         <x>20</x>
@@ -57,7 +57,7 @@
                     <string>Speed</string>
                 </property>
             </widget>
-            <widget class="QCheckBox" name="check2">
+            <widget class="QCheckBox" name="check1">
                 <property name="geometry">
                     <rect>
                         <x>20</x>
@@ -70,7 +70,7 @@
                     <string>Distance</string>
                 </property>
             </widget>
-            <widget class="QCheckBox" name="check3">
+            <widget class="QCheckBox" name="check2">
                 <property name="geometry">
                     <rect>
                         <x>20</x>
