@@ -121,7 +121,7 @@ class MainWindow(QDialog):
                 Y_axis = file["b"]
             axis[i].plot(X_axis, Y_axis,
                          label=self.checkboxes.button(self.checkedButtons[i]).text())
-        plt.legend()
+            axis[i].legend()
         plt.show()
 
     def mergeplot(self):
