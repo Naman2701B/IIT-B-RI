@@ -7,6 +7,7 @@ import pandas as pd
 import os
 from scipy import io
 from matplotlib import interactive
+from test import timeTableData, routeAltitudeData
 
 
 class MainWindow(QDialog):
@@ -19,52 +20,80 @@ class MainWindow(QDialog):
         self.mergeplotbtn.clicked.connect(self.mergeplot)
         self.selectbtn.clicked.connect(self.showCheckBoxOpt)
         self.options.currentTextChanged.connect(self.current_text_changed)
-        self.check0.clicked.connect(self.stateChange)
-        self.check1.clicked.connect(self.stateChange)
-        self.check2.clicked.connect(self.stateChange)
-        self.checkboxes.setExclusive(False)
-        self.checkboxes.addButton(self.check0, 0)
-        self.checkboxes.addButton(self.check1, 1)
-        self.checkboxes.addButton(self.check2, 2)
-        self.check0.setEnabled(False)
-        self.check1.setEnabled(False)
-        self.check2.setEnabled(False)
+        self.Tractiveeffort.setEnabled(False)
+        self.Reactivepower.setEnabled(False)
+        self.Activepower.setEnabled(False)
+        self.Voltage.setEnabled(False)
+        self.Brakingeffort.setEnabled(False)
+        self.Current.setEnabled(False)
+        self.Trainplots.setEnabled(False)
+        self.Stringline.setEnabled(False)
+        self.Conductorconfig.setEnabled(False)
+        self.Routealtitude.setEnabled(False)
+        self.Timetable.setEnabled(False)
+        self.Trainplots1.setEnabled(False)
+        self.Substationplots.setEnabled(False)
+        self.Time_radio.setEnabled(False)
+        self.Distance_radio.setEnabled(False)
         self.file_paths = []
         self.checkedButtons = []
         self.file_names = []
+        self.folder_paths = []
 
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
             self, 'Choose a Folder', '')
         if (fname):
-            folder_paths = self.findFolders(fname)
+            self.folder_paths = self.findFolders(fname)
             self.options.clear()
-            self.addOpt(folder_paths)
+            self.addOpt()
         self.filename.setText(fname)
 
-    def addOpt(self, paths):
-        for path in paths:
-            self.options.addItem(path)
+    def addOpt(self):
+        for path in self.folder_paths:
+            dispName = os.path.basename(path).split('/')[-1]
+            self.options.addItem(dispName)
 
     def showCheckBoxOpt(self):
         self.file_names.clear()
-        self.check0.setEnabled(False)
-        self.check1.setEnabled(False)
-        self.check2.setEnabled(False)
-        file_paths_local = self.findFiles(self.options.currentText())
-        self.file_paths = file_paths_local
-        for i in range(0, len(file_paths_local)):
-            self.file_names.append(os.path.basename(
-                file_paths_local[i]).split('/')[-1])
-        for i in range(0, len(self.file_names)):
-            if (self.check0.text() in self.file_names[i]):
-                self.check0.setEnabled(True)
-        for i in range(0, len(self.file_names)):
-            if (self.check1.text() in self.file_names[i]):
-                self.check1.setEnabled(True)
-        for i in range(0, len(self.file_names)):
-            if (self.check2.text() in self.file_names[i]):
-                self.check2.setEnabled(True)
+        self.Tractiveeffort.setEnabled(True)
+        self.Reactivepower.setEnabled(True)
+        self.Activepower.setEnabled(True)
+        self.Voltage.setEnabled(True)
+        self.Brakingeffort.setEnabled(True)
+        self.Current.setEnabled(True)
+        self.Trainplots.setEnabled(True)
+        self.Stringline.setEnabled(True)
+        self.Conductorconfig.setEnabled(True)
+        self.Routealtitude.setEnabled(True)
+        self.Timetable.setEnabled(True)
+        self.Trainplots1.setEnabled(True)
+        self.Substationplots.setEnabled(True)
+        self.Time_radio.setEnabled(True)
+        self.Distance_radio.setEnabled(True)
+        output_file_results = []
+        input_file_results = []
+        input_directory_results = []
+        final_input_directories = []
+        for path in self.folder_paths:
+            for root, dirs, files in os.walk(path):
+                for dir in dirs:
+                    dir_path = os.path.join(root, dir)
+                    for root, dirs, files in os.walk(dir_path):
+                        for file in files:
+                            if "output" in file.lower():
+                                output_file_results.append(os.path.abspath(
+                                    os.path.join(dir_path, file)))
+                break
+            for root, dirs, files in os.walk(path):
+                for dir in dirs:
+                    if "input" in dir.lower():
+                        input_directory_results.append(
+                            os.path.abspath(os.path.join(root, dir)))
+            for directories in input_directory_results:
+                for root, dirs, files in os.walk(directories):
+                    if (len(files) > 0):
+                        final_input_directories.append(directories)
 
     def current_text_changed(self, text):
         return text
@@ -147,8 +176,10 @@ class MainWindow(QDialog):
         for root, dirs, files in os.walk(start_dir):
             for dir in dirs:
                 dir_path = os.path.join(root, dir)
-                directory_results.append(dir_path)
-            break
+                if "output" in dir.lower():
+                    directory_results.append(os.path.abspath(
+                        os.path.join(dir_path, os.pardir)))
+                break
         return directory_results
 
     def findFiles(self, start_dir):
@@ -167,7 +198,7 @@ app = QApplication(sys.argv)
 mainwindow = MainWindow()
 widget = QtWidgets.QStackedWidget()
 widget.addWidget(mainwindow)
-widget.setFixedWidth(1000)
-widget.setFixedHeight(500)
+widget.setFixedWidth(1129)
+widget.setFixedHeight(976)
 widget.show()
 sys.exit(app.exec_())
