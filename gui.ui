@@ -329,7 +329,7 @@
                         <string>String line diagram</string>
                     </property>
                 </widget>
-                <widget class="QListWidget" name="task3">
+                <widget class="QListWidget" name="unselected">
                     <property name="geometry">
                         <rect>
                             <x>30</x>
@@ -417,7 +417,7 @@
                         <string>Substation Plots</string>
                     </property>
                 </widget>
-                <widget class="QListWidget" name="listWidget_5">
+                <widget class="QListWidget" name="selected">
                     <property name="geometry">
                         <rect>
                             <x>30</x>

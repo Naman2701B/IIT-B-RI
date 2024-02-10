@@ -8,12 +8,17 @@ import os
 from scipy import io
 from matplotlib import interactive
 from test import timeTableData, routeAltitudeData
+import matplotlib.dates as mdates
+from matplotlib.dates import HourLocator, MinuteLocator, DateFormatter
+import numpy as np
+from matplotlib.backend_bases import MouseButton
 
 
 class MainWindow(QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
         loadUi("gui.ui", self)
+        self.stringlineplot.setEnabled(False)
         self.browse.clicked.connect(self.browsefiles)
         self.plotbtn.clicked.connect(self.plot)
         self.subplotbtn.clicked.connect(self.subplot)
@@ -72,9 +77,9 @@ class MainWindow(QDialog):
         self.Time_radio.setEnabled(True)
         self.Distance_radio.setEnabled(True)
         output_file_results = []
-        input_file_results = []
         input_directory_results = []
         final_input_directories = []
+        data = []
         for path in self.folder_paths:
             for root, dirs, files in os.walk(path):
                 for dir in dirs:
@@ -94,6 +99,32 @@ class MainWindow(QDialog):
                 for root, dirs, files in os.walk(directories):
                     if (len(files) > 0):
                         final_input_directories.append(directories)
+        for i in range(0, len(final_input_directories)):
+            data = timeTableData(final_input_directories[i])
+            # routeAltitudeData(final_input_directories[i])
+            for j in range(0, len(data["calculativeData"])):
+                x_axis = []
+                y_axis = []
+                for z in range(0, len(data["calculativeData"][j]["timeFromStarting"])):
+                    x_axis.append(
+                        int(data["calculativeData"][j]['distanceFromStarting'][z]))
+                    y_axis.append(
+                        (int(data["calculativeData"][j]['timeFromStartingInMins'][z])))
+                plt.plot(x_axis, y_axis,
+                         label=data["calculativeData"][j]["trainnumber"])
+                plt.gca().invert_yaxis()
+            for j in range(0, len(data["plottingData"][0])):
+                plt.yticks(data["plottingData"][1],
+                           data["plottingData"][0])
+            plt.legend(loc='center left', bbox_to_anchor=(1, 1))
+            # binding_id = plt.connect('motion_notify_event', on_move)
+            plt.show()
+        # self.unselected.addItem(data[j]["trainnumber"])
+
+    # def on_move(event):
+    # if event.inaxes:
+    #     print(f'data coords {event.xdata} {event.ydata},',
+    #           f'pixel coords {event.x} {event.y}')
 
     def current_text_changed(self, text):
         return text
