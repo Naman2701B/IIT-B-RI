@@ -19,6 +19,7 @@ class MainWindow(QDialog):
         super(MainWindow, self).__init__()
         loadUi("gui.ui", self)
         self.stringlineplot.setEnabled(False)
+        self.stringlineplot.clicked.connect(self.stringLinePlotClick)
         self.browse.clicked.connect(self.browsefiles)
         self.plotbtn.clicked.connect(self.plot)
         self.subplotbtn.clicked.connect(self.subplot)
@@ -44,6 +45,7 @@ class MainWindow(QDialog):
         self.checkedButtons = []
         self.file_names = []
         self.folder_paths = []
+        self.final_input_directories = []
 
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
@@ -76,9 +78,9 @@ class MainWindow(QDialog):
         self.Substationplots.setEnabled(True)
         self.Time_radio.setEnabled(True)
         self.Distance_radio.setEnabled(True)
+        self.stringlineplot.setEnabled(True)
         output_file_results = []
         input_directory_results = []
-        final_input_directories = []
         data = []
         for path in self.folder_paths:
             for root, dirs, files in os.walk(path):
@@ -98,27 +100,7 @@ class MainWindow(QDialog):
             for directories in input_directory_results:
                 for root, dirs, files in os.walk(directories):
                     if (len(files) > 0):
-                        final_input_directories.append(directories)
-        for i in range(0, len(final_input_directories)):
-            data = timeTableData(final_input_directories[i])
-            # routeAltitudeData(final_input_directories[i])
-            for j in range(0, len(data["calculativeData"])):
-                x_axis = []
-                y_axis = []
-                for z in range(0, len(data["calculativeData"][j]["timeFromStarting"])):
-                    x_axis.append(
-                        int(data["calculativeData"][j]['distanceFromStarting'][z]))
-                    y_axis.append(
-                        (int(data["calculativeData"][j]['timeFromStartingInMins'][z])))
-                plt.plot(x_axis, y_axis,
-                         label=data["calculativeData"][j]["trainnumber"])
-                plt.gca().invert_yaxis()
-            for j in range(0, len(data["plottingData"][0])):
-                plt.yticks(data["plottingData"][1],
-                           data["plottingData"][0])
-            plt.legend(loc='center left', bbox_to_anchor=(1, 1))
-            # binding_id = plt.connect('motion_notify_event', on_move)
-            plt.show()
+                        self.final_input_directories.append(directories)
         # self.unselected.addItem(data[j]["trainnumber"])
 
     # def on_move(event):
@@ -128,24 +110,6 @@ class MainWindow(QDialog):
 
     def current_text_changed(self, text):
         return text
-
-    def stateChange(self):
-        sender = self.sender()
-        if (sender == self.check0):
-            if (0 in self.checkedButtons):
-                self.checkedButtons.remove(0)
-            else:
-                self.checkedButtons.append(0)
-        elif (sender == self.check1):
-            if (1 in self.checkedButtons):
-                self.checkedButtons.remove(1)
-            else:
-                self.checkedButtons.append(1)
-        else:
-            if (2 in self.checkedButtons):
-                self.checkedButtons.remove(2)
-            else:
-                self.checkedButtons.append(2)
 
     def plot(self):
         print()
@@ -201,6 +165,36 @@ class MainWindow(QDialog):
                 self.checkedButtons[i]).text())
             plt.legend()
         plt.show()
+
+    def getStringLineData(self):
+        for i in range(0, len(self.final_input_directories)):
+            data = timeTableData(self.final_input_directories[i])
+            for j in range(0, len(data["calculativeData"])):
+                x_axis = []
+                y_axis = []
+                for z in range(0, len(data["calculativeData"][j]["timeFromStarting"])):
+                    x_axis.append(
+                        int(data["calculativeData"][j]['distanceFromStarting'][z]))
+                    y_axis.append(
+                        (int(data["calculativeData"][j]['timeFromStartingInMins'][z])))
+                plt.plot(x_axis, y_axis,
+                         label=data["calculativeData"][j]["trainnumber"])
+                plt.gca().invert_yaxis()
+            plt.yticks(data["plottingData"][1], data["plottingData"][0])
+            plt.legend(loc='center left', bbox_to_anchor=(1, 1))
+            plt.xlabel("Distance from Starting Point")
+            plt.ylabel("Time")
+            plt.title("String Line Diagram")
+            plt.get_current_fig_manager().resize(950, 500)
+            # binding_id = plt.connect('motion_notify_event', on_move)
+            plt.show()
+
+    def stringLinePlotClick(self):
+        if (self.Stringline.isChecked()):
+            self.getStringLineData()
+        if (self.Routealtitude.isChecked()):
+            for i in range(0, len(self.final_input_directories)):
+                routeAltitudeData(self.final_input_directories[i])
 
     def findFolders(self, start_dir):
         directory_results = []
