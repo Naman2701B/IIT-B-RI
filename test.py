@@ -1,5 +1,5 @@
 import pandas as pd
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt2
 from datetime import datetime, timedelta
 
 
@@ -60,8 +60,14 @@ def routeAltitudeData(basefolder):
     df2 = pd.read_csv(basefolder + "/RouteAltitudeData.csv")
     X_axis = df2["DistanceKM"]
     Y_axis = df2["HeightAboveGroundMSL"]
-    plt.plot(X_axis, Y_axis, label='Route-Altitude graph')
-    plt.xlabel("Distance From Source")
-    plt.ylabel("Altitude")
-    plt.legend()
-    plt.show()
+    plt2.plot(X_axis, Y_axis, label='Route-Altitude graph')
+    plt2.xlabel("Distance From Source")
+    plt2.ylabel("Altitude")
+    plt2.legend()
+    plt2.show()
+
+def EffortOutputdata(basefolder, selected_trains):
+    df = pd.read_csv(basefolder+"/EffortOutput.csv")
+    for i in range (0, len(selected_trains)):
+        Y_axis = df["TractiveEffort_Uptrack_"+str(selected_trains[i])+"_0"]
+    
