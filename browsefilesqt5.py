@@ -81,6 +81,8 @@ class MainWindow(QDialog):
         self.stringlineplot.setEnabled(True)
         output_file_results = []
         input_directory_results = []
+        output_directory_results = []
+        selected_trains = []
         data = []
         for path in self.folder_paths:
             for root, dirs, files in os.walk(path):
@@ -94,6 +96,10 @@ class MainWindow(QDialog):
                 break
             for root, dirs, files in os.walk(path):
                 for dir in dirs:
+                    if "output" in dir.lower():
+                        output_directory_results.append(
+                            os.path.abspath(os.path.join(root, dir)))
+                    print(output_directory_results)
                     if "input" in dir.lower():
                         input_directory_results.append(
                             os.path.abspath(os.path.join(root, dir)))
@@ -156,6 +162,11 @@ class MainWindow(QDialog):
                     self.file_paths[self.checkedButtons[i]], header=None)
                 X_axis = file[0]
                 Y_axis.append(file[1])
+            elif (self.file_paths[self.checkedButtons[i]].endswith(".csv")):
+                file = pd.read_csv(
+                    self.file_paths[self.checkedButtons[i]], header=None)
+                X_axis = file[0]
+                Y_axis.append(file[1])
             else:
                 file = io.loadmat(
                     file_name=self.file_paths[self.checkedButtons[i]])
@@ -191,8 +202,10 @@ class MainWindow(QDialog):
 
     def stringLinePlotClick(self):
         if (self.Stringline.isChecked()):
+            plt.figure()
             self.getStringLineData()
         if (self.Routealtitude.isChecked()):
+            plt.figure()
             for i in range(0, len(self.final_input_directories)):
                 routeAltitudeData(self.final_input_directories[i])
 
@@ -208,7 +221,7 @@ class MainWindow(QDialog):
         return directory_results
 
     def findFiles(self, start_dir):
-        file_extension = [".xlsx", ".mat"]
+        file_extension = [".xlsx", ".mat", ".csv"]
         file_results_path = []
         for ext in file_extension:
             for root, dirs, files in os.walk(start_dir):
