@@ -73,8 +73,8 @@
                     <rect>
                         <x>10</x>
                         <y>340</y>
-                        <width>331</width>
-                        <height>481</height>
+                        <width>350</width>
+                        <height>510</height>
                     </rect>
                 </property>
                 <property name="title">
@@ -98,9 +98,6 @@
                             <width>171</width>
                             <height>22</height>
                         </rect>
-                    </property>
-                    <property name="styleSheet">
-                        <string notr="true">color: black;</string>
                     </property>
                     <property name="text">
                         <string>Tractive effort</string>
@@ -141,9 +138,6 @@
                             <height>22</height>
                         </rect>
                     </property>
-                    <property name="styleSheet">
-                        <string notr="true">color: black;</string>
-                    </property>
                     <property name="text">
                         <string>Reactive power</string>
                     </property>
@@ -156,9 +150,6 @@
                             <width>171</width>
                             <height>22</height>
                         </rect>
-                    </property>
-                    <property name="styleSheet">
-                        <string notr="true">color: black;</string>
                     </property>
                     <property name="text">
                         <string>Active power</string>
@@ -173,9 +164,6 @@
                             <height>22</height>
                         </rect>
                     </property>
-                    <property name="styleSheet">
-                        <string notr="true">color: black;</string>
-                    </property>
                     <property name="text">
                         <string>Voltage</string>
                     </property>
@@ -189,11 +177,21 @@
                             <height>22</height>
                         </rect>
                     </property>
-                    <property name="styleSheet">
-                        <string notr="true">color: black;</string>
-                    </property>
                     <property name="text">
                         <string>Braking effort</string>
+                    </property>
+                </widget>
+                <widget class="QCheckBox" name="velocity">
+                    <property name="geometry">
+                        <rect>
+                            <x>20</x>
+                            <y>430</y>
+                            <width>171</width>
+                            <height>22</height>
+                        </rect>
+                    </property>
+                    <property name="text">
+                        <string>Velocity</string>
                     </property>
                 </widget>
                 <widget class="QCheckBox" name="Current">
@@ -204,9 +202,6 @@
                             <width>171</width>
                             <height>22</height>
                         </rect>
-                    </property>
-                    <property name="styleSheet">
-                        <string notr="true">color: black;</string>
                     </property>
                     <property name="text">
                         <string>Current</string>
@@ -229,7 +224,7 @@
                     <property name="geometry">
                         <rect>
                             <x>236</x>
-                            <y>450</y>
+                            <y>470</y>
                             <width>93</width>
                             <height>28</height>
                         </rect>
@@ -242,7 +237,7 @@
                     <property name="geometry">
                         <rect>
                             <x>123</x>
-                            <y>450</y>
+                            <y>470</y>
                             <width>93</width>
                             <height>28</height>
                         </rect>
@@ -255,7 +250,7 @@
                     <property name="geometry">
                         <rect>
                             <x>10</x>
-                            <y>450</y>
+                            <y>470</y>
                             <width>93</width>
                             <height>28</height>
                         </rect>
@@ -309,7 +304,7 @@
                     <rect>
                         <x>10</x>
                         <y>20</y>
-                        <width>331</width>
+                        <width>350</width>
                         <height>301</height>
                     </rect>
                 </property>

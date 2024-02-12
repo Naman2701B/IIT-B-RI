@@ -1,17 +1,12 @@
 import sys
 from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QPushButton
+from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
 from PyQt5.uic import loadUi
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
 from scipy import io
-from matplotlib import interactive
 from test import timeTableData, routeAltitudeData
-import matplotlib.dates as mdates
-from matplotlib.dates import HourLocator, MinuteLocator, DateFormatter
-import numpy as np
-from matplotlib.backend_bases import MouseButton
 
 
 class MainWindow(QDialog):
@@ -19,6 +14,7 @@ class MainWindow(QDialog):
         super(MainWindow, self).__init__()
         loadUi("gui.ui", self)
         self.stringlineplot.setEnabled(False)
+        self.velocity.setEnabled(False)
         self.stringlineplot.clicked.connect(self.stringLinePlotClick)
         self.browse.clicked.connect(self.browsefiles)
         self.plotbtn.clicked.connect(self.plot)
@@ -41,11 +37,15 @@ class MainWindow(QDialog):
         self.Substationplots.setEnabled(False)
         self.Time_radio.setEnabled(False)
         self.Distance_radio.setEnabled(False)
+        self.plotbtn.setEnabled(False)
+        self.subplotbtn.setEnabled(False)
+        self.mergeplotbtn.setEnabled(False)
         self.file_paths = []
         self.checkedButtons = []
         self.file_names = []
         self.folder_paths = []
         self.final_input_directories = []
+        self.trains = []
 
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
@@ -79,11 +79,11 @@ class MainWindow(QDialog):
         self.Time_radio.setEnabled(True)
         self.Distance_radio.setEnabled(True)
         self.stringlineplot.setEnabled(True)
+        self.plotbtn.setEnabled(True)
+        self.subplotbtn.setEnabled(True)
+        self.mergeplotbtn.setEnabled(True)
         output_file_results = []
         input_directory_results = []
-        output_directory_results = []
-        selected_trains = []
-        data = []
         for path in self.folder_paths:
             for root, dirs, files in os.walk(path):
                 for dir in dirs:
@@ -91,15 +91,14 @@ class MainWindow(QDialog):
                     for root, dirs, files in os.walk(dir_path):
                         for file in files:
                             if "output" in file.lower():
-                                output_file_results.append(os.path.abspath(
+                                output_file_results = (os.path.abspath(
                                     os.path.join(dir_path, file)))
                 break
             for root, dirs, files in os.walk(path):
                 for dir in dirs:
                     if "output" in dir.lower():
-                        output_directory_results.append(
+                        output_directory_results = (
                             os.path.abspath(os.path.join(root, dir)))
-                    print(output_directory_results)
                     if "input" in dir.lower():
                         input_directory_results.append(
                             os.path.abspath(os.path.join(root, dir)))
@@ -180,6 +179,8 @@ class MainWindow(QDialog):
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
             data = timeTableData(self.final_input_directories[i])
+            for j in range(0, len(data["calculativeData"])):
+                self.trains.append(data["calculativeData"][j]["trainnumber"])
             for j in range(0, len(data["calculativeData"])):
                 x_axis = []
                 y_axis = []
