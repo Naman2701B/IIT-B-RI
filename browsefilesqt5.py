@@ -202,8 +202,10 @@ class MainWindow(QDialog):
 
     def stringLinePlotClick(self):
         if (self.Stringline.isChecked()):
+            plt.figure()
             self.getStringLineData()
         if (self.Routealtitude.isChecked()):
+            plt.figure()
             for i in range(0, len(self.final_input_directories)):
                 routeAltitudeData(self.final_input_directories[i])
 
@@ -219,7 +221,7 @@ class MainWindow(QDialog):
         return directory_results
 
     def findFiles(self, start_dir):
-        file_extension = [".xlsx", ".mat",".csv"]
+        file_extension = [".xlsx", ".mat", ".csv"]
         file_results_path = []
         for ext in file_extension:
             for root, dirs, files in os.walk(start_dir):
