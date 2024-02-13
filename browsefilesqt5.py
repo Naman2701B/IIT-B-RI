@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 from scipy import io
-from test import timeTableData, routeAltitudeData
+from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData, ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
 
 
 class MainWindow(QDialog):
@@ -17,9 +17,9 @@ class MainWindow(QDialog):
         self.velocity.setEnabled(False)
         self.stringlineplot.clicked.connect(self.stringLinePlotClick)
         self.browse.clicked.connect(self.browsefiles)
-        self.plotbtn.clicked.connect(self.plot)
-        self.subplotbtn.clicked.connect(self.subplot)
-        self.mergeplotbtn.clicked.connect(self.mergeplot)
+        self.plotbtn.clicked.connect(self.clickEvent)
+        self.subplotbtn.clicked.connect(self.clickEvent)
+        self.mergeplotbtn.clicked.connect(self.clickEvent)
         self.selectbtn.clicked.connect(self.showCheckBoxOpt)
         self.options.currentTextChanged.connect(self.current_text_changed)
         self.Tractiveeffort.setEnabled(False)
@@ -45,7 +45,8 @@ class MainWindow(QDialog):
         self.file_names = []
         self.folder_paths = []
         self.final_input_directories = []
-        self.trains = []
+        self.trains = ["101"]
+        self.final_output_directories = []
 
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
@@ -82,22 +83,14 @@ class MainWindow(QDialog):
         self.plotbtn.setEnabled(True)
         self.subplotbtn.setEnabled(True)
         self.mergeplotbtn.setEnabled(True)
-        output_file_results = []
+        self.Time_radio.setChecked(True)
+        output_directory_results = []
         input_directory_results = []
         for path in self.folder_paths:
             for root, dirs, files in os.walk(path):
                 for dir in dirs:
-                    dir_path = os.path.join(root, dir)
-                    for root, dirs, files in os.walk(dir_path):
-                        for file in files:
-                            if "output" in file.lower():
-                                output_file_results = (os.path.abspath(
-                                    os.path.join(dir_path, file)))
-                break
-            for root, dirs, files in os.walk(path):
-                for dir in dirs:
                     if "output" in dir.lower():
-                        output_directory_results = (
+                        output_directory_results.append(
                             os.path.abspath(os.path.join(root, dir)))
                     if "input" in dir.lower():
                         input_directory_results.append(
@@ -106,6 +99,10 @@ class MainWindow(QDialog):
                 for root, dirs, files in os.walk(directories):
                     if (len(files) > 0):
                         self.final_input_directories.append(directories)
+            for directories in output_directory_results:
+                for root, dirs, files in os.walk(directories):
+                    if (len(files) > 0):
+                        self.final_output_directories.append(directories)
         # self.unselected.addItem(data[j]["trainnumber"])
 
     # def on_move(event):
@@ -116,63 +113,113 @@ class MainWindow(QDialog):
     def current_text_changed(self, text):
         return text
 
-    def plot(self):
-        print()
-        for i in range(0, len(self.checkedButtons)):
-            if (self.file_paths[self.checkedButtons[i]].endswith(".xlsx")):
-                file = pd.read_excel(
-                    self.file_paths[self.checkedButtons[i]], header=None)
-                X_axis = file[0]
-                Y_axis = file[1]
-            else:
-                file = io.loadmat(
-                    file_name=self.file_paths[self.checkedButtons[i]])
-                X_axis = file["a"]
-                Y_axis = file["b"]
-            plt.figure(i)
-            plt.plot(X_axis, Y_axis, label=self.checkboxes.button(
-                self.checkedButtons[i]).text())
+    def clickEvent(self):
+        X_axis = []
+        Y_axis = []
+        keys = []
+        if (self.Voltage.isChecked()):
+            for i in range(0, len(self.final_output_directories)):
+                if (self.Time_radio.isChecked()):
+                    x, y = VoltageData(
+                        self.final_output_directories[i], self.trains, 1)
+                else:
+                    x, y = VoltageData(
+                        self.final_output_directories[i], self.trains, 0)
+            keys.append("Voltage")
+            X_axis.append(x)
+            Y_axis.append(y)
+        if (self.Current.isChecked()):
+            for i in range(0, len(self.final_output_directories)):
+                if (self.Time_radio.isChecked()):
+                    x, y = CurrentData(
+                        self.final_output_directories[i], self.trains, 1)
+                else:
+                    x, y = CurrentData(
+                        self.final_output_directories[i], self.trains, 0)
+            keys.append("Current")
+            X_axis.append(x)
+            Y_axis.append(y)
+        if (self.Activepower.isChecked()):
+            for i in range(0, len(self.final_output_directories)):
+                if (self.Time_radio.isChecked()):
+                    x, y = ActivePowerData(
+                        self.final_output_directories[i], self.trains, 1)
+                else:
+                    x, y = ActivePowerData(
+                        self.final_output_directories[i], self.trains, 0)
+            keys.append("Active Power")
+            X_axis.append(x)
+            Y_axis.append(y)
+        if (self.Reactivepower.isChecked()):
+            for i in range(0, len(self.final_output_directories)):
+                if (self.Time_radio.isChecked()):
+                    x, y = ReactivePowerData(self.final_input_directories[0],
+                                             self.final_output_directories[i], self.trains, 1)
+                else:
+                    x, y = ReactivePowerData(self.final_input_directories[0],
+                                             self.final_output_directories[i], self.trains, 0)
+            keys.append("Reactive Power")
+            X_axis.append(x)
+            Y_axis.append(y)
+        if (self.Tractiveeffort.isChecked()):
+            for i in range(0, len(self.final_output_directories)):
+                if (self.Time_radio.isChecked()):
+                    x, y = TractiveEffortData(
+                        self.final_output_directories[i], self.trains, 1)
+                else:
+                    x, y = TractiveEffortData(
+                        self.final_output_directories[i], self.trains, 0)
+            keys.append("Tractive Effort")
+            X_axis.append(x)
+            Y_axis.append(y)
+        if (self.Brakingeffort.isChecked()):
+            for i in range(0, len(self.final_output_directories)):
+                if (self.Time_radio.isChecked()):
+                    x, y = BrakingEffortData(
+                        self.final_output_directories[i], self.trains, 1)
+                else:
+                    x, y = BrakingEffortData(
+                        self.final_output_directories[i], self.trains, 0)
+            keys.append("Braking Effort")
+            X_axis.append(x)
+            Y_axis.append(y)
+        if (self.velocity.isChecked()):
+            for i in range(0, len(self.final_output_directories)):
+                if (self.Time_radio.isChecked()):
+                    x, y = VelocityData(
+                        self.final_output_directories[i], self.trains, 1)
+                else:
+                    x, y = VelocityData(
+                        self.final_output_directories[i], self.trains, 0)
+            keys.append("Velocity")
+            X_axis.append(x)
+            Y_axis.append(y)
+        sender = self.sender()
+        if (sender == self.plotbtn):
+            self.plot(X_axis, Y_axis, keys)
+        elif (sender == self.subplotbtn):
+            self.subplot(X_axis, Y_axis, keys)
+        else:
+            self.mergeplot(X_axis, Y_axis, keys)
+
+    def plot(self, X_axis, Y_axis, keys):
+        print(X_axis)
+        print(Y_axis)
+        for i in range(0, len(Y_axis)):
+            plt.plot(X_axis[i], Y_axis[i], label=str(keys[i]))
             plt.legend()
             plt.show()
 
-    def subplot(self):
-        figure, axis = plt.subplots(len(self.checkedButtons))
-        for i in range(0, len(self.checkedButtons)):
-            if (self.file_paths[self.checkedButtons[i]]).endswith(".xlsx"):
-                file = pd.read_excel(
-                    self.file_paths[self.checkedButtons[i]], header=None)
-                X_axis = file[0]
-                Y_axis = file[1]
-            else:
-                file = io.loadmat(
-                    file_name=self.file_paths[self.checkedButtons[i]])
-                X_axis = file["a"]
-                Y_axis = file["b"]
-            axis[i].plot(X_axis, Y_axis,
-                         label=self.checkboxes.button(self.checkedButtons[i]).text())
+    def subplot(self, X_axis, Y_axis, keys):
+        figure, axis = plt.subplots(len(X_axis))
+        for i in range(0, len(X_axis)):
+            axis[i].plot(X_axis[i], Y_axis[i], label=str(keys[i]))
             axis[i].legend()
         plt.show()
 
-    def mergeplot(self):
-        Y_axis = []
-        for i in range(0, len(self.checkedButtons)):
-            if (self.file_paths[self.checkedButtons[i]].endswith(".xlsx")):
-                file = pd.read_excel(
-                    self.file_paths[self.checkedButtons[i]], header=None)
-                X_axis = file[0]
-                Y_axis.append(file[1])
-            elif (self.file_paths[self.checkedButtons[i]].endswith(".csv")):
-                file = pd.read_csv(
-                    self.file_paths[self.checkedButtons[i]], header=None)
-                X_axis = file[0]
-                Y_axis.append(file[1])
-            else:
-                file = io.loadmat(
-                    file_name=self.file_paths[self.checkedButtons[i]])
-                X_axis = file["a"]
-                Y_axis.append(file["b"])
-            plt.plot(X_axis, Y_axis[i], label=self.checkboxes.button(
-                self.checkedButtons[i]).text())
+    def mergeplot(self, X_axis, Y_axis, keys):
+        for i in range(0, len(Y_axis)):
+            plt.plot(X_axis[0], Y_axis[i], label=str(keys[i]))
             plt.legend()
         plt.show()
 
@@ -200,6 +247,9 @@ class MainWindow(QDialog):
             plt.get_current_fig_manager().resize(950, 500)
             # binding_id = plt.connect('motion_notify_event', on_move)
             plt.show()
+
+    def getTrainNumberData(self):
+        self.getStringLineData()
 
     def stringLinePlotClick(self):
         if (self.Stringline.isChecked()):
