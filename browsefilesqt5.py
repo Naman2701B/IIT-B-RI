@@ -67,9 +67,9 @@ class MainWindow(QDialog):
         self.Tractiveeffort.setEnabled(True)
         self.Reactivepower.setEnabled(True)
         self.Activepower.setEnabled(True)
-        self.Voltage.setEnabled(True)
+        self.Voltage.setEnabled(False)
         self.Brakingeffort.setEnabled(True)
-        self.Current.setEnabled(True)
+        self.Current.setEnabled(False)
         self.Trainplots.setEnabled(True)
         self.Stringline.setEnabled(True)
         self.Conductorconfig.setEnabled(True)
@@ -84,8 +84,11 @@ class MainWindow(QDialog):
         self.subplotbtn.setEnabled(True)
         self.mergeplotbtn.setEnabled(True)
         self.Time_radio.setChecked(True)
+        self.velocity.setEnabled(True)
         output_directory_results = []
         input_directory_results = []
+        self.final_input_directories = []
+        self.final_output_directories = []
         for path in self.folder_paths:
             for root, dirs, files in os.walk(path):
                 for dir in dirs:
@@ -197,28 +200,41 @@ class MainWindow(QDialog):
             Y_axis.append(y)
         sender = self.sender()
         if (sender == self.plotbtn):
-            self.plot(X_axis, Y_axis, keys)
+            self.plot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
         elif (sender == self.subplotbtn):
-            self.subplot(X_axis, Y_axis, keys)
+            self.subplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
         else:
-            self.mergeplot(X_axis, Y_axis, keys)
+            self.mergeplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
 
-    def plot(self, X_axis, Y_axis, keys):
-        print(X_axis)
-        print(Y_axis)
+    def plot(self, X_axis, Y_axis, keys, timeflag):
         for i in range(0, len(Y_axis)):
+            plt.figure()
+            if (timeflag == True):
+                plt.xlabel("Time in Minutes")
+            else:
+                plt.xlabel("Distance in km")
             plt.plot(X_axis[i], Y_axis[i], label=str(keys[i]))
             plt.legend()
+            plt.ylabel(keys[i])
             plt.show()
 
-    def subplot(self, X_axis, Y_axis, keys):
+    def subplot(self, X_axis, Y_axis, keys, timeflag):
         figure, axis = plt.subplots(len(X_axis))
+        if (timeflag == True):
+            plt.xlabel("Time in Minutes")
+        else:
+            plt.xlabel("Distance in km")
         for i in range(0, len(X_axis)):
+            plt.ylabel(keys[i])
             axis[i].plot(X_axis[i], Y_axis[i], label=str(keys[i]))
             axis[i].legend()
-        plt.show()
+            plt.show()
 
-    def mergeplot(self, X_axis, Y_axis, keys):
+    def mergeplot(self, X_axis, Y_axis, keys, timeflag):
+        if (timeflag == True):
+            plt.xlabel("Time in Minutes")
+        else:
+            plt.xlabel("Distance in km")
         for i in range(0, len(Y_axis)):
             plt.plot(X_axis[0], Y_axis[i], label=str(keys[i]))
             plt.legend()
@@ -242,7 +258,7 @@ class MainWindow(QDialog):
                 plt.gca().invert_yaxis()
             plt.yticks(data["plottingData"][1], data["plottingData"][0])
             plt.legend(loc='center left', bbox_to_anchor=(1, 1))
-            plt.xlabel("Distance from Starting Point")
+            plt.xlabel("Distance from Starting Point(KM)")
             plt.ylabel("Time")
             plt.title("String Line Diagram")
             plt.get_current_fig_manager().resize(950, 500)

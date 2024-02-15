@@ -73,17 +73,12 @@ def routeAltitudeData(basefolder):
     X_axis = df2["DistanceKM"]
     Y_axis = df2["HeightAboveGroundMSL"]
     plt.plot(X_axis, Y_axis, label='Route-Altitude graph')
-    plt.xlabel("Distance From Source")
-    plt.ylabel("Altitude")
+    plt.xlabel("Distance From Source(KM)")
+    plt.ylabel("Altitude(M)")
     plt.xticks(df3["DistanceKMWithReferenceToStartingStation"],
                df3["StationName "])
     plt.legend()
     plt.show()
-
-
-# basefolderoutput = "C:/Users/ashok/Desktop/IIT RESEARCH/SPIT_Interns_task/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
-# basefolderinput = "C:/Users/ashok/Desktop/IIT RESEARCH/SPIT_Interns_task/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Input_01_MTMM"
-# selected_trains = ["101"]
 
 
 def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
@@ -92,20 +87,18 @@ def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
     X_axis = []
     Y_axis = []
     for i in range(0, len(selected_trains)):
-        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"]) == 0):
+        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"][0]) == 0):
             partstr = "Uptrack"
         else:
             partstr = "Downtrack"
-        Y_axis.append(df_y["TractiveEffort_"+partstr+"_" +
-                      str(selected_trains[i])+"_0"])
+        Y_axis = df_y["TractiveEffort_"+partstr+"_" +
+                      str(selected_trains[i])+"_0"]
         if (timeFlag == 1):
             X_axis = round(
                 df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60)
-            plt.xlabel("Time")
         else:
             X_axis = df_x["Distance_"+partstr+"_" +
-                          str(selected_trains[i])+"_0"]*1000
-            plt.xlabel("Distance")
+                          str(selected_trains[i])+"_0"]
     return X_axis, Y_axis
 
 
@@ -115,20 +108,18 @@ def BrakingEffortData(basefolderoutput, selected_trains, timeFlag):
     X_axis = []
     Y_axis = []
     for i in range(0, len(selected_trains)):
-        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"]) == 0):
+        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"][0]) == 0):
             partstr = "Uptrack"
         else:
             partstr = "Downtrack"
-        Y_axis.append(df_y["BrakingEffort_"+partstr+"_" +
-                      str(selected_trains[i])+"_0"])
+        Y_axis = df_y["BrakingEffort_"+partstr+"_" +
+                      str(selected_trains[i])+"_0"]
         if (timeFlag == 1):
             X_axis = round(
                 df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60)
-            plt.xlabel("Time")
         else:
             X_axis = df_x["Distance_"+partstr+"_" +
-                          str(selected_trains[i])+"_0"]*1000
-            plt.xlabel("Distance")
+                          str(selected_trains[i])+"_0"]
     return X_axis, Y_axis
 
 
@@ -139,7 +130,7 @@ def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFl
     Y_axis = pd.DataFrame()
     inputdata = timeTableData(basefolderinput)
     for i in range(0, len(selected_trains)):
-        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"]) == 0):
+        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"][0]) == 0):
             partstr = "Uptrack"
         else:
             partstr = "Downtrack"
@@ -152,12 +143,9 @@ def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFl
         if (timeFlag == 1):
             X_axis = round(
                 df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60)
-            plt.xlabel("Time")
         else:
             X_axis = df_x["Distance_"+partstr+"_" +
-                          str(selected_trains[i])+"_0"]*1000
-            plt.xlabel("Distance")
-    print(X_axis, Y_axis)
+                          str(selected_trains[i])+"_0"]
     return X_axis, Y_axis
 
 
@@ -166,20 +154,18 @@ def ActivePowerData(basefolderoutput, selected_trains, timeFlag):
     X_axis = []
     Y_axis = []
     for i in range(0, len(selected_trains)):
-        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"]) == 0):
+        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"][0]) == 0):
             partstr = "Uptrack"
         else:
             partstr = "Downtrack"
-        Y_axis.append(df_x["ActivePower_"+partstr+"_" +
-                      str(selected_trains[i])+"_0"])
+        Y_axis = df_x["ActivePower_"+partstr+"_" +
+                      str(selected_trains[i])+"_0"]
         if (timeFlag == 1):
             X_axis = round(
                 df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60)
-            plt.xlabel("Time")
         else:
             X_axis = df_x["Distance_"+partstr+"_" +
-                          str(selected_trains[i])+"_0"]*1000
-            plt.xlabel("Distance")
+                          str(selected_trains[i])+"_0"]
     return X_axis, Y_axis
 
 
@@ -189,7 +175,7 @@ def CurrentData(basefolderoutput, selected_trains, timeFlag):
     X_axis = []
     Y_axis = []
     for i in range(0, len(selected_trains)):
-        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"]) == 0):
+        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"][0]) == 0):
             partstr = "Uptrack"
         else:
             partstr = "Downtrack"
@@ -200,7 +186,7 @@ def CurrentData(basefolderoutput, selected_trains, timeFlag):
                 df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60*60)
         else:
             X_axis = df_x["Distance_"+partstr+"_" +
-                          str(selected_trains[i])+"_0"]*1000
+                          str(selected_trains[i])+"_0"]
     plt.plot(X_axis, Y_axis)
     plt.show()
 
@@ -211,7 +197,7 @@ def VoltageData(basefolderoutput, selected_trains, timeFlag):
     X_axis = []
     Y_axis = []
     for i in range(0, len(selected_trains)):
-        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"]) == 0):
+        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"][0]) == 0):
             partstr = "Uptrack"
         else:
             partstr = "Downtrack"
@@ -222,7 +208,7 @@ def VoltageData(basefolderoutput, selected_trains, timeFlag):
                 df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60*60)
         else:
             X_axis = df_x["Distance_"+partstr+"_" +
-                          str(selected_trains[i])+"_0"]*1000
+                          str(selected_trains[i])+"_0"]
     plt.plot(X_axis, Y_axis)
     plt.show()
 
@@ -232,20 +218,16 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
     Y_axis = []
     df_x = pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
     for i in range(0, len(selected_trains)):
-        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"]) == 0):
+        if (int(df_x["Up/Downtrack_"+str(selected_trains[i])+"_0"][0]) == 0):
             partstr = "Uptrack"
         else:
             partstr = "Downtrack"
-        Y_axis.append(df_x["Velocity_"+partstr+"_" +
-                      str(selected_trains[i])+"_0"])
+        Y_axis = (df_x["Velocity_"+partstr+"_" +
+                       str(selected_trains[i])+"_0"])
         if (timeFlag == 1):
             X_axis = round(
                 df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60)
-            plt.xlabel("Time")
         else:
             X_axis = df_x["Distance_"+partstr+"_" +
-                          str(selected_trains[i])+"_0"]*1000
-            plt.xlabel("Distance")
+                          str(selected_trains[i])+"_0"]
     return X_axis, Y_axis
-
-# timeTableData(basefolderinput)
