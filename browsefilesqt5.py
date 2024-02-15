@@ -114,6 +114,7 @@ class MainWindow(QDialog):
         return text
 
     def clickEvent(self):
+        self.getTrainNumberData()
         X_axis = []
         Y_axis = []
         keys = []
@@ -249,7 +250,10 @@ class MainWindow(QDialog):
             plt.show()
 
     def getTrainNumberData(self):
-        self.getStringLineData()
+        for i in range(0, len(self.final_input_directories)):
+            data = timeTableData(self.final_input_directories[i])
+            for j in range(0, len(data["calculativeData"])):
+                self.trains.append(data["calculativeData"][j]["trainnumber"])
 
     def stringLinePlotClick(self):
         if (self.Stringline.isChecked()):
