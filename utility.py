@@ -2,10 +2,12 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import numpy as np
+import mplcursors
 
 
-def timeTableData(basefolder):
-    df = pd.read_csv(basefolder+"/TimeTableData.csv", header=None)
+def timeTableData(basefolderinput, basefolderoutput):
+    df = pd.read_csv(basefolderinput+"/TimeTableData.csv", header=None)
+    df_output= pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
     rows = []
     final_dict = []
     timingGraph = []
@@ -73,11 +75,12 @@ def routeAltitudeData(basefolder):
     X_axis = df2["DistanceKM"]
     Y_axis = df2["HeightAboveGroundMSL"]
     plt.plot(X_axis, Y_axis, label='Route-Altitude graph')
-    plt.xlabel("Distance From Source(KM)")
+    plt.xlabel("Stations")
     plt.ylabel("Altitude(M)")
     plt.xticks(df3["DistanceKMWithReferenceToStartingStation"],
                df3["StationName "])
     plt.legend()
+    cursor = mplcursors.cursor(hover=True)
     plt.show()
 
 
@@ -95,7 +98,7 @@ def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
                       str(selected_trains[i])+"_0"])
         if (timeFlag == 1):
             X_axis.append(round(
-                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60))
+                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*60))
         else:
             X_axis.append(df_x["Distance_"+partstr+"_" +
                           str(selected_trains[i])+"_0"])
@@ -116,7 +119,7 @@ def BrakingEffortData(basefolderoutput, selected_trains, timeFlag):
                       str(selected_trains[i])+"_0"])
         if (timeFlag == 1):
             X_axis.append(round(
-                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60))
+                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*60))
         else:
             X_axis.append(df_x["Distance_"+partstr+"_" +
                           str(selected_trains[i])+"_0"])
@@ -143,7 +146,7 @@ def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFl
         Y_axis.append(temp_y*np.tan(np.arccos(result)))
         if (timeFlag == 1):
             X_axis.append(round(
-                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60))
+                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*60))
         else:
             X_axis.append(df_x["Distance_"+partstr+"_" +
                                str(selected_trains[i])+"_0"])
@@ -163,7 +166,7 @@ def ActivePowerData(basefolderoutput, selected_trains, timeFlag):
                       str(selected_trains[i])+"_0"])
         if (timeFlag == 1):
             X_axis.append(round(
-                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60))
+                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*60))
         else:
             X_axis.append(df_x["Distance_"+partstr+"_" +
                           str(selected_trains[i])+"_0"])
@@ -184,7 +187,7 @@ def CurrentData(basefolderoutput, selected_trains, timeFlag):
                       "_"+str(selected_trains[i])+"_0"])
         if (timeFlag == 1):
             X_axis.append(round(
-                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60*60))
+                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*60*60))
         else:
             X_axis.append(df_x["Distance_"+partstr+"_" +
                           str(selected_trains[i])+"_0"])
@@ -206,7 +209,7 @@ def VoltageData(basefolderoutput, selected_trains, timeFlag):
                       "_"+str(selected_trains[i])+"_0"]
         if (timeFlag == 1):
             X_axis.append(round(
-                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60*60))
+                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*60*60))
         else:
             X_axis.append(df_x["Distance_"+partstr+"_" +
                           str(selected_trains[i])+"_0"])
@@ -227,7 +230,7 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
                            str(selected_trains[i])+"_0"])
         if (timeFlag == 1):
             X_axis.append(round(
-                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*24*60))
+                df_x["Time_"+partstr+"_"+str(selected_trains[i])+"_0"]*60))
         else:
             X_axis.append(df_x["Distance_"+partstr+"_" +
                           str(selected_trains[i])+"_0"])
