@@ -5,9 +5,8 @@ import numpy as np
 import mplcursors
 
 
-def timeTableData(basefolderinput, basefolderoutput):
+def timeTableData(basefolderinput):
     df = pd.read_csv(basefolderinput+"/TimeTableData.csv", header=None)
-    df_output= pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
     rows = []
     final_dict = []
     timingGraph = []
@@ -74,11 +73,21 @@ def routeAltitudeData(basefolder):
     df3 = pd.read_csv(basefolder+"/AllStationData.csv")
     X_axis = df2["DistanceKM"]
     Y_axis = df2["HeightAboveGroundMSL"]
+    markers_onx = []
+    markers_ony = []
+    station_names = []
+    for i in range (0,len(df3["DistanceKMWithReferenceToStartingStation"])):
+        markers_onx.append(df3["DistanceKMWithReferenceToStartingStation"][i])
+        station_names.append(df3["StationName "][i])
+    for i in range(0, len(X_axis)):
+        if X_axis[i] in markers_onx:
+            markers_ony.append(Y_axis[i])
+    plt.scatter(markers_onx,markers_ony)
+    for i, txt in enumerate(station_names):
+        plt.annotate(txt, (markers_onx[i], markers_ony[i]), horizontalalignment='center')
     plt.plot(X_axis, Y_axis, label='Route-Altitude graph')
     plt.xlabel("Stations")
     plt.ylabel("Altitude(M)")
-    plt.xticks(df3["DistanceKMWithReferenceToStartingStation"],
-               df3["StationName "])
     plt.legend()
     cursor = mplcursors.cursor(hover=True)
     plt.show()
