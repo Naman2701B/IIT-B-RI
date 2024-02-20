@@ -119,7 +119,7 @@ class MainWindow(QDialog):
     #           f'pixel coords {event.x} {event.y}')
 
     def getTrainNumberData(self):
-        for i in range(0, len(self.final_input_directories)):
+        for i in range(0, len(self.final_input_directoies)):
             data = timeTableData(self.final_input_directories[i])
             for j in range(0, len(data["calculativeData"])):
                 self.trains.append(data["calculativeData"][j]["trainnumber"])
@@ -274,21 +274,22 @@ class MainWindow(QDialog):
 
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
-            data = timeTableData(self.final_input_directories[i], self.final_output_directories[i])
+            data = timeTableData(self.final_input_directories[i])
+            x_axis = []
+            y_axis = []
+            output_data = pd.read_csv(self.final_output_directories[i]+"/TrainModuleOutput.csv")
             for j in range(0, len(data["calculativeData"])):
                 self.trains.append(data["calculativeData"][j]["trainnumber"])
             for j in range(0, len(data["calculativeData"])):
-                x_axis = []
-                y_axis = []
-                for z in range(0, len(data["calculativeData"][j]["timeFromStarting"])):
-                    x_axis.append(
-                        int(data["calculativeData"][j]['distanceFromStarting'][z]))
-                    y_axis.append(
-                        (int(data["calculativeData"][j]['timeFromStartingInMins'][z])))
-                plt.plot(x_axis, y_axis,
-                         label=data["calculativeData"][j]["trainnumber"])
-                plt.gca().invert_yaxis()
-            plt.yticks(data["plottingData"][1], data["plottingData"][0])
+                if (int(output_data["Up/Downtrack_"+str(self.trains[j])+"_0"][0]) == 0):
+                    partstr = "Uptrack"
+                else:
+                    partstr = "Downtrack"
+                x_axis.append((output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0']))
+                y_axis.append((output_data['Time_'+partstr+'_'+str(self.trains[j])+'_0'])*60)
+                plt.plot(x_axis[j], y_axis[j],
+                         label=self.trains[j])
+            plt.gca().invert_yaxis()
             plt.legend(loc='center left', bbox_to_anchor=(1, 1))
             plt.xlabel("Distance from Starting Point")
             plt.ylabel("Time")
