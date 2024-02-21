@@ -48,6 +48,7 @@ class MainWindow(QDialog):
         self.Brakingeffort.toggled.connect(self.counter)
         self.Current.toggled.connect(self.counter)
         self.velocity.toggled.connect(self.counter)
+        self.Trainplots.toggled.connect(self.MTMM)
         self.file_paths = []
         self.checkedButtons = []
         self.file_names = []
@@ -72,13 +73,6 @@ class MainWindow(QDialog):
 
     def showCheckBoxOpt(self):
         self.file_names.clear()
-        self.velocity.setEnabled(True)
-        self.Tractiveeffort.setEnabled(True)
-        self.Reactivepower.setEnabled(True)
-        self.Activepower.setEnabled(True)
-        self.Voltage.setEnabled(False)
-        self.Brakingeffort.setEnabled(True)
-        self.Current.setEnabled(False)
         self.Trainplots.setEnabled(True)
         self.Stringline.setEnabled(True)
         self.Conductorconfig.setEnabled(True)
@@ -86,8 +80,6 @@ class MainWindow(QDialog):
         self.Timetable.setEnabled(True)
         self.Trainplots1.setEnabled(True)
         self.Substationplots.setEnabled(True)
-        self.Time_radio.setEnabled(True)
-        self.Distance_radio.setEnabled(True)
         self.stringlineplot.setEnabled(True)
         self.plotbtn.setEnabled(True)
         self.subplotbtn.setEnabled(True)
@@ -119,6 +111,34 @@ class MainWindow(QDialog):
     #     print(f'data coords {event.xdata} {event.ydata},',
     #           f'pixel coords {event.x} {event.y}')
 
+    def MTMM(self):
+        self.MTMMList.clear()
+        self.trains = []
+        if (self.Trainplots.isChecked()):
+            self.getTrainNumberData()
+            self.MTMMList.addItems(self.trains)
+            self.MTMMList.setCurrentItem(self.MTMMList.item(0))
+            self.velocity.setEnabled(True)
+            self.Tractiveeffort.setEnabled(True)
+            self.Reactivepower.setEnabled(True)
+            self.Activepower.setEnabled(True)
+            self.Voltage.setEnabled(False)
+            self.Brakingeffort.setEnabled(True)
+            self.Current.setEnabled(False)
+            self.Time_radio.setEnabled(True)
+            self.Distance_radio.setEnabled(True)
+            self.Time_radio.setChecked(True)
+        else:
+            self.Tractiveeffort.setEnabled(False)
+            self.Reactivepower.setEnabled(False)
+            self.Activepower.setEnabled(False)
+            self.Voltage.setEnabled(False)
+            self.Brakingeffort.setEnabled(False)
+            self.Current.setEnabled(False)
+            self.Time_radio.setEnabled(False)
+            self.Distance_radio.setEnabled(False)
+            self.velocity.setEnabled(False)
+
     def getTrainNumberData(self):
         for i in range(0, len(self.final_input_directories)):
             data = timeTableData(self.final_input_directories[i])
@@ -134,10 +154,10 @@ class MainWindow(QDialog):
             self.checkedButtons.remove(sender)
         else:
             self.checkedButtons.append(sender)
-        if (len(self.checkedButtons) > 2):
-            self.mergeplotbtn.setEnabled(False)
-        else:
+        if (len(self.checkedButtons) == 2):
             self.mergeplotbtn.setEnabled(True)
+        else:
+            self.mergeplotbtn.setEnabled(False)
 
     def clickEvent(self):
         self.trains = []
@@ -150,10 +170,10 @@ class MainWindow(QDialog):
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = VoltageData(
-                        self.final_output_directories[i], self.trains, 1)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
                 else:
                     x, y = VoltageData(
-                        self.final_output_directories[i], self.trains, 0)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
             keys.append("Voltage")
             X_axis.append(x)
             Y_axis.append(y)
@@ -161,10 +181,10 @@ class MainWindow(QDialog):
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = CurrentData(
-                        self.final_output_directories[i], self.trains, 1)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
                 else:
                     x, y = CurrentData(
-                        self.final_output_directories[i], self.trains, 0)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
             keys.append("Current")
             X_axis.append(x)
             Y_axis.append(y)
@@ -172,10 +192,10 @@ class MainWindow(QDialog):
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = ActivePowerData(
-                        self.final_output_directories[i], self.trains, 1)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
                 else:
                     x, y = ActivePowerData(
-                        self.final_output_directories[i], self.trains, 0)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
             keys.append("Active Power")
             X_axis.append(x)
             Y_axis.append(y)
@@ -183,10 +203,10 @@ class MainWindow(QDialog):
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = ReactivePowerData(self.final_input_directories[0],
-                                             self.final_output_directories[i], self.trains, 1)
+                                             self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
                 else:
                     x, y = ReactivePowerData(self.final_input_directories[0],
-                                             self.final_output_directories[i], self.trains, 0)
+                                             self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
             keys.append("Reactive Power")
             X_axis.append(x)
             Y_axis.append(y)
@@ -194,10 +214,10 @@ class MainWindow(QDialog):
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = TractiveEffortData(
-                        self.final_output_directories[i], self.trains, 1)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
                 else:
                     x, y = TractiveEffortData(
-                        self.final_output_directories[i], self.trains, 0)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
             keys.append("Tractive Effort")
             X_axis.append(x)
             Y_axis.append(y)
@@ -205,10 +225,10 @@ class MainWindow(QDialog):
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = BrakingEffortData(
-                        self.final_output_directories[i], self.trains, 1)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
                 else:
                     x, y = BrakingEffortData(
-                        self.final_output_directories[i], self.trains, 0)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
             keys.append("Braking Effort")
             X_axis.append(x)
             Y_axis.append(y)
@@ -216,10 +236,10 @@ class MainWindow(QDialog):
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = VelocityData(
-                        self.final_output_directories[i], self.trains, 1)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
                 else:
                     x, y = VelocityData(
-                        self.final_output_directories[i], self.trains, 0)
+                        self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
             keys.append("Velocity")
             X_axis.append(x)
             Y_axis.append(y)
@@ -240,7 +260,8 @@ class MainWindow(QDialog):
                 else:
                     plt.xlabel("Distance in KM")
                 plt.title(keys[i])
-                plt.plot(X_axis[i][j], Y_axis[i][j], label=str(self.trains[j]))
+                plt.plot(X_axis[i][j], Y_axis[i][j],
+                         label=str(self.MTMMList.currentItem().text()))
                 plt.legend()
                 plt.ylabel(keys[i])
                 cursor = mplcursors.cursor(hover=True)
@@ -255,25 +276,29 @@ class MainWindow(QDialog):
                 plt.xlabel("Distance in KM")
             for j in range(0, len(Y_axis[i])):
                 axis[i].plot(X_axis[i][j], Y_axis[i][j],
-                             label=str(self.trains[j]))
+                             label=str(self.MTMMList.currentItem().text()))
+                axis[i].set_ylabel(keys[i])
                 axis[i].legend()
-                axis[i].set_title(keys[i])
                 # axis[i].set_ylabel[keys[i]]
         cursor = mplcursors.cursor(hover=True)
         plt.show()
 
     def mergeplot(self, X_axis, Y_axis, keys, timeflag):
+        fig, ax1 = plt.subplots()
         if (timeflag == True):
             plt.xlabel("Time in Minutes")
         else:
             plt.xlabel("Distance in KM")
-        for i in range(0, len(Y_axis)):
-            for j in range(0, len(Y_axis[i])):
-                plt.plot(X_axis[i][j], Y_axis[i][j], label=str(
-                    keys[i])+" "+str(self.trains[j]))
-                plt.legend()
-                cursor = mplcursors.cursor(hover=True)
-                plt.show()
+        ax2 = ax1.twinx()
+        ax1.plot(X_axis[0][0], Y_axis[0][0], label=(str(
+            keys[0])+" "+str(self.MTMMList.currentItem().text())), color='tab:cyan')
+        ax1.set_ylabel(str(keys[0]))
+        ax2.plot(X_axis[0][0], Y_axis[1][0], label=(str(
+            keys[1])+" "+str(self.MTMMList.currentItem().text())), color='tab:orange')
+        ax2.set_ylabel(str(keys[1]))
+        plt.legend()
+        cursor = mplcursors.cursor(hover=True)
+        plt.show()
 
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):

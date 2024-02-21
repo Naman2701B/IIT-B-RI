@@ -80,7 +80,7 @@
                 <property name="title">
                     <string>Integrated MTMM-LFA</string>
                 </property>
-                <widget class="QListWidget" name="listWidget_4">
+                <widget class="QListWidget" name="MTMMList">
                     <property name="geometry">
                         <rect>
                             <x>20</x>
