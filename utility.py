@@ -18,22 +18,11 @@ def timeTableData(basefolderinput):
         stationName = []
         distanceFromStarting = []
         timeFromStarting = []
-        dwelltime = []
         timeFromStarting_mins = []
         for k in range(rows[j]+4, rows[j+1]-1):
             stationName.append(df[1][k])
             distanceFromStarting.append(df[3][k])
             timeFromStarting_mins.append(int(df[4][k]))
-            dwelltime.append(int(df[5][k]))
-        dwell_counter = 0
-        for i in range(0, len(dwelltime)):
-            if (dwelltime[i] != 0):
-                dwell_counter += 1
-                stationName.insert(i+1, stationName[i])
-                distanceFromStarting.insert(
-                    2*i+1, distanceFromStarting[i+dwell_counter-1])
-                timeFromStarting_mins.insert(
-                    2*i+1, timeFromStarting_mins[i+dwell_counter-1]+dwelltime[i])
         for i in range(0, len(timeFromStarting_mins)):
             values = df[2][rows[j]+1].split(":")
             h = int(timeFromStarting_mins[i]) // 60
@@ -45,13 +34,12 @@ def timeTableData(basefolderinput):
             timeFromStarting_mins[i] = timeFromStarting_mins[i] + \
                 int(datetime.strptime(df[2][rows[j]+1], "%H:%M").minute)
             timingGraph.append(timeFromStarting_mins[i])
-        temp = {"trainnumber": df[0][rows[j]+1], "startTime": df[2][rows[j]+1],
+        temp = {"trainnumber": df[0][rows[j]+1], "startTime": df[2][rows[j]+1], "endDistance": df[3][rows[j]+len(stationName)+3], "startDistance": df[3][rows[j]+4],
                 "trainType": df[6][rows[j]+1],
                 "stationName": stationName,
                 "distanceFromStarting": distanceFromStarting,
                 "timeFromStarting": timeFromStarting,
-                "timeFromStartingInMins": timeFromStarting_mins,
-                "dwelltime": dwelltime}
+                "timeFromStartingInMins": timeFromStarting_mins}
         final_dict.append(temp)
     splitDuration = (max(timingGraph) - min(timingGraph))//8
     timingGraph = [min(timingGraphInHrsAndMins)]
@@ -70,21 +58,22 @@ def timeTableData(basefolderinput):
 
 def routeAltitudeData(basefolder):
     df2 = pd.read_csv(basefolder + "/RouteAltitudeData.csv")
-    df3 = pd.read_csv(basefolder+"/AllStationData.csv")
+    df3 = pd.read_csv(basefolder + "/AllStationData.csv")
     X_axis = df2["DistanceKM"]
     Y_axis = df2["HeightAboveGroundMSL"]
     markers_onx = []
     markers_ony = []
     station_names = []
-    for i in range (0,len(df3["DistanceKMWithReferenceToStartingStation"])):
+    for i in range(0, len(df3["DistanceKMWithReferenceToStartingStation"])):
         markers_onx.append(df3["DistanceKMWithReferenceToStartingStation"][i])
         station_names.append(df3["StationName "][i])
     for i in range(0, len(X_axis)):
         if X_axis[i] in markers_onx:
             markers_ony.append(Y_axis[i])
-    plt.scatter(markers_onx,markers_ony)
+    plt.scatter(markers_onx, markers_ony)
     for i, txt in enumerate(station_names):
-        plt.annotate(txt, (markers_onx[i], markers_ony[i]), horizontalalignment='center')
+        plt.annotate(
+            txt, (markers_onx[i], markers_ony[i]), horizontalalignment='')
     plt.plot(X_axis, Y_axis, label='Route-Altitude graph')
     plt.xlabel("Stations")
     plt.ylabel("Altitude(M)")

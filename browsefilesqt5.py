@@ -9,6 +9,7 @@ from scipy import io
 from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData, ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
 import mplcursors
 
+
 class MainWindow(QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -119,14 +120,14 @@ class MainWindow(QDialog):
     #           f'pixel coords {event.x} {event.y}')
 
     def getTrainNumberData(self):
-        for i in range(0, len(self.final_input_directoies)):
+        for i in range(0, len(self.final_input_directories)):
             data = timeTableData(self.final_input_directories[i])
             for j in range(0, len(data["calculativeData"])):
                 self.trains.append(data["calculativeData"][j]["trainnumber"])
 
     def current_text_changed(self, text):
         return text
-    
+
     def counter(self):
         sender = self.sender()
         if (sender in self.checkedButtons):
@@ -139,7 +140,7 @@ class MainWindow(QDialog):
             self.mergeplotbtn.setEnabled(True)
 
     def clickEvent(self):
-        self.trains= []
+        self.trains = []
         self.getTrainNumberData()
         X_axis = []
         Y_axis = []
@@ -232,9 +233,9 @@ class MainWindow(QDialog):
 
     def plot(self, X_axis, Y_axis, keys, timeflag):
         for i in range(0, len(Y_axis)):
-            for j in range (0,len(Y_axis[i])):
+            for j in range(0, len(Y_axis[i])):
                 plt.figure()
-                if(timeflag==True):
+                if (timeflag == True):
                     plt.xlabel("Time in Minutes")
                 else:
                     plt.xlabel("Distance in KM")
@@ -242,34 +243,36 @@ class MainWindow(QDialog):
                 plt.plot(X_axis[i][j], Y_axis[i][j], label=str(self.trains[j]))
                 plt.legend()
                 plt.ylabel(keys[i])
-                cursor = mplcursors.cursor(hover = True)
+                cursor = mplcursors.cursor(hover=True)
                 plt.show()
 
     def subplot(self, X_axis, Y_axis, keys, timeflag):
         figure, axis = plt.subplots(len(Y_axis))
         for i in range(0, len(Y_axis)):
-            if(timeflag==True):
+            if (timeflag == True):
                 plt.xlabel("Time in Minutes")
             else:
                 plt.xlabel("Distance in KM")
-            for j in range(0,len(Y_axis[i])):
-                axis[i].plot(X_axis[i][j], Y_axis[i][j], label=str(self.trains[j]))
+            for j in range(0, len(Y_axis[i])):
+                axis[i].plot(X_axis[i][j], Y_axis[i][j],
+                             label=str(self.trains[j]))
                 axis[i].legend()
                 axis[i].set_title(keys[i])
                 # axis[i].set_ylabel[keys[i]]
-        cursor = mplcursors.cursor(hover = True)        
+        cursor = mplcursors.cursor(hover=True)
         plt.show()
 
     def mergeplot(self, X_axis, Y_axis, keys, timeflag):
-        if(timeflag==True):
+        if (timeflag == True):
             plt.xlabel("Time in Minutes")
         else:
             plt.xlabel("Distance in KM")
         for i in range(0, len(Y_axis)):
-            for j in range (0,len(Y_axis[i])):
-                plt.plot(X_axis[i][j], Y_axis[i][j], label=str(keys[i])+" "+str(self.trains[j]))
+            for j in range(0, len(Y_axis[i])):
+                plt.plot(X_axis[i][j], Y_axis[i][j], label=str(
+                    keys[i])+" "+str(self.trains[j]))
                 plt.legend()
-                cursor = mplcursors.cursor(hover = True)
+                cursor = mplcursors.cursor(hover=True)
                 plt.show()
 
     def getStringLineData(self):
@@ -277,19 +280,34 @@ class MainWindow(QDialog):
             data = timeTableData(self.final_input_directories[i])
             x_axis = []
             y_axis = []
-            output_data = pd.read_csv(self.final_output_directories[i]+"/TrainModuleOutput.csv")
+            start = 0
+            end = 0
+            output_data = pd.read_csv(
+                self.final_output_directories[i]+"/TrainModuleOutput.csv")
             for j in range(0, len(data["calculativeData"])):
                 self.trains.append(data["calculativeData"][j]["trainnumber"])
             for j in range(0, len(data["calculativeData"])):
-                if (int(output_data["Up/Downtrack_"+str(self.trains[j])+"_0"][0]) == 0):
+                if (int(output_data["Up/Downtrack_"+str(self.trains[j])+"_0"][1]) == 0):
                     partstr = "Uptrack"
                 else:
                     partstr = "Downtrack"
-                x_axis.append((output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0']))
-                y_axis.append((output_data['Time_'+partstr+'_'+str(self.trains[j])+'_0'])*60)
+                for k in range(0, len(output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'])):
+                    if (float(output_data["Velocity_"+partstr+"_"+str(self.trains[j])+"_0"][k]) > 0.0):
+                        start = k
+                        break
+                for k in range(0, len(output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'])):
+                    if (float(output_data["Velocity_"+partstr+"_"+str(self.trains[j])+"_0"][k]) == 0.0):
+                        if (float(output_data["Distance_"+partstr+"_"+str(self.trains[j])+"_0"][k]) == float(data["calculativeData"][j]["endDistance"])):
+                            end = k
+                            break
+                x_axis.append(
+                    (output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'][start:end]))
+                y_axis.append(
+                    (output_data['Time_'+partstr+'_'+str(self.trains[j])+'_0'][start:end])*60)
                 plt.plot(x_axis[j], y_axis[j],
                          label=self.trains[j])
             plt.gca().invert_yaxis()
+            plt.yticks(data["plottingData"][1], data["plottingData"][0])
             plt.legend(loc='center left', bbox_to_anchor=(1, 1))
             plt.xlabel("Distance from Starting Point")
             plt.ylabel("Time")
