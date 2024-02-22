@@ -265,6 +265,7 @@ class MainWindow(QDialog):
                 plt.legend()
                 plt.ylabel(keys[i])
                 cursor = mplcursors.cursor(hover=True)
+                plt.grid(alpha=0.3)
                 plt.show()
 
     def subplot(self, X_axis, Y_axis, keys, timeflag):
@@ -281,6 +282,7 @@ class MainWindow(QDialog):
                 axis[i].legend()
                 # axis[i].set_ylabel[keys[i]]
         cursor = mplcursors.cursor(hover=True)
+        plt.grid(alpha=0.3)
         plt.show()
 
     def mergeplot(self, X_axis, Y_axis, keys, timeflag):
@@ -297,6 +299,7 @@ class MainWindow(QDialog):
             keys[1])+" "+str(self.MTMMList.currentItem().text())), color='tab:orange')
         ax2.set_ylabel(str(keys[1]))
         plt.legend()
+        plt.grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
         plt.show()
 
@@ -333,11 +336,14 @@ class MainWindow(QDialog):
                          label=self.trains[j])
             plt.gca().invert_yaxis()
             plt.yticks(data["plottingData"][1], data["plottingData"][0])
+            plt.xticks(data["plottingData"][3], data["plottingData"][2])
+            plt.xlim(left=0, right=max(data["plottingData"][3]))
             plt.legend(loc='center left', bbox_to_anchor=(1, 1))
             plt.xlabel("Distance from Starting Point")
             plt.ylabel("Time")
             plt.title("String Line Diagram")
             plt.get_current_fig_manager().resize(950, 500)
+            plt.grid(alpha=0.3)
             # binding_id = plt.connect('motion_notify_event', on_move)
             plt.show()
 

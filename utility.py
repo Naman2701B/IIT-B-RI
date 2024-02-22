@@ -7,9 +7,11 @@ import mplcursors
 
 def timeTableData(basefolderinput):
     df = pd.read_csv(basefolderinput+"/TimeTableData.csv", header=None)
+    df2 = pd.read_csv(basefolderinput+"/AllStationData.csv")
     rows = []
     final_dict = []
     timingGraph = []
+    distanceGraph = []
     timingGraphInHrsAndMins = []
     for i in range(0, len(df)):
         if (df[0][i] == "TrainNumber "):
@@ -34,6 +36,7 @@ def timeTableData(basefolderinput):
             timeFromStarting_mins[i] = timeFromStarting_mins[i] + \
                 int(datetime.strptime(df[2][rows[j]+1], "%H:%M").minute)
             timingGraph.append(timeFromStarting_mins[i])
+            distanceGraph.append(int(distanceFromStarting[i]))
         temp = {"trainnumber": df[0][rows[j]+1], "startTime": df[2][rows[j]+1], "endDistance": df[3][rows[j]+len(stationName)+3], "startDistance": df[3][rows[j]+4],
                 "trainType": df[6][rows[j]+1],
                 "stationName": stationName,
@@ -42,7 +45,11 @@ def timeTableData(basefolderinput):
                 "timeFromStartingInMins": timeFromStarting_mins}
         final_dict.append(temp)
     splitDuration = (max(timingGraph) - min(timingGraph))//8
+    splitDistance = (max(distanceGraph)-min(distanceGraph))//5
     timingGraph = [min(timingGraphInHrsAndMins)]
+    distanceToReplace = df2["DistanceKMWithReferenceToStartingStation"].to_list(
+    )
+    distanceGraph = [min(distanceGraph)]
     timeToReplaceInMins = [0]
     values = timingGraph[0].split(":")
     for i in range(1, 9):
@@ -51,8 +58,10 @@ def timeTableData(basefolderinput):
         m = int(timeToReplaceInMins[i]) % 60
         timingGraph.append(str(timedelta(
             hours=h, minutes=m) + timedelta(hours=int(values[0]), minutes=int(values[1]))))
+    for i in range(1, 6):
+        distanceGraph.append(distanceGraph[i-1]+splitDistance)
     dataToBeSent = {"calculativeData": final_dict,
-                    "plottingData": [timingGraph, timeToReplaceInMins]}
+                    "plottingData": [timingGraph, timeToReplaceInMins, distanceGraph, distanceToReplace]}
     return dataToBeSent
 
 
@@ -73,11 +82,12 @@ def routeAltitudeData(basefolder):
     plt.scatter(markers_onx, markers_ony)
     for i, txt in enumerate(station_names):
         plt.annotate(
-            txt, (markers_onx[i], markers_ony[i]), horizontalalignment='')
+            txt, (markers_onx[i], markers_ony[i]), horizontalalignment='center')
     plt.plot(X_axis, Y_axis, label='Route-Altitude graph')
     plt.xlabel("Stations")
     plt.ylabel("Altitude(M)")
     plt.legend()
+    plt.grid(alpha=0.3)
     cursor = mplcursors.cursor(hover=True)
     plt.show()
 
