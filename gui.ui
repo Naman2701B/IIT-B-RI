@@ -59,9 +59,9 @@
         <widget class="QGroupBox" name="groupBox_2">
             <property name="geometry">
                 <rect>
-                    <x>40</x>
-                    <y>100</y>
-                    <width>821</width>
+                    <x>10</x>
+                    <y>50</y>
+                    <width>861</width>
                     <height>861</height>
                 </rect>
             </property>
@@ -421,6 +421,346 @@
                             <height>81</height>
                         </rect>
                     </property>
+                </widget>
+            </widget>
+            <widget class="QTabWidget" name="analysistab">
+                <property name="geometry">
+                    <rect>
+                        <x>370</x>
+                        <y>30</y>
+                        <width>480</width>
+                        <height>820</height>
+                    </rect>
+                </property>
+                <property name="currentIndex">
+                    <number>0</number>
+                </property>
+                <property name="tabsClosable">
+                    <bool>false</bool>
+                </property>
+                <widget class="QWidget" name="tab">
+                    <property name="autoFillBackground">
+                        <bool>true</bool>
+                    </property>
+                    <attribute name="title">
+                        <string>Tab 1</string>
+                    </attribute>
+                    <widget class="QRadioButton" name="lfaradio">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>10</y>
+                                <width>141</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Load Flow Analysis</string>
+                        </property>
+                    </widget>
+                    <widget class="QRadioButton" name="scaradio">
+                        <property name="geometry">
+                            <rect>
+                                <x>150</x>
+                                <y>10</y>
+                                <width>145</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Short Circuit Analysis</string>
+                        </property>
+                    </widget>
+                    <widget class="QRadioButton" name="pqaradio">
+                        <property name="geometry">
+                            <rect>
+                                <x>300</x>
+                                <y>10</y>
+                                <width>160</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Power Quality Analysis</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" name="pushButton_14">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>460</y>
+                                <width>80</width>
+                                <height>25</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Single plot</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" name="pushButton_15">
+                        <property name="geometry">
+                            <rect>
+                                <x>180</x>
+                                <y>460</y>
+                                <width>80</width>
+                                <height>25</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Subplot</string>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" name="pushButton_16">
+                        <property name="geometry">
+                            <rect>
+                                <x>330</x>
+                                <y>460</y>
+                                <width>80</width>
+                                <height>25</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Merge</string>
+                        </property>
+                    </widget>
+                    <widget class="QComboBox" name="comboBox_8">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>50</y>
+                                <width>191</width>
+                                <height>24</height>
+                            </rect>
+                        </property>
+                        <item>
+                            <property name="text">
+                                <string>Conductors</string>
+                            </property>
+                        </item>
+                    </widget>
+                    <widget class="QCheckBox" name="checkBox_11">
+                        <property name="geometry">
+                            <rect>
+                                <x>20</x>
+                                <y>100</y>
+                                <width>171</width>
+                                <height>22</height>
+                            </rect>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">color: black;</string>
+                        </property>
+                        <property name="text">
+                            <string>Node Voltage</string>
+                        </property>
+                    </widget>
+                    <widget class="QCheckBox" name="checkBox_12">
+                        <property name="geometry">
+                            <rect>
+                                <x>20</x>
+                                <y>130</y>
+                                <width>171</width>
+                                <height>22</height>
+                            </rect>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">color: black;</string>
+                        </property>
+                        <property name="text">
+                            <string>Branch Current</string>
+                        </property>
+                    </widget>
+                    <widget class="QComboBox" name="comboBox_9">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>190</y>
+                                <width>191</width>
+                                <height>24</height>
+                            </rect>
+                        </property>
+                        <item>
+                            <property name="text">
+                                <string>Time Interval</string>
+                            </property>
+                        </item>
+                    </widget>
+                    <widget class="QComboBox" name="comboBox_10">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>270</y>
+                                <width>191</width>
+                                <height>24</height>
+                            </rect>
+                        </property>
+                        <item>
+                            <property name="text">
+                                <string>Frequency</string>
+                            </property>
+                        </item>
+                    </widget>
+                    <widget class="QListWidget" name="listWidget_10">
+                        <property name="geometry">
+                            <rect>
+                                <x>210</x>
+                                <y>190</y>
+                                <width>211</width>
+                                <height>41</height>
+                            </rect>
+                        </property>
+                        <item>
+                            <property name="text">
+                                <string>Time instants</string>
+                            </property>
+                        </item>
+                    </widget>
+                    <widget class="QListWidget" name="listWidget_18">
+                        <property name="geometry">
+                            <rect>
+                                <x>210</x>
+                                <y>270</y>
+                                <width>211</width>
+                                <height>41</height>
+                            </rect>
+                        </property>
+                        <item>
+                            <property name="text">
+                                <string>Frequency</string>
+                            </property>
+                        </item>
+                    </widget>
+                    <widget class="QRadioButton" name="radioButton_8">
+                        <property name="geometry">
+                            <rect>
+                                <x>210</x>
+                                <y>230</y>
+                                <width>141</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>2D</string>
+                        </property>
+                    </widget>
+                    <widget class="QRadioButton" name="radioButton_9">
+                        <property name="geometry">
+                            <rect>
+                                <x>260</x>
+                                <y>230</y>
+                                <width>141</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>3D</string>
+                        </property>
+                    </widget>
+                    <widget class="QRadioButton" name="radioButton_10">
+                        <property name="geometry">
+                            <rect>
+                                <x>210</x>
+                                <y>310</y>
+                                <width>141</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>2D</string>
+                        </property>
+                    </widget>
+                    <widget class="QRadioButton" name="radioButton_11">
+                        <property name="geometry">
+                            <rect>
+                                <x>260</x>
+                                <y>310</y>
+                                <width>141</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>3D</string>
+                        </property>
+                    </widget>
+                    <widget class="QListWidget" name="listWidget_19">
+                        <property name="geometry">
+                            <rect>
+                                <x>210</x>
+                                <y>50</y>
+                                <width>211</width>
+                                <height>41</height>
+                            </rect>
+                        </property>
+                        <item>
+                            <property name="text">
+                                <string>Selected conductors</string>
+                            </property>
+                        </item>
+                    </widget>
+                </widget>
+                <widget class="QWidget" name="tab_2">
+                    <property name="autoFillBackground">
+                        <bool>true</bool>
+                    </property>
+                    <attribute name="title">
+                        <string>Tab 2</string>
+                    </attribute>
+                    <widget class="QRadioButton" name="radioButton_6">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>10</y>
+                                <width>141</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Interference Analysis</string>
+                        </property>
+                    </widget>
+                    <widget class="QRadioButton" name="radioButton_7">
+                        <property name="geometry">
+                            <rect>
+                                <x>260</x>
+                                <y>10</y>
+                                <width>141</width>
+                                <height>31</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Temperature Analysis</string>
+                        </property>
+                    </widget>
+                    <widget class="QComboBox" name="comboBox_6">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>60</y>
+                                <width>231</width>
+                                <height>24</height>
+                            </rect>
+                        </property>
+                        <item>
+                            <property name="text">
+                                <string>Select Module</string>
+                            </property>
+                        </item>
+                    </widget>
+                    <widget class="QComboBox" name="comboBox_7">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>130</y>
+                                <width>231</width>
+                                <height>24</height>
+                            </rect>
+                        </property>
+                        <item>
+                            <property name="text">
+                                <string>Select Case</string>
+                            </property>
+                        </item>
+                    </widget>
                 </widget>
             </widget>
         </widget>

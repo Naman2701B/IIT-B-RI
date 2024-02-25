@@ -41,6 +41,12 @@ class MainWindow(QDialog):
         self.plotbtn.setEnabled(False)
         self.subplotbtn.setEnabled(False)
         self.mergeplotbtn.setEnabled(False)
+        self.lfaradio.setEnabled(False)
+        self.pqaradio.setEnabled(False)
+        self.scaradio.setEnabled(False)
+        self.analysistab.setTabEnabled(1, False)
+        self.analysistab.setTabEnabled(0, False)
+
         self.Tractiveeffort.toggled.connect(self.counter)
         self.Reactivepower.toggled.connect(self.counter)
         self.Activepower.toggled.connect(self.counter)
@@ -85,7 +91,10 @@ class MainWindow(QDialog):
         self.subplotbtn.setEnabled(True)
         self.mergeplotbtn.setEnabled(True)
         self.Time_radio.setChecked(True)
+        self.analysistab.setTabEnabled(0, True)
+        self.analysistab.setTabEnabled(1, True)
         output_directory_results = []
+
         input_directory_results = []
         for path in self.folder_paths:
             for root, dirs, files in os.walk(path):
