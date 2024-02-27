@@ -6,7 +6,9 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import os
 from scipy import io
-from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData, ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
+from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData
+from utility import ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
+# from utility import loadFlowAnalysis, powerQualityAnalysis, shortCircuitAnalysis
 import mplcursors
 
 
@@ -92,7 +94,6 @@ class MainWindow(QDialog):
         self.mergeplotbtn.setEnabled(True)
         self.Time_radio.setChecked(True)
         self.analysistab.setTabEnabled(0, True)
-        self.analysistab.setTabEnabled(1, True)
         output_directory_results = []
 
         input_directory_results = []
@@ -113,12 +114,6 @@ class MainWindow(QDialog):
                 for root, dirs, files in os.walk(directories):
                     if (len(files) > 0):
                         self.final_output_directories.append(directories)
-        # self.unselected.addItem(data[j]["trainnumber"])
-
-    # def on_move(event):
-    # if event.inaxes:
-    #     print(f'data coords {event.xdata} {event.ydata},',
-    #           f'pixel coords {event.x} {event.y}')
 
     def MTMM(self):
         self.MTMMList.clear()

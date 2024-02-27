@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 from datetime import datetime, timedelta
 import numpy as np
 import mplcursors
+from scipy import io
 
 
 def timeTableData(basefolderinput):
@@ -235,3 +236,14 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
         X_axis.append(df_x["Distance_"+partstr+"_" +
                            str(selected_trains)+"_0"])
     return X_axis, Y_axis
+
+
+outputfolder = "C:/Users/ashok/Desktop/etpss/OLFA_213159_20-07-2023_R"
+
+
+def loadFlowAnalysis(outputfolder):
+    file = io.loadmat(file_name=outputfolder+"/data_ntwrk.mat")
+    print(file)
+
+
+loadFlowAnalysis(outputfolder)
