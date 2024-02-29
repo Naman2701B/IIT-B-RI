@@ -78,6 +78,17 @@ class MainWindow(QDialog):
         for path in self.folder_paths:
             dispName = os.path.basename(path).split('/')[-1]
             self.options.addItem(dispName)
+    
+    def LFA_PQA_SCA(self):
+        res = self.final_output_directories[0]
+        r1 = os.listdir(res)
+        for i in range(len(r1)):
+            if "LFA" in r1[i]:
+                self.lfaradio.setEnabled(True)
+            if "SCA" in r1[i]:
+                self.scaradio.setEnabled(True)
+            if "PQA" in r1[i]:
+                self.pqaradio.setEnabled(True)
 
     def showCheckBoxOpt(self):
         self.file_names.clear()
@@ -114,7 +125,8 @@ class MainWindow(QDialog):
                 for root, dirs, files in os.walk(directories):
                     if (len(files) > 0):
                         self.final_output_directories.append(directories)
-
+            self.LFA_PQA_SCA()
+    
     def MTMM(self):
         self.MTMMList.clear()
         self.trains = []
