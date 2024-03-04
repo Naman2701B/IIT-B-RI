@@ -484,11 +484,11 @@
        <string>Power Quality Analysis</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_14">
+     <widget class="QPushButton" name="pltlfa_pqa_sca">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>331</y>
+        <y>500</y>
         <width>80</width>
         <height>25</height>
        </rect>
@@ -497,11 +497,11 @@
        <string>Single plot</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_15">
+     <widget class="QPushButton" name="subpltlfa_pqa_sca">
       <property name="geometry">
        <rect>
         <x>180</x>
-        <y>331</y>
+        <y>500</y>
         <width>80</width>
         <height>25</height>
        </rect>
@@ -510,11 +510,11 @@
        <string>Subplot</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_16">
+     <widget class="QPushButton" name="mergepltlfa_pqa_sca">
       <property name="geometry">
        <rect>
         <x>330</x>
-        <y>331</y>
+        <y>500</y>
         <width>80</width>
         <height>25</height>
        </rect>
@@ -523,22 +523,7 @@
        <string>Merge</string>
       </property>
      </widget>
-     <widget class="QComboBox" name="comboBox_8">
-      <property name="geometry">
-       <rect>
-        <x>10</x>
-        <y>202</y>
-        <width>191</width>
-        <height>24</height>
-       </rect>
-      </property>
-      <item>
-       <property name="text">
-        <string>Conductors</string>
-       </property>
-      </item>
-     </widget>
-     <widget class="QComboBox" name="comboBox_9">
+     <widget class="QComboBox" name="timeoptions">
       <property name="geometry">
        <rect>
         <x>10</x>
@@ -568,7 +553,7 @@
        </property>
       </item>
      </widget>
-     <widget class="QListWidget" name="listWidget_10">
+     <widget class="QListWidget" name="timelist">
       <property name="geometry">
        <rect>
         <x>210</x>
@@ -577,11 +562,6 @@
         <height>41</height>
        </rect>
       </property>
-      <item>
-       <property name="text">
-        <string>Time instants</string>
-       </property>
-      </item>
      </widget>
      <widget class="QListWidget" name="listWidget_18">
       <property name="geometry">
@@ -650,26 +630,21 @@
        <string>3D</string>
       </property>
      </widget>
-     <widget class="QListWidget" name="listWidget_19">
+     <widget class="QListWidget" name="conductorlist">
       <property name="geometry">
        <rect>
-        <x>210</x>
+        <x>0</x>
         <y>202</y>
-        <width>211</width>
-        <height>41</height>
+        <width>421</width>
+        <height>250</height>
        </rect>
       </property>
-      <item>
-       <property name="text">
-        <string>Selected conductors</string>
-       </property>
-      </item>
      </widget>
-     <widget class="QRadioButton" name="radioButton">
+     <widget class="QRadioButton" name="nodeVoltRadio">
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>290</y>
+        <y>465</y>
         <width>121</width>
         <height>20</height>
        </rect>
@@ -678,11 +653,11 @@
        <string>Node Voltage</string>
       </property>
      </widget>
-     <widget class="QRadioButton" name="radioButton_2">
+     <widget class="QRadioButton" name="branchCurrRadio">
       <property name="geometry">
        <rect>
         <x>190</x>
-        <y>290</y>
+        <y>465</y>
         <width>121</width>
         <height>20</height>
        </rect>
