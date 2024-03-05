@@ -57,9 +57,11 @@ class MainWindow(QDialog):
         self.velocity.toggled.connect(self.counter)
         self.Trainplots.toggled.connect(self.MTMM)
         self.lfaradio.clicked.connect(self.tsnaps)
+        self.timelist.doubleClicked.connect(self.removeListOptions)
+        self.time_3d.setEnabled(False)
         self.tsnap = []
         self.selectedTsnaps = []
-
+        self.selectedTsnapValue = []
         self.file_paths = []
         self.checkedButtons = []
         self.file_names = []
@@ -67,7 +69,8 @@ class MainWindow(QDialog):
         self.final_input_directories = []
         self.trains = []
         self.final_output_directories = []
-        self.conductors = ["Catenary Node Voltage, kV (Uptrack)", "Rail1 Voltage, kV (Uptrack)","Rail2 Voltage, kV (Uptrack)","Catenary Node Voltage, kV (Downtrack)", "Rail1 Voltage, kV (Downtrack)", "Rail2 Voltage, kV (Downtrack)", "Feeder Node Voltage, kV (Uptrack)", "Feeder Node Voltage, kV (Downtrack)", "Protective Wire Node Voltage, kV (Uptrack)", "Protective Wire Node Voltage, kV (Downtrack)"]
+        self.conductors = ["Catenary Node Voltage, kV (Uptrack)", "Rail1 Voltage, kV (Uptrack)", "Rail2 Voltage, kV (Uptrack)", "Catenary Node Voltage, kV (Downtrack)", "Rail1 Voltage, kV (Downtrack)",
+                           "Rail2 Voltage, kV (Downtrack)", "Feeder Node Voltage, kV (Uptrack)", "Feeder Node Voltage, kV (Downtrack)", "Protective Wire Node Voltage, kV (Uptrack)", "Protective Wire Node Voltage, kV (Downtrack)"]
 
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
@@ -82,29 +85,48 @@ class MainWindow(QDialog):
         for path in self.folder_paths:
             dispName = os.path.basename(path).split('/')[-1]
             self.options.addItem(dispName)
-    
-    def optionSwitching(self, index):
-        self.selectedTsnaps.append(self.tsnap[index-1])
-        self.timeoptions.removeItem(index)
-        # self.timeoptions.setCurrentIndex(0)
-        
+
+    def radiostatus(self):
+        if len(self.selectedTsnaps) >= 2:
+            self.time_3d.setEnabled(True)
+        else:
+            self.time_3d.setEnabled(False)
+
+    def removeListOptions(self):
+        for i in range(0, len(self.selectedTsnapValue)):
+            if self.selectedTsnapValue[i] == self.timelist.currentItem().text():
+                self.timeoptions.insertItem(
+                    self.selectedTsnaps[i]+1, self.selectedTsnapValue[i])
+                self.selectedTsnaps.remove(self.selectedTsnaps[i])
+                self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
+                break
+        self.timelist.takeItem(self.timelist.currentRow())
+        self.radiostatus()
+
     def tsnaps(self):
         self.selectedTsnaps.clear()
         self.timeoptions.clear()
         self.timeoptions.insertItem(0, "Select Time")
         self.conductorlist.clear()
-        self.conductorlist.insertItems(0,self.conductors)
-        location = self.final_output_directories[0]+"/OLFA_213159_20-07-2023_R/data_ntwrk.mat"
+        self.conductorlist.insertItems(0, self.conductors)
+        location = self.final_output_directories[0] + \
+            "/OLFA_213159_20-07-2023_R/data_ntwrk.mat"
         file = io.loadmat(location)
         self.tsnap = file["tsnap"]
-        self.timeoptions.insertItems(1,self.tsnap) 
+        self.timeoptions.insertItems(1, self.tsnap)
         self.timeoptions.activated.connect(self.activated)
+        self.timeoptions.setCurrentIndex(0)
 
     def activated(self, index):
-        print("Activated index:", index)
-        self.optionSwitching(index)
+        for i in range(len(self.tsnap)):
+            if (self.timeoptions.itemText(index) == self.tsnap[i]):
+                self.selectedTsnaps.append(i)
+        self.timelist.addItem(self.timeoptions.itemText(index))
+        self.selectedTsnapValue.append(self.timeoptions.itemText(index))
+        self.timeoptions.removeItem(index)
+        self.timeoptions.setCurrentIndex(0)
+        self.radiostatus()
 
-    
     def LFA_PQA_SCA(self):
         res = self.final_output_directories[0]
         r1 = os.listdir(res)
@@ -115,7 +137,7 @@ class MainWindow(QDialog):
                 self.scaradio.setEnabled(True)
             if "PQA" in r1[i]:
                 self.pqaradio.setEnabled(True)
-    
+
     def showCheckBoxOpt(self):
         self.file_names.clear()
         self.Trainplots.setEnabled(True)
@@ -152,7 +174,7 @@ class MainWindow(QDialog):
                     if (len(files) > 0):
                         self.final_output_directories.append(directories)
             self.LFA_PQA_SCA()
-    
+
     def MTMM(self):
         self.MTMMList.clear()
         self.trains = []
@@ -381,9 +403,10 @@ class MainWindow(QDialog):
             plt.xticks(data["plottingData"][3], data["plottingData"][2])
             plt.xlim(left=0, right=max(data["plottingData"][3]))
             plt.legend(loc='center left', bbox_to_anchor=(1, 1))
-            plt.xlabel("Distance from Starting Point", fontsize=15,fontweight='bold')
-            plt.ylabel("Time", fontsize=15,fontweight='bold')
-            plt.title("String Line Diagram", fontsize=15,fontweight='bold')
+            plt.xlabel("Distance from Starting Point",
+                       fontsize=15, fontweight='bold')
+            plt.ylabel("Time", fontsize=15, fontweight='bold')
+            plt.title("String Line Diagram", fontsize=15, fontweight='bold')
             plt.get_current_fig_manager().resize(950, 500)
             plt.grid(alpha=0.3)
             # binding_id = plt.connect('motion_notify_event', on_move)
