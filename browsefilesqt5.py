@@ -8,6 +8,7 @@ import os
 from scipy import io
 from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData
 from utility import ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
+from utility import loadFlowAnalysis
 # from utility import loadFlowAnalysis, powerQualityAnalysis, shortCircuitAnalysis
 import mplcursors
 
@@ -24,6 +25,7 @@ class MainWindow(QDialog):
         self.subplotbtn.clicked.connect(self.clickEvent)
         self.mergeplotbtn.clicked.connect(self.clickEvent)
         self.selectbtn.clicked.connect(self.showCheckBoxOpt)
+        self.pltlfa_pqa_sca.clicked.connect(self.clickEvent)
         self.options.currentTextChanged.connect(self.current_text_changed)
         self.Tractiveeffort.setEnabled(False)
         self.Reactivepower.setEnabled(False)
@@ -312,8 +314,11 @@ class MainWindow(QDialog):
             self.plot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
         elif (sender == self.subplotbtn):
             self.subplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
-        else:
+        elif (sender == self.mergeplotbtn):
             self.mergeplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
+        if (sender == self.pltlfa_pqa_sca):
+            self.LFA()
+
 
     def plot(self, X_axis, Y_axis, keys, timeflag):
         for i in range(0, len(Y_axis)):
@@ -367,6 +372,9 @@ class MainWindow(QDialog):
         cursor = mplcursors.cursor(hover=True)
         plt.show()
 
+    def LFA(self):
+        X,Y = loadFlowAnalysis(self.final_output_directories[0], self.selectedTsnaps, self.selectedconductors)
+    
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
             data = timeTableData(self.final_input_directories[i])
