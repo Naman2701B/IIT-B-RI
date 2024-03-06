@@ -578,57 +578,61 @@
                             </property>
                         </item>
                     </widget>
-                    <widget class="QRadioButton" name="time_2d">
-                        <property name="geometry">
-                            <rect>
-                                <x>210</x>
-                                <y>91</y>
-                                <width>141</width>
-                                <height>31</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>2D</string>
-                        </property>
+                    <widget class="QButtonGroup" name = "timebuttons">
+                        <widget class="QRadioButton" name="time_2d">
+                            <property name="geometry">
+                                <rect>
+                                    <x>210</x>
+                                    <y>91</y>
+                                    <width>141</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>2D</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" name="time_3d">
+                            <property name="geometry">
+                                <rect>
+                                    <x>260</x>
+                                    <y>91</y>
+                                    <width>141</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>3D</string>
+                            </property>
+                        </widget>
                     </widget>
-                    <widget class="QRadioButton" name="time_3d">
-                        <property name="geometry">
-                            <rect>
-                                <x>260</x>
-                                <y>91</y>
-                                <width>141</width>
-                                <height>31</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>3D</string>
-                        </property>
-                    </widget>
-                    <widget class="QRadioButton" name="frequency_2d">
-                        <property name="geometry">
-                            <rect>
-                                <x>210</x>
-                                <y>165</y>
-                                <width>141</width>
-                                <height>31</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>2D</string>
-                        </property>
-                    </widget>
-                    <widget class="QRadioButton" name="">
-                        <property name="geometry">
-                            <rect>
-                                <x>260</x>
-                                <y>165</y>
-                                <width>141</width>
-                                <height>31</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>3D</string>
-                        </property>
+                    <widget class="QButtonGroup" name = "frequencybuttons">
+                        <widget class="QRadioButton" name="frequency_2d">
+                            <property name="geometry">
+                                <rect>
+                                    <x>210</x>
+                                    <y>165</y>
+                                    <width>141</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>2D</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" name="frequency_3d">
+                            <property name="geometry">
+                                <rect>
+                                    <x>260</x>
+                                    <y>165</y>
+                                    <width>141</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>3D</string>
+                            </property>
+                        </widget>
                     </widget>
                     <widget class="QListWidget" name="conductorlist">
                         <property name="geometry">
@@ -640,31 +644,33 @@
                             </rect>
                         </property>
                     </widget>
-                    <widget class="QRadioButton" name="nodeVoltRadio">
-                        <property name="geometry">
-                            <rect>
-                                <x>20</x>
-                                <y>465</y>
-                                <width>121</width>
-                                <height>20</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>Node Voltage</string>
-                        </property>
-                    </widget>
-                    <widget class="QRadioButton" name="branchCurrRadio">
-                        <property name="geometry">
-                            <rect>
-                                <x>190</x>
-                                <y>465</y>
-                                <width>121</width>
-                                <height>20</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>Branch Current</string>
-                        </property>
+                    <widget class="QButtonGroup" name = "voltCurrentbuttons">
+                        <widget class="QRadioButton" name="nodeVoltRadio">
+                            <property name="geometry">
+                                <rect>
+                                    <x>20</x>
+                                    <y>465</y>
+                                    <width>121</width>
+                                    <height>20</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Node Voltage</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" name="branchCurrRadio">
+                            <property name="geometry">
+                                <rect>
+                                    <x>190</x>
+                                    <y>465</y>
+                                    <width>121</width>
+                                    <height>20</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Branch Current</string>
+                            </property>
+                        </widget>
                     </widget>
                 </widget>
                 <widget class="QWidget" name="tab_2">

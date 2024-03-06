@@ -241,8 +241,8 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
 
 # outputfolder = "C:\Internship\SPIT_Interns_task\eTPSS\Traction_Power_Supply_System_Modules\HSRIC_00_Projects\Case_2_P0.25B\Case_2_P0.25B_Output\OLFA_213159_20-07-2023_R"
 
-def loadFlowAnalysis(outputfolder, selectedtnsapindex, selectedcoonductor):
-    file = io.loadmat(file_name=outputfolder+"/data_ntwrk.mat")
+def loadFlowAnalysis(outputfolder, selectedtnsapindex, selectedconductor):
+    file = io.loadmat(file_name=outputfolder+"\data_ntwrk.mat")
     x_axis = []
     y_axis = []
     for i in range(0, len(file["dev_seqn"])):
@@ -251,11 +251,11 @@ def loadFlowAnalysis(outputfolder, selectedtnsapindex, selectedcoonductor):
                 {"label": file["dev_seqn"][i][0][0], "data": file["dev_seqn"][i][3][0][0]})
     # x axis label is chainage in kilometers
     tsnap = file["tsnap"]
-    file2 = io.loadmat(file_name=outputfolder+"/line_summary.mat")
+    file2 = io.loadmat(file_name=outputfolder+"\line_summary.mat")
     for i in range(len(selectedtnsapindex)):
         for j in range(len(file2["Line_Currents"][0])):
             zvalue = selectedtnsapindex[i]
             y_axis.append(abs(file2['Line_Currents']
-                          [selectedcoonductor][j][zvalue]))
-    return x_axis,y_axis
-            # print(j, ":", y_axis)
+                          [selectedconductor][j][zvalue]))
+    return x_axis, y_axis
+    # print(j, ":", y_axis)

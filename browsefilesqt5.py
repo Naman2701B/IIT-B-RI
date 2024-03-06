@@ -58,9 +58,32 @@ class MainWindow(QDialog):
         self.Current.toggled.connect(self.counter)
         self.velocity.toggled.connect(self.counter)
         self.Trainplots.toggled.connect(self.MTMM)
-        self.lfaradio.clicked.connect(self.tsnaps)
+        self.lfaradio.clicked.connect(self.lfaconnect)
+        self.pqaradio.clicked.connect(self.pqaconnect)
         self.timelist.doubleClicked.connect(self.removeListOptions)
         self.time_3d.setEnabled(False)
+        self.timebuttons.setExclusive(True)
+        self.frequencybuttons.setExclusive(True)
+        self.voltCurrentbuttons.setExclusive(True)
+        self.timebuttons.addButton(self.time_2d, 0)
+        self.timebuttons.addButton(self.time_3d, 1)
+        self.frequencybuttons.addButton(self.frequency_2d, 0)
+        self.frequencybuttons.addButton(self.frequency_3d, 1)
+        self.voltCurrentbuttons.addButton(self.nodeVoltRadio, 0)
+        self.voltCurrentbuttons.addButton(self.branchCurrRadio, 1)
+        self.pltlfa_pqa_sca.setEnabled(False)
+        self.subpltlfa_pqa_sca.setEnabled(False)
+        self.mergepltlfa_pqa_sca.setEnabled(False)
+        self.timeoptions.setEnabled(False)
+        self.frequencyoptions.setEnabled(False)
+        self.timelist.setEnabled(False)
+        self.frequencyList.setEnabled(False)
+        self.time_2d.setEnabled(False)
+        self.time_3d.setEnabled(False)
+        self.frequency_2d.setEnabled(False)
+        self.frequency_3d.setEnabled(False)
+        self.nodeVoltRadio.setEnabled(False)
+        self.branchCurrRadio.setEnabled(False)
         self.tsnap = []
         self.selectedTsnaps = []
         self.selectedTsnapValue = []
@@ -89,10 +112,24 @@ class MainWindow(QDialog):
             self.options.addItem(dispName)
 
     def radiostatus(self):
+        self.time_2d.setEnabled(True)
         if len(self.selectedTsnaps) >= 2:
             self.time_3d.setEnabled(True)
+        elif len(self.selectedTsnaps) == 0:
+            self.time_3d.setEnabled(False)
+            self.time_2d.setEnabled(False)
         else:
             self.time_3d.setEnabled(False)
+
+    def pqaconnect(self):
+        self.frequencyoptions.setEnabled(True)
+        self.frequencyList.setEnabled(True)
+        self.frequency_2d.setEnabled(True)
+        self.frequency_3d.setEnabled(True)
+        self.timeoptions.setEnabled(False)
+        self.timelist.setEnabled(False)
+        self.time_2d.setEnabled(False)
+        self.time_3d.setEnabled(False)
 
     def removeListOptions(self):
         for i in range(0, len(self.selectedTsnapValue)):
@@ -105,7 +142,13 @@ class MainWindow(QDialog):
         self.timelist.takeItem(self.timelist.currentRow())
         self.radiostatus()
 
-    def tsnaps(self):
+    def lfaconnect(self):
+        self.timeoptions.setEnabled(True)
+        self.timelist.setEnabled(True)
+        self.frequencyoptions.setEnabled(False)
+        self.frequencyList.setEnabled(False)
+        self.frequency_2d.setEnabled(False)
+        self.frequency_3d.setEnabled(False)
         self.selectedTsnaps.clear()
         self.timeoptions.clear()
         self.timeoptions.insertItem(0, "Select Time")
@@ -150,9 +193,6 @@ class MainWindow(QDialog):
         self.Trainplots1.setEnabled(True)
         self.Substationplots.setEnabled(True)
         self.stringlineplot.setEnabled(True)
-        self.plotbtn.setEnabled(True)
-        self.subplotbtn.setEnabled(True)
-        self.mergeplotbtn.setEnabled(True)
         self.Time_radio.setChecked(True)
         self.analysistab.setTabEnabled(0, True)
         output_directory_results = []
@@ -220,6 +260,13 @@ class MainWindow(QDialog):
             self.checkedButtons.remove(sender)
         else:
             self.checkedButtons.append(sender)
+        if (len(self.checkedButtons) > 0):
+            self.plotbtn.setEnabled(True)
+            self.subplotbtn.setEnabled(True)
+        else:
+            self.plotbtn.setEnabled(False)
+            self.subplotbtn.setEnabled(False)
+            self.mergeplotbtn.setEnabled(False)
         if (len(self.checkedButtons) == 2):
             self.mergeplotbtn.setEnabled(True)
         else:
@@ -232,7 +279,6 @@ class MainWindow(QDialog):
         Y_axis = []
         keys = []
         if (self.Voltage.isChecked()):
-
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = VoltageData(
@@ -318,7 +364,10 @@ class MainWindow(QDialog):
             self.mergeplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
         if (sender == self.pltlfa_pqa_sca):
             self.LFA()
-
+        if (sender == self.subpltlfa_pqa_sca):
+            self.LFA()
+        if (sender == self.mergepltlfa_pqa_sca):
+            self.LFA()
 
     def plot(self, X_axis, Y_axis, keys, timeflag):
         for i in range(0, len(Y_axis)):
@@ -373,8 +422,9 @@ class MainWindow(QDialog):
         plt.show()
 
     def LFA(self):
-        X,Y = loadFlowAnalysis(self.final_output_directories[0], self.selectedTsnaps, self.selectedconductors)
-    
+        X, Y = loadFlowAnalysis(
+            self.final_output_directories[0], self.selectedTsnaps, (self.conductorlist.currentRow()+10))
+
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
             data = timeTableData(self.final_input_directories[i])
