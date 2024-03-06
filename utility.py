@@ -239,8 +239,7 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
     return X_axis, Y_axis
 
 
-outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_213159_20-07-2023_R"
-
+# outputfolder = "C:\Internship\SPIT_Interns_task\eTPSS\Traction_Power_Supply_System_Modules\HSRIC_00_Projects\Case_2_P0.25B\Case_2_P0.25B_Output\OLFA_213159_20-07-2023_R"
 
 def loadFlowAnalysis(outputfolder, selectedtnsapindex, selectedcoonductor):
     file = io.loadmat(file_name=outputfolder+"/data_ntwrk.mat")
@@ -258,7 +257,5 @@ def loadFlowAnalysis(outputfolder, selectedtnsapindex, selectedcoonductor):
             zvalue = selectedtnsapindex[i]
             y_axis.append(abs(file2['Line_Currents']
                           [selectedcoonductor][j][zvalue]))
+    return x_axis,y_axis
             # print(j, ":", y_axis)
-
-
-loadFlowAnalysis(outputfolder, [1], 1)
