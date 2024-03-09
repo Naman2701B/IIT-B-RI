@@ -484,11 +484,57 @@
                             <string>Power Quality Analysis</string>
                         </property>
                     </widget>
+                    <widget class="QComboBox" name="lfaoptions">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>50</y>
+                                <width>350</width>
+                                <height>24</height>
+                            </rect>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" name="lfaselect">
+                        <property name="geometry">
+                            <rect>
+                                <x>380</x>
+                                <y>50</y>
+                                <width>80</width>
+                                <height>25</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Select</string>
+                        </property>
+                    </widget>
+                    <widget class="QComboBox" name="pqa_scaoptions">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>94</y>
+                                <width>350</width>
+                                <height>24</height>
+                            </rect>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" name="pqa_sca_select">
+                        <property name="geometry">
+                            <rect>
+                                <x>380</x>
+                                <y>94</y>
+                                <width>80</width>
+                                <height>25</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Select</string>
+                        </property>
+                    </widget>
                     <widget class="QPushButton" name="pltlfa_pqa_sca">
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>500</y>
+                                <y>600</y>
                                 <width>80</width>
                                 <height>25</height>
                             </rect>
@@ -501,7 +547,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>180</x>
-                                <y>500</y>
+                                <y>600</y>
                                 <width>80</width>
                                 <height>25</height>
                             </rect>
@@ -514,7 +560,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>330</x>
-                                <y>500</y>
+                                <y>600</y>
                                 <width>80</width>
                                 <height>25</height>
                             </rect>
@@ -527,7 +573,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>51</y>
+                                <y>151</y>
                                 <width>191</width>
                                 <height>24</height>
                             </rect>
@@ -542,7 +588,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>125</y>
+                                <y>225</y>
                                 <width>191</width>
                                 <height>24</height>
                             </rect>
@@ -557,7 +603,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>210</x>
-                                <y>51</y>
+                                <y>151</y>
                                 <width>211</width>
                                 <height>41</height>
                             </rect>
@@ -567,7 +613,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>210</x>
-                                <y>125</y>
+                                <y>225</y>
                                 <width>211</width>
                                 <height>41</height>
                             </rect>
@@ -583,7 +629,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>210</x>
-                                    <y>91</y>
+                                    <y>191</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -596,7 +642,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>260</x>
-                                    <y>91</y>
+                                    <y>191</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -611,7 +657,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>210</x>
-                                    <y>165</y>
+                                    <y>265</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -624,7 +670,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>260</x>
-                                    <y>165</y>
+                                    <y>265</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -638,7 +684,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>0</x>
-                                <y>202</y>
+                                <y>302</y>
                                 <width>421</width>
                                 <height>250</height>
                             </rect>
@@ -649,7 +695,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>20</x>
-                                    <y>465</y>
+                                    <y>565</y>
                                     <width>121</width>
                                     <height>20</height>
                                 </rect>
@@ -662,7 +708,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>190</x>
-                                    <y>465</y>
+                                    <y>565</y>
                                     <width>121</width>
                                     <height>20</height>
                                 </rect>

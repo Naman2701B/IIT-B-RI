@@ -4,6 +4,8 @@ from datetime import datetime, timedelta
 import numpy as np
 import mplcursors
 from scipy import io
+from mpl_toolkits.mplot3d import axes3d
+# reconfigdev_sqn
 
 
 def timeTableData(basefolderinput):
@@ -239,23 +241,92 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
     return X_axis, Y_axis
 
 
-# outputfolder = "C:\Internship\SPIT_Interns_task\eTPSS\Traction_Power_Supply_System_Modules\HSRIC_00_Projects\Case_2_P0.25B\Case_2_P0.25B_Output\OLFA_213159_20-07-2023_R"
+outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_213159_20-07-2023_R"
 
-def loadFlowAnalysis(outputfolder, selectedtnsapindex, selectedconductor):
+
+def D3plot(xvalues, super_y_axis, zvalue, radioflag):
+    ax = plt.figure().add_subplot(projection='3d')
+    # Plot the 3D surface
+    for i in range(0, len(zvalue)):
+        for j in range(0, len(zvalue[i])):
+            zvalue[i][j] = calculateTime(zvalue[i][j])
+    zvalue = np.array(zvalue)
+    super_y_axis = np.array(super_y_axis)
+    ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
+    ax.view_init(elev=20, azim=-145, roll=0)
+
+    # Plot projections of the contours for each dimension.  By choosing offsets
+    # that match the appropriate axes limits, the projected contours will sit on
+    # the 'walls' of the graph
+    # ax.contourf(xvalues, super_y_axis, zvalue,
+    #             zdir='z', cmap='coolwarm')
+    # ax.contourf(xvalues, super_y_axis, zvalue,
+    #             zdir='x', cmap='coolwarm')
+    # ax.contourf(xvalues, super_y_axis, zvalue,
+    #             zdir='y', cmap='coolwarm')
+
+    ax.set(xlabel='Chainage in Distance',
+           ylabel='Time Snaps', zlabel="Voltage" if radioflag == 0 else "Current")
+    plt.show()
+
+
+def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radioflag, flag_3d):
     file = io.loadmat(file_name=outputfolder+"\data_ntwrk.mat")
     x_axis = []
-    y_axis = []
+    super_y_axis = []
+    super_x_axis = []
+    z_values = []
     for i in range(0, len(file["dev_seqn"])):
         if "line_" in str(file["dev_seqn"][i][0][0]):
             x_axis.append(
-                {"label": file["dev_seqn"][i][0][0], "data": file["dev_seqn"][i][3][0][0]})
+                {"label": file["dev_seqn"][i][0][0], "data": float(file["dev_seqn"][i][3][0][0])})
     # x axis label is chainage in kilometers
     tsnap = file["tsnap"]
     file2 = io.loadmat(file_name=outputfolder+"\line_summary.mat")
-    for i in range(len(selectedtnsapindex)):
-        for j in range(len(file2["Line_Currents"][0])):
-            zvalue = selectedtnsapindex[i]
-            y_axis.append(abs(file2['Line_Currents']
-                          [selectedconductor][j][zvalue]))
-    return x_axis, y_axis
-    # print(j, ":", y_axis)
+    if radioflag == 1:
+        for i in range(len(selectedtsnapindex)):
+            y_axis = []
+            z_axis = [tsnap[selectedtsnapindex[i]]]
+            y_axis.append(float(abs(file2['Line_Currents']
+                                    [selectedconductor][0][selectedtsnapindex[i]])))
+            for j in range(len(file2["Line_Currents"][0])):
+                y_axis.append(float(abs(file2['Line_Currents']
+                                        [selectedconductor][j][selectedtsnapindex[i]])))
+                z_axis.append(tsnap[selectedtsnapindex[i]])
+            z_values.append(z_axis)
+            super_y_axis.append(y_axis)
+    else:
+        for i in range(len(selectedtsnapindex)):
+            y_axis = []
+            z_axis = []
+            z_axis = [tsnap[selectedtsnapindex[i]]]
+            y_axis.append(float(abs(file2['Line_Voltages']
+                                    [selectedconductor][0][selectedtsnapindex[i]])/1000))
+            for j in range(len(file2["Line_Voltages"][0])):
+                y_axis.append(float(abs(file2['Line_Voltages']
+                                        [selectedconductor][j][selectedtsnapindex[i]])/1000))
+                z_axis.append(tsnap[selectedtsnapindex[i]])
+            z_values.append(z_axis)
+            super_y_axis.append(y_axis)
+    for j in range(0, len(selectedtsnapindex)):
+        xvalues = [0]
+        for i in range(0, len(x_axis)):
+            xvalues.append(x_axis[i]["data"])
+        super_x_axis.append(xvalues)
+    if flag_3d == 0:
+        return super_x_axis, super_y_axis
+    else:
+        D3plot(super_x_axis, super_y_axis, z_values, radioflag)
+
+
+# x, y, z = loadFlowAnalysis(outputfolder, [0, 1, 2, 3, 4, 5, 6, 7], 11, 0, 1)
+
+
+def calculateTime(time):
+    hours = datetime.strptime(time, "%H:%M:%S").hour
+    mins = datetime.strptime(time, "%H:%M:%S").minute
+    seconds = datetime.strptime(time, "%H:%M:%S").second
+    return (hours*3600+mins*60+seconds)
+
+
+# D3plot(x, y, z)
