@@ -8,8 +8,7 @@ import os
 from scipy import io
 from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData
 from utility import ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
-from utility import loadFlowAnalysis
-# from utility import loadFlowAnalysis, powerQualityAnalysis, shortCircuitAnalysis
+from utility import loadFlowAnalysis, ShortCircuitAnalysis
 import mplcursors
 
 
@@ -25,7 +24,9 @@ class MainWindow(QDialog):
         self.subplotbtn.clicked.connect(self.clickEvent)
         self.mergeplotbtn.clicked.connect(self.clickEvent)
         self.selectbtn.clicked.connect(self.showCheckBoxOpt)
-        self.pltlfa_pqa_sca.clicked.connect(self.clickEvent)
+        self.pltlfa_pqa_sca.clicked.connect(self.LFA)
+        self.subpltlfa_pqa_sca.clicked.connect(self.LFA)
+        self.mergepltlfa_pqa_sca.clicked.connect(self.LFA)
         self.options.currentTextChanged.connect(self.current_text_changed)
         self.Tractiveeffort.setEnabled(False)
         self.Reactivepower.setEnabled(False)
@@ -60,7 +61,7 @@ class MainWindow(QDialog):
         self.Trainplots.toggled.connect(self.MTMM)
         self.lfaradio.clicked.connect(self.lfabrowse)
         self.lfaselect.clicked.connect(self.lfaconnect)
-        self.pqa_sca_select.clicked.connect(self.pqaconnect)
+        self.pqa_sca_select.clicked.connect(self.pqa_sca_connect)
         self.pqaradio.clicked.connect(self.lfabrowse)
         self.scaradio.clicked.connect(self.lfabrowse)
         self.lfaoptions.setEnabled(False)
@@ -156,43 +157,59 @@ class MainWindow(QDialog):
 
     def pqabrowse(self):
         dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
-        scadirectories = []
-        pqadirectories = []
+        directoriesToShow = []
+        self.locationDirectories = []
         for i in range(0, len(dir)):
             if "SCA" in dir[i]:
-                scadirectories.append(os.path.join(
+                self.locationDirectories.append(os.path.join(
                     self.lfadirectories[self.lfaoptions.currentIndex()], dir[i]))
+                directoriesToShow.append(dir[i])
             if "PQA" in dir[i]:
-                pqadirectories.append(os.path.join(
+                self.locationDirectories.append(os.path.join(
                     self.lfadirectories[self.lfaoptions.currentIndex()], dir[i]))
+                directoriesToShow.append(dir[i])
         if (self.scaradio.isChecked()):
-            if len(scadirectories) == 0:
+            if len(directoriesToShow) == 0:
                 self.pqa_sca_select.setEnabled(False)
                 self.pqa_scaoptions.setEnabled(False)
             else:
-                self.pqa_scaoptions.addItems(scadirectories)
+                self.pqa_scaoptions.addItems(directoriesToShow)
                 self.pqa_sca_select.setEnabled(True)
                 self.pqa_scaoptions.setEnabled(True)
         if (self.pqaradio.isChecked()):
-            if len(pqadirectories) == 0:
+            if len(directoriesToShow) == 0:
                 self.pqa_sca_select.setEnabled(False)
                 self.pqa_scaoptions.setEnabled(False)
             else:
-                self.pqa_scaoptions.addItems(pqadirectories)
+                self.pqa_scaoptions.addItems(directoriesToShow)
                 self.pqa_sca_select.setEnabled(True)
                 self.pqa_scaoptions.setEnabled(True)
 
-    def pqaconnect(self):
-        self.lfaoptions.setEnabled(True)
-        self.pqa_scaoptions.setEnabled(True)
-        self.frequencyoptions.setEnabled(True)
-        self.frequencyList.setEnabled(True)
-        self.frequency_2d.setEnabled(True)
-        self.frequency_3d.setEnabled(True)
-        self.timeoptions.setEnabled(False)
-        self.timelist.setEnabled(False)
-        self.time_2d.setEnabled(False)
-        self.time_3d.setEnabled(False)
+    def pqa_sca_connect(self):
+        if(self.scaradio.isChecked()):
+            self.timeoptions.clear()
+            self.timeoptions.setEnabled(False)
+            self.frequencyoptions.setEnabled(False)
+            self.timelist.setEnabled(False)
+            self.frequencyList.setEnabled(False)
+            self.time_2d.setEnabled(False)
+            self.time_3d.setEnabled(False)
+            self.frequency_2d.setEnabled(False)
+            self.frequency_3d.setEnabled(False)
+            self.frequency_2d.setChecked(True)
+            self.time_2d.setChecked(True)
+            self.pltlfa_pqa_sca.setEnabled(True)
+        else:
+            self.lfaoptions.setEnabled(True)
+            self.pqa_scaoptions.setEnabled(True)
+            self.frequencyoptions.setEnabled(True)
+            self.frequencyList.setEnabled(True)
+            self.frequency_2d.setEnabled(True)
+            self.frequency_3d.setEnabled(True)
+            self.timeoptions.setEnabled(False)
+            self.timelist.setEnabled(False)
+            self.time_2d.setEnabled(False)
+            self.time_3d.setEnabled(False)
 
     def removeListOptions(self):
         for i in range(0, len(self.selectedTsnapValue)):
@@ -208,6 +225,7 @@ class MainWindow(QDialog):
     def lfabrowse(self):
         self.time_2d.setEnabled(False)
         self.time_3d.setEnabled(False)
+        self.time_2d.setChecked(False)
         self.frequency_2d.setEnabled(False)
         self.frequency_3d.setEnabled(False)
         self.timeoptions.setEnabled(False)
@@ -234,6 +252,7 @@ class MainWindow(QDialog):
         if (self.pqaradio.isChecked() or self.scaradio.isChecked()):
             self.pqabrowse()
         self.timeoptions.setEnabled(True)
+        self.time_2d.setChecked(True)
         self.timelist.setEnabled(True)
         self.nodeVoltRadio.setEnabled(True)
         self.branchCurrRadio.setEnabled(True)
@@ -248,7 +267,7 @@ class MainWindow(QDialog):
         self.conductorlist.clear()
         self.conductorlist.insertItems(0, self.conductors)
         self.location = self.final_output_directories[0] + \
-            "/OLFA_213159_20-07-2023_R/data_ntwrk.mat"
+            "/OLFA_125748_14-03-2024_R/data_ntwrk.mat"
         file = io.loadmat(self.location)
         self.tsnap = file["tsnap"]
         self.timeoptions.insertItems(1, self.tsnap)
@@ -458,12 +477,7 @@ class MainWindow(QDialog):
             self.subplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
         elif (sender == self.mergeplotbtn):
             self.mergeplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
-        if (sender == self.pltlfa_pqa_sca):
-            self.LFA()
-        if (sender == self.subpltlfa_pqa_sca):
-            self.LFA()
-        if (sender == self.mergepltlfa_pqa_sca):
-            self.LFA()
+
 
     def plot(self, X_axis, Y_axis, keys, timeflag):
         for i in range(0, len(Y_axis)):
@@ -472,7 +486,7 @@ class MainWindow(QDialog):
                 if (timeflag == True):
                     plt.xlabel("Time in Minutes")
                 else:
-                    plt.xlabel("Distance in KM")
+                    plt.xlabel("Distance (km)")
                 plt.title(keys[i])
                 plt.plot(X_axis[i][j], Y_axis[i][j],
                          label=str(self.MTMMList.currentItem().text()))
@@ -488,7 +502,7 @@ class MainWindow(QDialog):
             if (timeflag == True):
                 plt.xlabel("Time in Minutes")
             else:
-                plt.xlabel("Distance in KM")
+                plt.xlabel("Distance (km)")
             for j in range(0, len(Y_axis[i])):
                 axis[i].plot(X_axis[i][j], Y_axis[i][j],
                              label=str(self.MTMMList.currentItem().text()))
@@ -504,7 +518,7 @@ class MainWindow(QDialog):
         if (timeflag == True):
             plt.xlabel("Time in Minutes")
         else:
-            plt.xlabel("Distance in KM")
+            plt.xlabel("Distance (km)")
         ax2 = ax1.twinx()
         ax1.plot(X_axis[0][0], Y_axis[0][0], label=(str(
             keys[0])+" "+str(self.MTMMList.currentItem().text())), color='tab:cyan')
@@ -518,22 +532,58 @@ class MainWindow(QDialog):
         plt.show()
 
     def LFA(self):
+        sender = self.sender()
         radioflag = 0
         if self.branchCurrRadio.isChecked():
             radioflag = 1
         if self.time_3d.isChecked():
             loadFlowAnalysis(
-                self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()+10), radioflag, 1)
+                self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, self.conductorlist.currentRow(), radioflag, 1)
         else:
             X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex(
-            )], self.selectedTsnaps, (self.conductorlist.currentRow()+10), radioflag, 0)
-            for i in range(0, len(Y)):
-                plt.plot(X[i], Y[i])
-                plt.xlabel("Distance in KM")
-                if radioflag == 1:
-                    plt.ylabel("Branch Current")
+            )], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0)
+        if (sender == self.pltlfa_pqa_sca):
+            if self.time_3d.isChecked()==False:
+                for i in range(0, len(Y)):
+                    plt.figure()
+                    plt.title("Load Flow Analysis 2D")
+                    plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
+                    plt.xlabel("Distance (km)")
+                    if radioflag == 1:
+                        plt.ylabel("Branch Current (A)")
+                    else:
+                        plt.ylabel("Node Voltage (kV)")
+                    plt.xlim(left=0, right = max(X[i]))
+                    plt.grid(alpha=0.3)
+                    plt.legend()
+                    plt.show()
+            if self.scaradio.isChecked():
+                ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.conductorlist.currentRow(), radioflag)
+        if (sender == self.subpltlfa_pqa_sca):
+            figure, axis = plt.subplots(len(Y))
+            for i in range (0,len(Y)):
+                axis[i].plot(X[i], Y[i], label = self.selectedTsnapValue[i])
+                if radioflag==1:
+                    axis[i].set_ylabel("Branch Current (A)")
                 else:
-                    plt.ylabel("Node Voltage in kV")
+                    axis[i].set_ylabel("Node Voltage (kV)")
+                axis[i].set_xlabel("Distance (km)")
+                axis[i].legend()
+                axis[i].set_xlim(left=0, right=max(X[i]))
+                axis[i].grid(alpha=0.3)
+            plt.show()
+        if (sender == self.mergepltlfa_pqa_sca):
+            for i in range(0, len(Y)):
+                plt.title("Load Flow Analysis 2D")
+                plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
+                plt.xlabel("Distance (km)")
+                if radioflag == 1:
+                    plt.ylabel("Branch Current (A)")
+                else:
+                    plt.ylabel("Node Voltage (kV)")
+                plt.xlim(left=0, right=max(X[i]))
+                plt.grid(alpha=0.3)
+                plt.legend()
                 plt.show()
 
     def getStringLineData(self):
