@@ -4,8 +4,7 @@ from datetime import datetime, timedelta
 import numpy as np
 import mplcursors
 from scipy import io
-from mpl_toolkits.mplot3d import axes3d
-# reconfigdev_sqn
+# reconfig dev_sqn
 
 
 def timeTableData(basefolderinput):
@@ -246,15 +245,25 @@ outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_
 
 def D3plot(xvalues, super_y_axis, zvalue, radioflag):
     ax = plt.figure().add_subplot(projection='3d')
+    zticks = []
     # Plot the 3D surface
     for i in range(0, len(zvalue)):
+        zticks.append([])
         for j in range(0, len(zvalue[i])):
+            zticks[i].append(zvalue[i][j])
             zvalue[i][j] = calculateTime(zvalue[i][j])
     zvalue = np.array(zvalue)
+    zticks = np.array(zticks)
     super_y_axis = np.array(super_y_axis)
     ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
     ax.view_init(elev=20, azim=-145, roll=0)
-
+    zvaluestoshow=[]
+    ztickstoshow =[]
+    for i in range(0, len(zvalue)):
+        for j in range(0, len(zticks)):
+            zvaluestoshow.append(zvalue[i][j])
+            ztickstoshow.append(zticks[i][j])
+    ax.set_yticks(zvaluestoshow, ztickstoshow)
     # Plot projections of the contours for each dimension.  By choosing offsets
     # that match the appropriate axes limits, the projected contours will sit on
     # the 'walls' of the graph
@@ -267,6 +276,8 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag):
 
     ax.set(xlabel='Chainage in Distance',
            ylabel='Time Snaps', zlabel="Voltage" if radioflag == 0 else "Current")
+    # plt.legend()
+    plt.title("Load Flow Analysis 3D")
     plt.show()
 
 
@@ -278,8 +289,7 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
     z_values = []
     for i in range(0, len(file["dev_seqn"])):
         if "line_" in str(file["dev_seqn"][i][0][0]):
-            x_axis.append(
-                {"label": file["dev_seqn"][i][0][0], "data": float(file["dev_seqn"][i][3][0][0])})
+            x_axis.append(float(file["dev_seqn"][i][3][0][0]))
     # x axis label is chainage in kilometers
     tsnap = file["tsnap"]
     file2 = io.loadmat(file_name=outputfolder+"\line_summary.mat")
@@ -291,7 +301,7 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
                                     [selectedconductor][0][selectedtsnapindex[i]])))
             for j in range(len(file2["Line_Currents"][0])):
                 y_axis.append(float(abs(file2['Line_Currents']
-                                        [selectedconductor][j][selectedtsnapindex[i]])))
+                                        [selectedconductor+10][j][selectedtsnapindex[i]])))
                 z_axis.append(tsnap[selectedtsnapindex[i]])
             z_values.append(z_axis)
             super_y_axis.append(y_axis)
@@ -304,23 +314,42 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
                                     [selectedconductor][0][selectedtsnapindex[i]])/1000))
             for j in range(len(file2["Line_Voltages"][0])):
                 y_axis.append(float(abs(file2['Line_Voltages']
-                                        [selectedconductor][j][selectedtsnapindex[i]])/1000))
+                                        [selectedconductor+10][j][selectedtsnapindex[i]])/1000))
                 z_axis.append(tsnap[selectedtsnapindex[i]])
             z_values.append(z_axis)
             super_y_axis.append(y_axis)
     for j in range(0, len(selectedtsnapindex)):
         xvalues = [0]
         for i in range(0, len(x_axis)):
-            xvalues.append(x_axis[i]["data"])
+            xvalues.append(x_axis[i])
         super_x_axis.append(xvalues)
     if flag_3d == 0:
         return super_x_axis, super_y_axis
     else:
         D3plot(super_x_axis, super_y_axis, z_values, radioflag)
 
-
-# x, y, z = loadFlowAnalysis(outputfolder, [0, 1, 2, 3, 4, 5, 6, 7], 11, 0, 1)
-
+def ShortCircuitAnalysis(outputfolder, selectedconductor, radioflag):
+    file = io.loadmat(file_name=outputfolder+"\line_summary_SCA.mat")
+    file2 = io.loadmat(file_name = outputfolder+"\IA_linesummary.mat")
+    x_axis = [{"label":file2["dev_seqn"][0][0][0],"data":float(file2["dev_seqn"][0][3][0][0])}]
+    xvalues=[]
+    y_axis = []
+    for i in range(len(file2["dev_seqn"])):
+        if "line_" in str(file2["dev_seqn"][i][0][0]):
+            x_axis.append({"label": file2["dev_seqn"][i][0][0], "data": float(file2["dev_seqn"][i][3][0][0])})
+            #x_axis.append(float(file2["dev_seqn"][i][3][0][0]))
+    if radioflag==1:
+        y_axis.append(float(abs(file['Line_Currents'][selectedconductor][0])))
+        for j in range(len(file["Line_Currents"][0])):
+            y_axis.append(float(abs(file['Line_Currents'][selectedconductor+10][j])/1000))
+    else:
+        y_axis.append(float(abs(file['Line_Voltages'][selectedconductor][0])))
+        for j in range(len(file["Line_Voltages"][0])):
+            y_axis.append(float(abs(file['Line_Voltages'][selectedconductor+10][j])/1000))
+    for i in range(len(x_axis)):
+        xvalues.append(x_axis[i]["data"])
+    plt.plot(xvalues, y_axis)
+    plt.show()
 
 def calculateTime(time):
     hours = datetime.strptime(time, "%H:%M:%S").hour
