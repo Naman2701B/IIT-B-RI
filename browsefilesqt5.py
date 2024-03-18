@@ -156,32 +156,34 @@ class MainWindow(QDialog):
             self.mergepltlfa_pqa_sca.setEnabled(True)
 
     def pqabrowse(self):
+        self.pqa_scaoptions.clear()
         dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
-        directoriesToShow = []
+        scadirectoriesToShow = []
+        pqadirectoriesToShow = []
         self.locationDirectories = []
         for i in range(0, len(dir)):
             if "SCA" in dir[i]:
                 self.locationDirectories.append(os.path.join(
                     self.lfadirectories[self.lfaoptions.currentIndex()], dir[i]))
-                directoriesToShow.append(dir[i])
+                scadirectoriesToShow.append(dir[i])
             if "PQA" in dir[i]:
                 self.locationDirectories.append(os.path.join(
                     self.lfadirectories[self.lfaoptions.currentIndex()], dir[i]))
-                directoriesToShow.append(dir[i])
+                pqadirectoriesToShow.append(dir[i])
         if (self.scaradio.isChecked()):
-            if len(directoriesToShow) == 0:
+            if len(scadirectoriesToShow) == 0:
                 self.pqa_sca_select.setEnabled(False)
                 self.pqa_scaoptions.setEnabled(False)
             else:
-                self.pqa_scaoptions.addItems(directoriesToShow)
+                self.pqa_scaoptions.addItems(scadirectoriesToShow)
                 self.pqa_sca_select.setEnabled(True)
                 self.pqa_scaoptions.setEnabled(True)
         if (self.pqaradio.isChecked()):
-            if len(directoriesToShow) == 0:
+            if len(pqadirectoriesToShow) == 0:
                 self.pqa_sca_select.setEnabled(False)
                 self.pqa_scaoptions.setEnabled(False)
             else:
-                self.pqa_scaoptions.addItems(directoriesToShow)
+                self.pqa_scaoptions.addItems(pqadirectoriesToShow)
                 self.pqa_sca_select.setEnabled(True)
                 self.pqa_scaoptions.setEnabled(True)
 
@@ -266,8 +268,8 @@ class MainWindow(QDialog):
         self.timeoptions.insertItem(0, "Select Time")
         self.conductorlist.clear()
         self.conductorlist.insertItems(0, self.conductors)
-        self.location = self.final_output_directories[0] + \
-            "/OLFA_125748_14-03-2024_R/data_ntwrk.mat"
+        self.location = self.lfadirectories[0] + \
+            "/data_ntwrk.mat"
         file = io.loadmat(self.location)
         self.tsnap = file["tsnap"]
         self.timeoptions.insertItems(1, self.tsnap)
