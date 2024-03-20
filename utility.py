@@ -4,12 +4,13 @@ from datetime import datetime, timedelta
 import numpy as np
 import mplcursors
 from scipy import io
+import os
 # reconfig dev_sqn
 
 
 def timeTableData(basefolderinput):
-    df = pd.read_csv(basefolderinput+"/TimeTableData.csv", header=None)
-    df2 = pd.read_csv(basefolderinput+"/AllStationData.csv")
+    df = pd.read_csv(os.path.join(basefolderinput,"TimeTableData.csv"), header=None)
+    df2 = pd.read_csv(os.path.join(basefolderinput,"AllStationData.csv"))
     rows = []
     final_dict = []
     timingGraph = []
@@ -68,8 +69,8 @@ def timeTableData(basefolderinput):
 
 
 def routeAltitudeData(basefolder):
-    df2 = pd.read_csv(basefolder + "/RouteAltitudeData.csv")
-    df3 = pd.read_csv(basefolder + "/AllStationData.csv")
+    df2 = pd.read_csv(os.path.join(basefolder ,"RouteAltitudeData.csv"))
+    df3 = pd.read_csv(os.path.join(basefolder , "AllStationData.csv"))
     X_axis = df2["DistanceKM"]
     Y_axis = df2["HeightAboveGroundMSL"]
     markers_onx = []
@@ -96,8 +97,8 @@ def routeAltitudeData(basefolder):
 
 
 def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
-    df_x = pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
-    df_y = pd.read_csv(basefolderoutput+"/EffortOutput.csv")
+    df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
+    df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
     X_axis = []
     Y_axis = []
     if (int(df_x["Up/Downtrack_"+str(selected_trains)+"_0"][0]) == 0):
@@ -116,8 +117,8 @@ def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
 
 
 def BrakingEffortData(basefolderoutput, selected_trains, timeFlag):
-    df_x = pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
-    df_y = pd.read_csv(basefolderoutput+"/EffortOutput.csv")
+    df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
+    df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
     X_axis = []
     Y_axis = []
     if (int(df_x["Up/Downtrack_"+str(selected_trains)+"_0"][0]) == 0):
@@ -136,8 +137,8 @@ def BrakingEffortData(basefolderoutput, selected_trains, timeFlag):
 
 
 def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFlag):
-    df_x = pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
-    df_p = pd.read_csv(basefolderinput+"/TrainElectricalData.csv", header=1)
+    df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
+    df_p = pd.read_csv(os.path.join(basefolderinput,"TrainElectricalData.csv"), header=1)
     X_axis = []
     Y_axis = []
     inputdata = timeTableData(basefolderinput)
@@ -161,7 +162,7 @@ def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFl
 
 
 def ActivePowerData(basefolderoutput, selected_trains, timeFlag):
-    df_x = pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
+    df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     X_axis = []
     Y_axis = []
     if (int(df_x["Up/Downtrack_"+str(selected_trains)+"_0"][0]) == 0):
@@ -180,8 +181,8 @@ def ActivePowerData(basefolderoutput, selected_trains, timeFlag):
 
 
 def CurrentData(basefolderoutput, selected_trains, timeFlag):
-    df_x = pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
-    df_y = pd.read_csv(basefolderoutput+"/EffortOutput.csv")
+    df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
+    df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
     X_axis = []
     Y_axis = []
     if (int(df_x["Up/Downtrack_"+str(selected_trains)+"_0"][0]) == 0):
@@ -201,8 +202,8 @@ def CurrentData(basefolderoutput, selected_trains, timeFlag):
 
 
 def VoltageData(basefolderoutput, selected_trains, timeFlag):
-    df_x = pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
-    df_y = pd.read_csv(basefolderoutput+"/EffortOutput.csv")
+    df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
+    df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
     X_axis = []
     Y_axis = []
     if (int(df_x["Up/Downtrack_"+str(selected_trains)+"_0"][0]) == 0):
@@ -224,7 +225,7 @@ def VoltageData(basefolderoutput, selected_trains, timeFlag):
 def VelocityData(basefolderoutput, selected_trains, timeFlag):
     X_axis = []
     Y_axis = []
-    df_x = pd.read_csv(basefolderoutput+"/TrainModuleOutput.csv")
+    df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     if (int(df_x["Up/Downtrack_"+str(selected_trains)+"_0"][0]) == 0):
         partstr = "Uptrack"
     else:
@@ -240,49 +241,61 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
     return X_axis, Y_axis
 
 
-outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_213159_20-07-2023_R"
+outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_130038_14-03-2024_R/PQA_130818_14-03-2024"
 
 
-def D3plot(xvalues, super_y_axis, zvalue, radioflag):
+def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa):
     ax = plt.figure().add_subplot(projection='3d')
     zticks = []
     # Plot the 3D surface
-    for i in range(0, len(zvalue)):
-        zticks.append([])
-        for j in range(0, len(zvalue[i])):
-            zticks[i].append(zvalue[i][j])
-            zvalue[i][j] = calculateTime(zvalue[i][j])
-    zvalue = np.array(zvalue)
-    zticks = np.array(zticks)
-    super_y_axis = np.array(super_y_axis)
-    ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
-    ax.view_init(elev=20, azim=-145, roll=0)
-    zvaluestoshow=[]
-    ztickstoshow =[]
-    for i in range(0, len(zvalue)):
-        for j in range(0, len(zticks)):
-            zvaluestoshow.append(zvalue[i][j])
-            ztickstoshow.append(zticks[i][j])
-    ax.set_yticks(zvaluestoshow, ztickstoshow)
-    # Plot projections of the contours for each dimension.  By choosing offsets
-    # that match the appropriate axes limits, the projected contours will sit on
-    # the 'walls' of the graph
-    # ax.contourf(xvalues, super_y_axis, zvalue,
-    #             zdir='z', cmap='coolwarm')
-    # ax.contourf(xvalues, super_y_axis, zvalue,
-    #             zdir='x', cmap='coolwarm')
-    # ax.contourf(xvalues, super_y_axis, zvalue,
-    #             zdir='y', cmap='coolwarm')
-
-    ax.set(xlabel='Chainage in Distance',
-           ylabel='Time Snaps', zlabel="Voltage" if radioflag == 0 else "Current")
-    # plt.legend()
-    plt.title("Load Flow Analysis 3D")
+    if(pqa_lfa==0):
+        for i in range(0, len(zvalue)):
+            zticks.append([])
+            for j in range(0, len(zvalue[i])):
+                zticks[i].append(zvalue[i][j])
+                zvalue[i][j] = calculateTime(zvalue[i][j])
+        zvalue = np.array(zvalue)
+        zticks = np.array(zticks)
+        super_y_axis = np.array(super_y_axis)
+        ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
+        ax.view_init(elev=20, azim=-145, roll=0)
+        zvaluestoshow=[]
+        ztickstoshow =[]
+        for i in range(0, len(zvalue)):
+            for j in range(0, len(zticks)):
+                zvaluestoshow.append(zvalue[i][j])
+                ztickstoshow.append(zticks[i][j])
+        ax.set_yticks(zvaluestoshow, ztickstoshow)
+        ax.set(xlabel='Chainage in Distance',
+            ylabel='Time Snaps', zlabel="Voltage" if radioflag == 0 else "Current")
+        # plt.legend()
+        plt.title("Load Flow Analysis 3D")
+    else:
+        for i in range(0, len(zvalue)):
+            zticks.append([])
+            for j in range(0, len(zvalue[i])):
+                zticks[i].append(zvalue[i][j])
+        zvalue = np.array(zvalue)   
+        zticks = np.array(zticks)
+        super_y_axis = np.array(super_y_axis)
+        ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
+        ax.view_init(elev=20, azim=-145, roll=0)
+        zvaluestoshow=[]
+        ztickstoshow =[]
+        for i in range(0, len(zvalue)):
+            for j in range(0, len(zticks)):
+                zvaluestoshow.append(zvalue[i][j])
+                ztickstoshow.append(zticks[i][j])
+        ax.set_yticks(zvaluestoshow, ztickstoshow)
+        ax.set(xlabel='Chainage in Distance',
+            ylabel='Frequencies (Hz)', zlabel="Voltage" if radioflag == 0 else "Current")
+        # plt.legend()
+        plt.title("Power Quality Analysis 3D")
     plt.show()
 
 
 def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radioflag, flag_3d):
-    file = io.loadmat(file_name=outputfolder+"\data_ntwrk.mat")
+    file = io.loadmat(file_name=os.path.join(outputfolder,"data_ntwrk.mat"))
     x_axis = []
     super_y_axis = []
     super_x_axis = []
@@ -292,7 +305,7 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
             x_axis.append(float(file["dev_seqn"][i][3][0][0]))
     # x axis label is chainage in kilometers
     tsnap = file["tsnap"]
-    file2 = io.loadmat(file_name=outputfolder+"\line_summary.mat")
+    file2 = io.loadmat(file_name=os.path.join(outputfolder,"line_summary.mat"))
     if radioflag == 1:
         for i in range(len(selectedtsnapindex)):
             y_axis = []
@@ -326,11 +339,58 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
     if flag_3d == 0:
         return super_x_axis, super_y_axis
     else:
-        D3plot(super_x_axis, super_y_axis, z_values, radioflag)
+        D3plot(super_x_axis, super_y_axis, z_values, radioflag,0)
+
+def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radioflag, flag_3d):
+    file = io.loadmat(file_name=os.path.join(outputfolder,"IA_linesummary.mat"))
+    x_axis = []
+    super_y_axis = []
+    super_x_axis = []
+    z_values = []
+    for i in range(0, len(file["dev_seqn"])):
+        if "line_" in str(file["dev_seqn"][i][0][0]):
+            x_axis.append(float(file["dev_seqn"][i][3][0][0]))
+    # x axis label is chainage in kilometers
+    frequency = list(file["fh"][0])
+    file2 = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_PQA.mat"))
+    if radioflag == 1:
+        for i in range(len(selectedfrequency)):
+            y_axis = []
+            z_axis = [frequency[selectedfrequency[i]]]
+            y_axis.append(float(abs(file2['Line_Currents']
+                                    [selectedconductor][0][selectedfrequency[i]])))
+            for j in range(len(file2["Line_Currents"][0])):
+                y_axis.append(float(abs(file2['Line_Currents']
+                                        [selectedconductor+10][j][selectedfrequency[i]])))
+                z_axis.append(frequency[selectedfrequency[i]])
+            z_values.append(z_axis)
+            super_y_axis.append(y_axis)
+    else:
+        for i in range(len(selectedfrequency)):
+            y_axis = []
+            z_axis = []
+            z_axis = [frequency[selectedfrequency[i]]]
+            y_axis.append(float(abs(file2['Line_Voltages']
+                                    [selectedconductor][0][selectedfrequency[i]])/1000))
+            for j in range(len(file2["Line_Voltages"][0])):
+                y_axis.append(float(abs(file2['Line_Voltages']
+                                        [selectedconductor+10][j][selectedfrequency[i]])/1000))
+                z_axis.append(frequency[selectedfrequency[i]])
+            z_values.append(z_axis)
+            super_y_axis.append(y_axis)
+    for j in range(0, len(selectedfrequency)):
+        xvalues = [0]
+        for i in range(0, len(x_axis)):
+            xvalues.append(x_axis[i])
+        super_x_axis.append(xvalues)
+    if flag_3d == 0:
+        return super_x_axis, super_y_axis
+    else:
+        D3plot(super_x_axis, super_y_axis, z_values, radioflag,1)
 
 def ShortCircuitAnalysis(outputfolder, selectedconductor, radioflag):
-    file = io.loadmat(file_name=outputfolder+"\line_summary_SCA.mat")
-    file2 = io.loadmat(file_name = outputfolder+"\IA_linesummary.mat")
+    file = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_SCA.mat"))
+    file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_linesummary.mat"))
     x_axis = [{"label":file2["dev_seqn"][0][0][0],"data":float(file2["dev_seqn"][0][3][0][0])}]
     xvalues=[]
     y_axis = []
@@ -348,7 +408,8 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor, radioflag):
             y_axis.append(float(abs(file['Line_Voltages'][selectedconductor+10][j])/1000))
     for i in range(len(x_axis)):
         xvalues.append(x_axis[i]["data"])
-    plt.plot(xvalues, y_axis)
+    plt.plot(xvalues, y_axis, label = file2["timesnap"][0])
+    plt.legend()
     plt.show()
 
 def calculateTime(time):
@@ -359,3 +420,4 @@ def calculateTime(time):
 
 
 # D3plot(x, y, z)
+# powerQualityAnalysis(outputfolder,[0,1],1,0,1 )
