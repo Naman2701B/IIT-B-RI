@@ -402,13 +402,17 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor, radioflag):
         y_axis.append(float(abs(file['Line_Currents'][selectedconductor][0])))
         for j in range(len(file["Line_Currents"][0])):
             y_axis.append(float(abs(file['Line_Currents'][selectedconductor+10][j])/1000))
+        plt.ylabel("Line Currents (A)")
     else:
         y_axis.append(float(abs(file['Line_Voltages'][selectedconductor][0])))
         for j in range(len(file["Line_Voltages"][0])):
             y_axis.append(float(abs(file['Line_Voltages'][selectedconductor+10][j])/1000))
+        plt.ylabel("Line Voltages (kV)")
     for i in range(len(x_axis)):
         xvalues.append(x_axis[i]["data"])
     plt.plot(xvalues, y_axis, label = file2["timesnap"][0])
+    plt.title("Short Circuit Analysis")
+    plt.xlabel("Chainage in Distance(km)")
     plt.legend()
     plt.show()
 
