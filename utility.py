@@ -7,6 +7,8 @@ from scipy import io
 import os
 # reconfig dev_sqn
 
+conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
+                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
 def timeTableData(basefolderinput):
     df = pd.read_csv(os.path.join(basefolderinput,"TimeTableData.csv"), header=None)
@@ -89,11 +91,10 @@ def routeAltitudeData(basefolder):
     plt.plot(X_axis, Y_axis)
     plt.title('Route-Altitude graph', fontsize=15, fontweight='bold')
     plt.xlabel("Stations", fontsize=15, fontweight='bold')
-    plt.ylabel("Altitude(M)", fontsize=15, fontweight='bold')
-    plt.legend()
+    plt.ylabel("Altitude (m)", fontsize=15, fontweight='bold')
     plt.grid(alpha=0.3)
     cursor = mplcursors.cursor(hover=True)
-    plt.show()
+    plt.show(block = False)
 
 
 def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
@@ -198,7 +199,7 @@ def CurrentData(basefolderoutput, selected_trains, timeFlag):
         X_axis.append(df_x["Distance_"+partstr+"_" +
                            str(selected_trains)+"_0"])
     plt.plot(X_axis, Y_axis)
-    plt.show()
+    plt.show(block = False)
 
 
 def VoltageData(basefolderoutput, selected_trains, timeFlag):
@@ -219,7 +220,7 @@ def VoltageData(basefolderoutput, selected_trains, timeFlag):
         X_axis.append(df_x["Distance_"+partstr+"_" +
                            str(selected_trains)+"_0"])
     plt.plot(X_axis, Y_axis)
-    plt.show()
+    plt.show(block = False)
 
 
 def VelocityData(basefolderoutput, selected_trains, timeFlag):
@@ -244,7 +245,7 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
 outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_130038_14-03-2024_R/PQA_130818_14-03-2024"
 
 
-def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa):
+def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors):
     ax = plt.figure().add_subplot(projection='3d')
     zticks = []
     # Plot the 3D surface
@@ -266,8 +267,8 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa):
                 zvaluestoshow.append(zvalue[i][j])
                 ztickstoshow.append(zticks[i][j])
         ax.set_yticks(zvaluestoshow, ztickstoshow)
-        ax.set(xlabel='Chainage in Distance',
-            ylabel='Time Snaps', zlabel="Voltage" if radioflag == 0 else "Current")
+        ax.set(xlabel='Distance (km)',
+            ylabel='Time Snaps', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)",fontsize=15, fontweight='bold')
         # plt.legend()
         plt.title("Load Flow Analysis 3D")
     else:
@@ -285,13 +286,13 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa):
         for i in range(0, len(zvalue)):
             for j in range(0, len(zticks)):
                 zvaluestoshow.append(zvalue[i][j])
-                ztickstoshow.append(zticks[i][j])
+                ztickstoshow.append(zticks[i][j]*50)
         ax.set_yticks(zvaluestoshow, ztickstoshow)
-        ax.set(xlabel='Chainage in Distance',
-            ylabel='Frequencies (Hz)', zlabel="Voltage" if radioflag == 0 else "Current")
+        ax.set(xlabel='Distance (km)',
+            ylabel='Frequencies (Hz)', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)", fontsize=15, fontweight='bold')
         # plt.legend()
-        plt.title("Power Quality Analysis 3D")
-    plt.show()
+        plt.title("Power Quality Analysis 3D",fontsize=15, fontweight='bold')
+    plt.show(block = False)
 
 
 def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radioflag, flag_3d):
@@ -339,7 +340,7 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
     if flag_3d == 0:
         return super_x_axis, super_y_axis
     else:
-        D3plot(super_x_axis, super_y_axis, z_values, radioflag,0)
+        D3plot(super_x_axis, super_y_axis, z_values, radioflag,0,selectedconductor)
 
 def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radioflag, flag_3d):
     file = io.loadmat(file_name=os.path.join(outputfolder,"IA_linesummary.mat"))
@@ -386,7 +387,7 @@ def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radi
     if flag_3d == 0:
         return super_x_axis, super_y_axis
     else:
-        D3plot(super_x_axis, super_y_axis, z_values, radioflag,1)
+        D3plot(super_x_axis, super_y_axis, z_values, radioflag,1,selectedconductor)
 
 def ShortCircuitAnalysis(outputfolder, selectedconductor, radioflag):
     file = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_SCA.mat"))
@@ -399,22 +400,23 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor, radioflag):
             x_axis.append({"label": file2["dev_seqn"][i][0][0], "data": float(file2["dev_seqn"][i][3][0][0])})
             #x_axis.append(float(file2["dev_seqn"][i][3][0][0]))
     if radioflag==1:
-        y_axis.append(float(abs(file['Line_Currents'][selectedconductor][0])))
+        y_axis.append(float(abs(file['Line_Currents'][selectedconductor][0]))/1000)
         for j in range(len(file["Line_Currents"][0])):
-            y_axis.append(float(abs(file['Line_Currents'][selectedconductor+10][j])/1000))
-        plt.ylabel("Line Currents (A)")
+            y_axis.append(float(abs(file['Line_Currents'][selectedconductor+10][j]))/1000)
+        plt.ylabel((conductors[selectedconductor]+" Currents (kA)"),fontsize=15, fontweight='bold')
     else:
-        y_axis.append(float(abs(file['Line_Voltages'][selectedconductor][0])))
+        y_axis.append(float(abs(file['Line_Voltages'][selectedconductor][0]))/1000)
         for j in range(len(file["Line_Voltages"][0])):
             y_axis.append(float(abs(file['Line_Voltages'][selectedconductor+10][j])/1000))
-        plt.ylabel("Line Voltages (kV)")
+        plt.ylabel((conductors[selectedconductor]+" Voltages (kV)"),fontsize=15, fontweight='bold')
     for i in range(len(x_axis)):
         xvalues.append(x_axis[i]["data"])
     plt.plot(xvalues, y_axis, label = file2["timesnap"][0])
-    plt.title("Short Circuit Analysis")
-    plt.xlabel("Chainage in Distance(km)")
+    plt.title("Short Circuit Analysis",fontsize=15, fontweight='bold')
+    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+    plt.grid(alpha=0.3)
     plt.legend()
-    plt.show()
+    plt.show(block = False)
 
 def calculateTime(time):
     hours = datetime.strptime(time, "%H:%M:%S").hour

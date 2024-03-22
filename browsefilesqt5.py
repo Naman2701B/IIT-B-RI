@@ -112,8 +112,8 @@ class MainWindow(QDialog):
         self.final_input_directories = []
         self.trains = []
         self.final_output_directories = []
-        self.conductors = ["Catenary Node Voltage, kV (Uptrack)", "Rail1 Voltage, kV (Uptrack)", "Rail2 Voltage, kV (Uptrack)", "Catenary Node Voltage, kV (Downtrack)", "Rail1 Voltage, kV (Downtrack)",
-                           "Rail2 Voltage, kV (Downtrack)", "Feeder Node Voltage, kV (Uptrack)", "Feeder Node Voltage, kV (Downtrack)", "Protective Wire Node Voltage, kV (Uptrack)", "Protective Wire Node Voltage, kV (Downtrack)"]
+        self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
+                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
@@ -214,7 +214,6 @@ class MainWindow(QDialog):
 
     def pqa_sca_connect(self):
         if(self.scaradio.isChecked()):
-            self.timeoptions.clear()
             self.timelist.clear()
             self.timeoptions.setEnabled(False)
             self.frequencyoptions.setEnabled(False)
@@ -229,6 +228,8 @@ class MainWindow(QDialog):
             self.pltlfa_pqa_sca.setEnabled(True)
             file = io.loadmat(os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
             self.timelist.addItem(file["timesnap"][0])
+            self.frequencyList.clear()
+            self.frequencyList.addItem("50")
         else:
             self.lfaoptions.setEnabled(True)
             self.pqa_scaoptions.setEnabled(True)
@@ -264,8 +265,6 @@ class MainWindow(QDialog):
             self.timelist.takeItem(self.timelist.currentRow())
             self.radiostatus(0)
         if(sender == self.frequencyList):
-            print(self.selectedFrequencyValue)
-            print(self.selectedFrequency)
             for i in range(0, len(self.selectedFrequencyValue)):
                 if self.selectedFrequencyValue[i] == self.frequencyList.currentItem().text():
                     self.frequencyoptions.insertItem(
@@ -283,12 +282,10 @@ class MainWindow(QDialog):
         self.frequency_2d.setEnabled(False)
         self.frequency_3d.setEnabled(False)
         self.timeoptions.setEnabled(False)
-        self.timeoptions.clear()
         self.conductorlist.clear()
         self.timelist.clear()
         self.selectedTsnaps.clear()
         self.selectedTsnapValue.clear()
-        self.frequencyoptions.clear()
         self.frequencyoptions.setEnabled(False)
         self.conductorlist.setEnabled(False)
         self.nodeVoltRadio.setEnabled(False)
@@ -297,6 +294,7 @@ class MainWindow(QDialog):
         self.frequencyList.setEnabled(False)
         self.lfaselect.setEnabled(True)
         self.lfaoptions.clear()
+        self.pqa_scaoptions.clear()
         self.lfaoptions.setEnabled(True)
         self.pqa_scaoptions.setEnabled(False)
         for i in range(0, len(self.lfadirectories)):
@@ -549,41 +547,43 @@ class MainWindow(QDialog):
             for j in range(0, len(Y_axis[i])):
                 plt.figure()
                 if (timeflag == True):
-                    plt.xlabel("Time in Minutes")
+                    plt.xlabel("Time in Minutes",fontsize=15, fontweight='bold')
                 else:
-                    plt.xlabel("Distance (km)")
-                plt.title(keys[i])
+                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                plt.title(keys[i],fontsize=15, fontweight='bold')
                 plt.plot(X_axis[i][j], Y_axis[i][j],
                          label=str(self.MTMMList.currentItem().text()))
                 plt.legend()
-                plt.ylabel(keys[i])
+                plt.ylabel(keys[i],fontsize=15, fontweight='bold')
                 cursor = mplcursors.cursor(hover=True)
                 plt.grid(alpha=0.3)
-                plt.show()
+                plt.show(block = False)
 
     def subplot(self, X_axis, Y_axis, keys, timeflag):
+        if(len(Y_axis)==1):
+            self.plot(X_axis,Y_axis,keys,timeflag)
+            return
         figure, axis = plt.subplots(len(Y_axis))
         for i in range(0, len(Y_axis)):
             if (timeflag == True):
-                plt.xlabel("Time in Minutes")
+                plt.xlabel("Time in Minutes",fontsize=15, fontweight='bold')
             else:
-                plt.xlabel("Distance (km)")
+                plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
             for j in range(0, len(Y_axis[i])):
                 axis[i].plot(X_axis[i][j], Y_axis[i][j],
                              label=str(self.MTMMList.currentItem().text()))
                 axis[i].set_ylabel(keys[i])
                 axis[i].legend()
-                # axis[i].set_ylabel[keys[i]]
         cursor = mplcursors.cursor(hover=True)
         plt.grid(alpha=0.3)
-        plt.show()
+        plt.show(block = False)
 
     def mergeplot(self, X_axis, Y_axis, keys, timeflag):
         fig, ax1 = plt.subplots()
         if (timeflag == True):
-            plt.xlabel("Time in Minutes")
+            plt.xlabel("Time in Minutes",fontsize=15, fontweight='bold')
         else:
-            plt.xlabel("Distance (km)")
+            plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
         ax2 = ax1.twinx()
         ax1.plot(X_axis[0][0], Y_axis[0][0], label=(str(
             keys[0])+" "+str(self.MTMMList.currentItem().text())), color='tab:cyan')
@@ -594,7 +594,7 @@ class MainWindow(QDialog):
         plt.legend()
         plt.grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
-        plt.show()
+        plt.show(block = False)
     
     def PQA(self):
         radioflag = 0
@@ -610,43 +610,67 @@ class MainWindow(QDialog):
             if self.frequency_3d.isChecked()==False:
                 for i in range(0, len(Y)):
                     plt.figure()
-                    plt.title("Power Quality Analysis 2D")
+                    plt.title("Power Quality Analysis 2D",fontsize=15, fontweight='bold')
                     plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
-                    plt.xlabel("Distance (km)")
+                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel("Branch Current (A)")
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
                     else:
-                        plt.ylabel("Node Voltage (kV)")
-                    plt.xlim(left=0, right = max(X[i]))
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                    plt.xlim(left=min(X[i]), right = max(X[i]))
                     plt.grid(alpha=0.3)
                     plt.legend()
-                    plt.show()
+                    plt.show(block = False)
         if (sender == self.subpltlfa_pqa_sca):
-            figure, axis = plt.subplots(len(Y))
-            for i in range (0,len(Y)):
-                axis[i].plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
-                if radioflag==1:
-                    axis[i].set_ylabel("Branch Current (A)")
+            t=len(Y)
+            while(t>0):
+                if(t//3>0):
+                    j=3
                 else:
-                    axis[i].set_ylabel("Node Voltage (kV)")
-                axis[i].set_xlabel("Distance (km)")
-                axis[i].legend()
-                axis[i].set_xlim(left=0, right=max(X[i]))
-                axis[i].grid(alpha=0.3)
-            plt.show()
+                    j=t
+                if(j==1):
+                    plt.figure()
+                    plt.title("Load Flow Analysis 2D", fontsize=15, fontweight='bold')
+                    plt.plot(X[t-1], Y[t-1], label = self.selectedFrequencyValue[t-1])
+                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                    if radioflag == 1:
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                    else:
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                    plt.xlim(left=min(X[t-1]), right = max(X[t-1]))
+                    plt.grid(alpha=0.3)
+                    plt.legend()
+                    plt.show(block = False)
+                    break
+                else:
+                    figure, axis = plt.subplots(j)
+                    for i in range (0,len(Y)):
+                        axis[i].plot(X[t-1], Y[t-1], label = self.selectedFrequencyValue[t-1])
+                        if radioflag==1:
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                        else:
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                        axis[i].set_xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                        axis[i].legend()
+                        axis[i].set_xlim(left=min(X[t-1]), right=max(X[t-1]))
+                        axis[i].grid(alpha=0.3)
+                        t-=1
+                        if(t==0):
+                            break
+                    plt.show(block = False)
         if (sender == self.mergepltlfa_pqa_sca):
             for i in range(0, len(Y)):
-                plt.title("Power Quality Analysis 2D")
+                plt.title("Power Quality Analysis 2D",fontsize=15, fontweight='bold')
                 plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
-                plt.xlabel("Distance (km)")
+                plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                 if radioflag == 1:
-                    plt.ylabel("Branch Current (A)")
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
                 else:
-                    plt.ylabel("Node Voltage (kV)")
-                plt.xlim(left=0, right=max(X[i]))
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                plt.xlim(left=min(X[i]), right=max(X[i]))
                 plt.grid(alpha=0.3)
                 plt.legend()
-                plt.show()
+                plt.show(block = False)
 
 
     def LFA(self):
@@ -665,45 +689,69 @@ class MainWindow(QDialog):
             if self.time_3d.isChecked()==False:
                 for i in range(0, len(Y)):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D")
+                    plt.title("Load Flow Analysis 2D", fontsize=15, fontweight='bold')
                     plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
-                    plt.xlabel("Distance (km)")
+                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel("Branch Current (A)")
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
                     else:
-                        plt.ylabel("Node Voltage (kV)")
-                    plt.xlim(left=0, right = max(X[i]))
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                    plt.xlim(left=min(X[i]), right = max(X[i]))
                     plt.grid(alpha=0.3)
                     plt.legend()
-                    plt.show()
+                    plt.show(block = False)
             if self.scaradio.isChecked():
                 ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.conductorlist.currentRow(), radioflag)
         if (sender == self.subpltlfa_pqa_sca):
-            figure, axis = plt.subplots(len(Y))
-            for i in range (0,len(Y)):
-                axis[i].plot(X[i], Y[i], label = self.selectedTsnapValue[i])
-                if radioflag==1:
-                    axis[i].set_ylabel("Branch Current (A)")
+            t=len(Y)
+            while(t>0):
+                if(t//3>0):
+                    j=3
                 else:
-                    axis[i].set_ylabel("Node Voltage (kV)")
-                axis[i].set_xlabel("Distance (km)")
-                axis[i].legend()
-                axis[i].set_xlim(left=0, right=max(X[i]))
-                axis[i].grid(alpha=0.3)
-            plt.show()
+                    j=t
+                if(j==1):
+                    plt.figure()
+                    plt.title("Load Flow Analysis 2D", fontsize=15, fontweight='bold')
+                    plt.plot(X[t-1], Y[t-1], label = self.selectedTsnapValue[t-1])
+                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                    if radioflag == 1:
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                    else:
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                    plt.xlim(left=min(X[t-1]), right = max(X[t-1]))
+                    plt.grid(alpha=0.3)
+                    plt.legend()
+                    plt.show(block = False)
+                    break
+                else:
+                    figure, axis = plt.subplots(j)
+                    for i in range (0,j):
+                        axis[i].plot(X[t-1], Y[t-1], label = self.selectedTsnapValue[t-1])
+                        if radioflag==1:
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)", fontweight='bold')
+                        else:
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)", fontweight='bold')
+                        axis[i].set_xlabel("Distance (km)", fontweight='bold')
+                        axis[i].legend()
+                        axis[i].set_xlim(left=min(X[t-1]), right=max(X[t-1]))
+                        axis[i].grid(alpha=0.3)
+                        t-=1
+                        if(t==0):
+                            break
+                    plt.show(block = False)
         if (sender == self.mergepltlfa_pqa_sca):
             for i in range(0, len(Y)):
-                plt.title("Load Flow Analysis 2D")
+                plt.title("Load Flow Analysis 2D", fontsize=15, fontweight='bold')
                 plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
-                plt.xlabel("Distance (km)")
+                plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                 if radioflag == 1:
-                    plt.ylabel("Branch Current (A)")
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
                 else:
-                    plt.ylabel("Node Voltage (kV)")
-                plt.xlim(left=0, right=max(X[i]))
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                plt.xlim(left=min(X[i]), right=max(X[i]))
                 plt.grid(alpha=0.3)
                 plt.legend()
-                plt.show()
+                plt.show(block = False)
 
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
@@ -739,16 +787,16 @@ class MainWindow(QDialog):
             plt.gca().invert_yaxis()
             plt.yticks(data["plottingData"][1], data["plottingData"][0])
             plt.xticks(data["plottingData"][3], data["plottingData"][2])
-            plt.xlim(left=0, right=max(data["plottingData"][3]))
+            plt.xlim(left=min(data["plottingData"][3]), right=max(data["plottingData"][3]))
             plt.legend(loc='center left', bbox_to_anchor=(1, 1))
-            plt.xlabel("Distance from Starting Point",
+            plt.xlabel("Distance from Starting Point (km)",
                        fontsize=15, fontweight='bold')
             plt.ylabel("Time", fontsize=15, fontweight='bold')
             plt.title("String Line Diagram", fontsize=15, fontweight='bold')
             plt.get_current_fig_manager().resize(950, 500)
             plt.grid(alpha=0.3)
             # binding_id = plt.connect('motion_notify_event', on_move)
-            plt.show()
+            plt.show(block = False)
 
     def stringLinePlotClick(self):
         if (self.Stringline.isChecked()):
