@@ -618,11 +618,6 @@
                                 <height>41</height>
                             </rect>
                         </property>
-                        <item>
-                            <property name="text">
-                                <string>Frequency</string>
-                            </property>
-                        </item>
                     </widget>
                     <widget class="QButtonGroup" name = "timebuttons">
                         <widget class="QRadioButton" name="time_2d">
