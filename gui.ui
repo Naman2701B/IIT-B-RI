@@ -334,19 +334,19 @@
                         </rect>
                     </property>
                 </widget>
-                <widget class="QCheckBox" name="Conductorconfig">
+                <!-- <widget class="QPushButton" name="reportGenerate">
                     <property name="geometry">
                         <rect>
-                            <x>30</x>
-                            <y>270</y>
-                            <width>171</width>
-                            <height>22</height>
+                            <x>210</x>
+                            <y>230</y>
+                            <width>119</width>
+                            <height>28</height>
                         </rect>
                     </property>
                     <property name="text">
-                        <string>Conductor configuration</string>
+                        <string>Generate Report</string>
                     </property>
-                </widget>
+                </widget> -->
                 <widget class="QPushButton" name="stringlineplot">
                     <property name="geometry">
                         <rect>
@@ -747,11 +747,24 @@
                             <string>Temperature Analysis</string>
                         </property>
                     </widget>
+                    <widget class="QCheckBox" name="Conductorconfig">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>55</y>
+                                <width>171</width>
+                                <height>22</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Conductor configuration</string>
+                        </property>
+                    </widget>
                     <widget class="QComboBox" name="comboBox_6">
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>60</y>
+                                <y>85</y>
                                 <width>231</width>
                                 <height>24</height>
                             </rect>

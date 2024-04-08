@@ -9,7 +9,9 @@ from scipy import io
 from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData
 from utility import ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
 from utility import loadFlowAnalysis, ShortCircuitAnalysis, powerQualityAnalysis
+from timetableoutput import timeTableExcel
 import mplcursors
+from PyQt5 import QtCore
 
 
 class MainWindow(QDialog):
@@ -198,6 +200,7 @@ class MainWindow(QDialog):
             if len(scadirectoriesToShow) == 0:
                 self.pqa_sca_select.setEnabled(False)
                 self.pqa_scaoptions.setEnabled(False)
+                self.pltlfa_pqa_sca.setEnabled(False)
             else:
                 self.pqa_scaoptions.addItems(scadirectoriesToShow)
                 self.pqa_sca_select.setEnabled(True)
@@ -798,7 +801,31 @@ class MainWindow(QDialog):
             # binding_id = plt.connect('motion_notify_event', on_move)
             plt.show(block = False)
 
+    def showdialog(self):
+        dialog = QDialog()
+        layout =  QtWidgets.QVBoxLayout(dialog)
+        for i in range(len(self.final_input_directories)):
+            dict = timeTableExcel(self.final_input_directories[i])
+        for i in range(len(dict)):
+            self.table = QtWidgets.QTableWidget()
+            labels = ["Station Name", "Station Number", "Travel Time", "Dwell Time (in mins)"]
+            header = self.table.horizontalHeader()
+            self.table.setColumnCount(4)
+            self.table.setHorizontalHeaderLabels(labels)
+            header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+            self.table.setRowCount(len(dict))
+            for i in range(len(dict)):
+                item = QtWidgets.QTableWidgetItem(dict[i]["stationName"][0])
+                self.table.setItem(i,0,item)
+            layout.addWidget(self.table)
+            # self.table.show()
+        flags = QtCore.Qt.WindowFlags()
+        dialog.setWindowFlags(flags)
+        dialog.exec_()
+        
     def stringLinePlotClick(self):
+        if (self.Timetable.isChecked()):
+            self.showdialog()
         if (self.Stringline.isChecked()):
             plt.figure()
             self.getStringLineData()
@@ -806,6 +833,7 @@ class MainWindow(QDialog):
             plt.figure()
             for i in range(0, len(self.final_input_directories)):
                 routeAltitudeData(self.final_input_directories[i])
+
 
     def findFolders(self, start_dir):
         directory_results = []
