@@ -266,8 +266,7 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors)
                 zvaluestoshow.append(zvalue[i][j])
                 ztickstoshow.append(zticks[i][j])
         ax.set_yticks(zvaluestoshow, ztickstoshow)
-        ax.set(xlabel='Distance (km)',
-            ylabel='Time Snaps', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)",fontsize=15, fontweight='bold')
+        ax.set(xlabel='Distance (km)',ylabel='Time Snaps', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)",fontsize=15, fontweight='bold')
         # plt.legend()
         plt.title("Load Flow Analysis 3D")
     else:

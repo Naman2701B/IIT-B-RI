@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets
+from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
 from PyQt5.uic import loadUi
 import matplotlib.pyplot as plt
@@ -11,13 +11,13 @@ from utility import ReactivePowerData, ActivePowerData, BrakingEffortData, Tract
 from utility import loadFlowAnalysis, ShortCircuitAnalysis, powerQualityAnalysis
 from timetableoutput import timeTableExcel
 import mplcursors
-from PyQt5 import QtCore
-
+from reportmaker import startReport
 
 class MainWindow(QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
         loadUi("gui.ui", self)
+        self.reportGenerate.setEnabled(False)
         self.stringlineplot.setEnabled(False)
         self.velocity.setEnabled(False)
         self.stringlineplot.clicked.connect(self.stringLinePlotClick)
@@ -30,6 +30,7 @@ class MainWindow(QDialog):
         self.subpltlfa_pqa_sca.clicked.connect(self.LFA)
         self.mergepltlfa_pqa_sca.clicked.connect(self.LFA)
         self.options.currentTextChanged.connect(self.current_text_changed)
+        self.reportGenerate.clicked.connect(self.reportTrigger)
         self.Tractiveeffort.setEnabled(False)
         self.Reactivepower.setEnabled(False)
         self.Activepower.setEnabled(False)
@@ -117,6 +118,8 @@ class MainWindow(QDialog):
         self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
+    def reportTrigger(self):
+        startReport(self.final_output_directories)
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
             self, 'Choose a Folder', '')
@@ -366,6 +369,7 @@ class MainWindow(QDialog):
         self.scaradio.setEnabled(True)
         self.pqaradio.setEnabled(True)
         self.file_names.clear()
+        self.reportGenerate.setEnabled(True)
         self.Trainplots.setEnabled(True)
         self.Stringline.setEnabled(True)
         self.Conductorconfig.setEnabled(True)
@@ -396,6 +400,7 @@ class MainWindow(QDialog):
                 for root, dirs, files in os.walk(directories):
                     if (len(files) > 0):
                         self.final_output_directories.append(directories)
+            print(output_directory_results)
             self.LFA_PQA_SCA()
 
     def MTMM(self):
@@ -808,17 +813,36 @@ class MainWindow(QDialog):
             dict = timeTableExcel(self.final_input_directories[i])
         for i in range(len(dict)):
             self.table = QtWidgets.QTableWidget()
-            labels = ["Station Name", "Station Number", "Travel Time", "Dwell Time (in mins)"]
+            # labels2 = ["Train Number", "Train Type"]
+            labels = ["Train Number","Train Type", "",""]
             header = self.table.horizontalHeader()
             self.table.setColumnCount(4)
             self.table.setHorizontalHeaderLabels(labels)
             header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
-            self.table.setRowCount(len(dict))
-            for i in range(len(dict)):
-                item = QtWidgets.QTableWidgetItem(dict[i]["stationName"][0])
-                self.table.setItem(i,0,item)
+            self.table.setRowCount(2+len(dict[i]["stationName"]))
+            item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
+            item2 = QtWidgets.QTableWidgetItem(dict[i]["trainType"])
+            item3 = QtWidgets.QTableWidgetItem("Station Name")
+            item4 = QtWidgets.QTableWidgetItem("Station Number")
+            item5 = QtWidgets.QTableWidgetItem("Travel Time")
+            item6 = QtWidgets.QTableWidgetItem("Dwell Time (in mins)")
+            self.table.setItem(0,0,item)
+            self.table.setItem(0,1,item2)
+            self.table.setItem(1,0,item3)
+            self.table.setItem(1,1,item4)
+            self.table.setItem(1,2,item5)
+            self.table.setItem(1,3,item6)
+            for j in range(len(dict[i]["stationName"])):
+                item = QtWidgets.QTableWidgetItem(dict[i]["stationName"][j])
+                item2 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
+                item3 = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
+                item4 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
+                self.table.setItem(j+2,0,item)
+                self.table.setItem(j+2,1,item2)
+                self.table.setItem(j+2,2,item3)
+                self.table.setItem(j+2,3,item4)
+                self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
             layout.addWidget(self.table)
-            # self.table.show()
         flags = QtCore.Qt.WindowFlags()
         dialog.setWindowFlags(flags)
         dialog.exec_()
