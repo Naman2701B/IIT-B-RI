@@ -7,12 +7,16 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-outputFolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
+outputFolder = "C:\Internship\SPIT_Interns_task\eTPSS\Traction_Power_Supply_System_Modules\HSRIC_00_Projects\Case_2_P0.25B\Case_2_P0.25B_Output"
 def startReport(outputFolder):
     file = pd.read_csv(outputFolder+"/SubstationResults.csv")
     fig,ax = plt.subplots()
-    ax.pie()
-    print(file)
+    pie1 = float(file["Supplied energy without Transformer losses SPT1(kWh)"])
+    pie2 = float(file["Supplied energy with Transformer losses SPT1(kWh)"])
+    data_labels = ["Supplied energy without Transformer losses SPT1(kWh)","Supplied energy with Transformer losses SPT1(kWh)"]
+    data = np.array([pie1,pie2])
+    ax.pie(data, labels=data_labels)
+    plt.show()
     return
 
 startReport(outputFolder)
