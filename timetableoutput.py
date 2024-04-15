@@ -2,10 +2,12 @@ import pandas as pd
 import os
 from datetime import datetime, timedelta
 
-# basefolderinput = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Input_01_MTMM"
+basefolderinput = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Input_01_MTMM"
 def timeTableExcel(basefolderinput):
     df = pd.read_csv(os.path.join(basefolderinput,"TimeTableData.csv"), header=None)
     df2 = pd.read_csv(os.path.join(basefolderinput,"AllStationData.csv"))
+    station_numbers = df2["StationNumber "]
+    station_name= df2["StationName "].to_list()
     rows = []
     final_dict = []
     for i in range(0, len(df)):
@@ -36,12 +38,18 @@ def timeTableExcel(basefolderinput):
                 int(datetime.strptime(df[2][rows[j]+1], "%H:%M").minute)
         temp = {"trainnumber": df[0][rows[j]+1], "startDistance": df[3][rows[j]+4],
                 "trainType": df[6][rows[j]+1],
-                "stationName": stationName,
+                "stationName": station_name,
                 "stationNumber":stationNumber,
                 "distanceBetweenStations": distanceBetweenStations,
                 "timeFromStarting": timeFromStarting}
         final_dict.append(temp)
-    # print(final_dict)
+    for i in range(len(final_dict)):
+        for j in station_numbers:
+            if str(j) in final_dict[i]["stationNumber"]:
+                continue
+            else:
+                final_dict[i]["stationNumber"].insert(j-1,str(j))
+                final_dict[i]["timeFromStarting"].insert(j-1, "-")
     return final_dict
 
-# timeTableExcel(basefolderinput)
+timeTableExcel(basefolderinput)

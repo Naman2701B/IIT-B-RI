@@ -7,19 +7,27 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 
-outputFolder = "C:\Internship\SPIT_Interns_task\eTPSS\Traction_Power_Supply_System_Modules\HSRIC_00_Projects\Case_2_P0.25B\Case_2_P0.25B_Output"
+outputFolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
 def startReport(outputFolder):
     file = pd.read_csv(outputFolder+"/SubstationResults.csv")
     fig,ax = plt.subplots()
     pie1 = float(file["Supplied energy without Transformer losses SPT1(kWh)"])
-    pie2 = float(file["Supplied energy with Transformer losses SPT1(kWh)"])
-    data_labels = ["Supplied energy without Transformer losses SPT1(kWh)","Supplied energy with Transformer losses SPT1(kWh)"]
+    pie2 = float(abs(file["Regenerative energy without Transformer losses SPT1(kWh)"]))
+    data_labels = ["Supplied energy without losses SPT1(kWh)","Regenerative energy without losses SPT1(kWh)"]
     data = np.array([pie1,pie2])
-    ax.pie(data, labels=data_labels)
+    ax.pie(data)
+    ax.legend(labels = data_labels, bbox_to_anchor=(0.4,1), loc="center")
     plt.show()
+    canvas = FigureCanvas(fig)
+    canvas.draw()
+    img = Image.fromarray(np.asarray(canvas.buffer_rgba()))
+    pdf = FPDF()
+    pdf.add_page()
+    pdf.image(img,w=pdf.epw/2, x=120, y=10) 
+    pdf.output("matplotlib.pdf")
     return
 
-startReport(outputFolder)
+# startReport(outputFolder)
 # fig = Figure(figsize=(6, 4), dpi=300)
 # fig.subplots_adjust(top=0.8)
 # ax1 = fig.add_subplot(211)
