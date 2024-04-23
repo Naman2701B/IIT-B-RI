@@ -236,6 +236,8 @@ class MainWindow(QDialog):
             self.timelist.addItem(file["timesnap"][0])
             self.frequencyList.clear()
             self.frequencyList.addItem("50")
+            self.subpltlfa_pqa_sca.setEnabled(False)
+            self.mergepltlfa_pqa_sca.setEnabled(False)
         else:
             self.lfaoptions.setEnabled(True)
             self.pqa_scaoptions.setEnabled(True)
@@ -375,7 +377,7 @@ class MainWindow(QDialog):
         self.Conductorconfig.setEnabled(True)
         self.Routealtitude.setEnabled(True)
         self.Timetable.setEnabled(True)
-        self.Trainplots1.setEnabled(True)
+        # self.Trainplots1.setEnabled(True)
         self.Substationplots.setEnabled(True)
         self.stringlineplot.setEnabled(True)
         self.Time_radio.setChecked(True)
@@ -400,7 +402,7 @@ class MainWindow(QDialog):
                 for root, dirs, files in os.walk(directories):
                     if (len(files) > 0):
                         self.final_output_directories.append(directories)
-            print(output_directory_results)
+            #print(output_directory_results)
             self.LFA_PQA_SCA()
 
     def MTMM(self):
@@ -811,42 +813,60 @@ class MainWindow(QDialog):
         layout =  QtWidgets.QVBoxLayout(dialog)
         for i in range(len(self.final_input_directories)):
             dict = timeTableExcel(self.final_input_directories[i])
+        # print(len(dict))
+        # print (dict)
         self.table = QtWidgets.QTableWidget()
-        
-        self.table.setColumnCount(2+2*(len(dict)))
-        labels = ["Station Number", "Station Name"]
+        self.table.setColumnCount(1+3*(len(dict)))
+        self.table.setRowCount(1+len(dict[0]["stationName"]))
+        labels = ["Station Name"]
         for i in range(len(dict)):
-            labels.append("Train Number","Train Type")
-            self.table.setSpan(0,2+2*i,1,2)
-        print(labels)
-        header = self.table.horizontalHeader()
+            column = i*2+i+1
+            item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"]) 
+            self.table.setSpan(0,column,1,3)
+            self.table.setItem(0,column,item)
+            temp = ["Arrival Time", "Departure Time", "Dwell Time"]
+            labels.extend(temp)
+        for i in range (len(dict)):
+            column = i*2+i+1
+            for j in range (len(dict[0]["stationName"])):
+                item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
+                self.table.setItem(j+1, column, item)
+        # for i in range(len(dict)):
+            # labels.append("Train Number")
+            # labels.append("Train Type")
+            # self.table.setSpan(0,2+2*i,1,2)
+        # print(labels)
+        # header = self.table.horizontalHeader()
         self.table.setHorizontalHeaderLabels(labels)
+        for i in range (0,len(dict[0]["stationName"])):
+            item = QtWidgets.QTableWidgetItem(dict[0]["stationName"][i])
+            self.table.setItem(i+1,0,item)
         # for i in range(len(dict)): 
-        #     # labels2 = ["Train Number", "Train Type"]
-        #     self.table.setRowCount(2+len(dict[i]["stationName"]))
-        #     header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
-        #     item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
-        #     item2 = QtWidgets.QTableWidgetItem(dict[i]["trainType"])
-        #     item3 = QtWidgets.QTableWidgetItem("Station Name")
-        #     item4 = QtWidgets.QTableWidgetItem("Station Number")
-        #     item5 = QtWidgets.QTableWidgetItem("Travel Time")
-        #     item6 = QtWidgets.QTableWidgetItem("Dwell Time (in mins)")
-        #     self.table.setItem(0,0,item)
-        #     self.table.setItem(0,1,item2)
-        #     self.table.setItem(1,0,item3)
-        #     self.table.setItem(1,1,item4)
-        #     self.table.setItem(1,2,item5)
-        #     self.table.setItem(1,3,item6)
-        #     for j in range(len(dict[i]["stationName"])):
-        #         item = QtWidgets.QTableWidgetItem(dict[i]["stationName"][j])
-        #         item2 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
-        #         item3 = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
-        #         item4 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
-        #         self.table.setItem(j+2,0,item)
-        #         self.table.setItem(j+2,1,item2)
-        #         self.table.setItem(j+2,2,item3)
-        #         self.table.setItem(j+2,3,item4)
-        #         self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+            # labels2 = ["Train Number", "Train Type"]
+            # self.table.setRowCount(2+len(dict[i]["stationName"]))
+            # header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+            # item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
+            # item2 = QtWidgets.QTableWidgetItem(dict[i]["trainType"])
+            # item3 = QtWidgets.QTableWidgetItem("Station Name")
+            # item4 = QtWidgets.QTableWidgetItem("Station Number")
+            # item5 = QtWidgets.QTableWidgetItem("Travel Time")
+            # item6 = QtWidgets.QTableWidgetItem("Dwell Time (in mins)")
+            # self.table.setItem(0,0,item)
+            # self.table.setItem(0,1,item2)
+            # self.table.setItem(1,0,item3)
+            # self.table.setItem(1,1,item4)
+            # self.table.setItem(1,2,item5)
+            # self.table.setItem(1,3,item6)
+            # for j in range(len(dict[i]["stationName"])):
+                # item = QtWidgets.QTableWidgetItem(dict[i]["stationName"][j])
+                # item2 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
+                # item3 = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
+                # item4 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
+                # self.table.setItem(j+2,0,item)
+                # self.table.setItem(j+2,1,item2)
+                # self.table.setItem(j+2,2,item3)
+                # self.table.setItem(j+2,3,item4)
+        self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         layout.addWidget(self.table)
         flags = QtCore.Qt.WindowFlags()
         dialog.setWindowFlags(flags)
