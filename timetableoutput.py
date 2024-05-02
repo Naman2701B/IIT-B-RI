@@ -16,12 +16,15 @@ def timeTableExcel(basefolderinput):
     for j in range(0, len(rows)-1):
         stationName = []
         stationNumber =[]
+        dwellTime = []
+        departureTime = [df[2][rows[j]+1]]
         distanceBetweenStations = []
         timeFromStarting = [df[2][rows[j]+1]]
         timeFromStarting_mins = []
         for k in range(rows[j]+4, rows[j+1]-1):
             stationName.append(df[1][k])
             stationNumber.append(df[2][k])
+            dwellTime.append(df[5][k])
             if(k == rows[j]+4):
                 continue
             else:
@@ -33,15 +36,20 @@ def timeTableExcel(basefolderinput):
             m = int(timeFromStarting_mins[i]) % 60
             timeFromStarting.append(str(timedelta(
                 hours=h, minutes=m) + timedelta(hours=int(values[0]), minutes=int(values[1]))))
+            print(timeFromStarting)
+            departureTime.append(str(timedelta(
+                hours=h, minutes=m) + timedelta(hours=(int(dwellTime[i])//60), minutes=(int(dwellTime[i])%60))))
         for i in range(0, len(timeFromStarting_mins)):
             timeFromStarting_mins[i] = timeFromStarting_mins[i] + \
                 int(datetime.strptime(df[2][rows[j]+1], "%H:%M").minute)
+        # print(timeFromStarting_mins)
         temp = {"trainnumber": df[0][rows[j]+1], "startDistance": df[3][rows[j]+4],
                 "trainType": df[6][rows[j]+1],
-                "stationName": station_name,
+                "stationNameToDisplay": station_name,
                 "stationNumber":stationNumber,
                 "distanceBetweenStations": distanceBetweenStations,
-                "timeFromStarting": timeFromStarting}
+                "dwellTime": dwellTime,
+                "timeFromStarting": timeFromStarting, "actualStationName": stationName, "departureTime": departureTime}
         final_dict.append(temp)
     for i in range(len(final_dict)):
         for j in station_numbers:
@@ -50,6 +58,8 @@ def timeTableExcel(basefolderinput):
             else:
                 final_dict[i]["stationNumber"].insert(j-1,str(j))
                 final_dict[i]["timeFromStarting"].insert(j-1, "-")
+                final_dict[i]["dwellTime"].insert(j-1,"-")
+    print(final_dict)
     return final_dict
 
 timeTableExcel(basefolderinput)

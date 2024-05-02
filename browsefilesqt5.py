@@ -817,20 +817,31 @@ class MainWindow(QDialog):
         # print (dict)
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(1+3*(len(dict)))
-        self.table.setRowCount(1+len(dict[0]["stationName"]))
+        self.table.setRowCount(1+len(dict[0]["stationNameToDisplay"]))
         labels = ["Station Name"]
         for i in range(len(dict)):
-            column = i*2+i+1
-            item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"]) 
+            column = (i*3)+1
+            item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
             self.table.setSpan(0,column,1,3)
             self.table.setItem(0,column,item)
-            temp = ["Arrival Time", "Departure Time", "Dwell Time"]
+            temp = ["Arrival Time", "Dwell Time (in mins)", "Departure Time"]
             labels.extend(temp)
-        for i in range (len(dict)):
-            column = i*2+i+1
-            for j in range (len(dict[0]["stationName"])):
-                item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
-                self.table.setItem(j+1, column, item)
+            for j in range (len(dict[0]["stationNameToDisplay"])):
+                item3 = QtWidgets.QTableWidgetItem(dict[0]["stationNameToDisplay"][j])
+                self.table.setItem(j+1,0,item3)
+                for k in range(len(dict[i]["actualStationName"])):
+                    for l in range(len(dict[0]["stationNameToDisplay"])):
+                        if(dict[i]["actualStationName"][k] == dict[0]["stationNameToDisplay"][l]):
+                            item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][int(dict[i]["stationNumber"][l])-1])                            
+                            item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][int(dict[i]["stationNumber"][l])-1])
+                            self.table.setItem(l+1, column, item)
+                            self.table.setItem(l+1,column+1,item2)
+                            break
+                        else:
+                            item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
+                            item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][j])
+                            self.table.setItem(j+1, column, item)
+                            self.table.setItem(j+1,column+1,item2)
         # for i in range(len(dict)):
             # labels.append("Train Number")
             # labels.append("Train Type")
@@ -838,9 +849,6 @@ class MainWindow(QDialog):
         # print(labels)
         # header = self.table.horizontalHeader()
         self.table.setHorizontalHeaderLabels(labels)
-        for i in range (0,len(dict[0]["stationName"])):
-            item = QtWidgets.QTableWidgetItem(dict[0]["stationName"][i])
-            self.table.setItem(i+1,0,item)
         # for i in range(len(dict)): 
             # labels2 = ["Train Number", "Train Type"]
             # self.table.setRowCount(2+len(dict[i]["stationName"]))
@@ -867,6 +875,7 @@ class MainWindow(QDialog):
                 # self.table.setItem(j+2,2,item3)
                 # self.table.setItem(j+2,3,item4)
         self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+        self.table.resizeColumnsToContents()
         layout.addWidget(self.table)
         flags = QtCore.Qt.WindowFlags()
         dialog.setWindowFlags(flags)
