@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog
+from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog,QMessageBox
 from PyQt5.uic import loadUi
 import matplotlib.pyplot as plt
 import pandas as pd
@@ -119,7 +119,11 @@ class MainWindow(QDialog):
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
     def reportTrigger(self):
-        startReport(self.final_output_directories)
+        startReport(self.final_output_directories[0])
+        msg = QMessageBox()
+        msg.setWindowTitle("PDF Notification")
+        msg.setText("PDF Successfully Created.")
+        msg.exec()
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
             self, 'Choose a Folder', '')

@@ -10,20 +10,60 @@ import matplotlib.pyplot as plt
 outputFolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
 def startReport(outputFolder):
     file = pd.read_csv(outputFolder+"/SubstationResults.csv")
-    fig,ax = plt.subplots()
-    pie1 = float(file["Supplied energy without Transformer losses SPT1(kWh)"])
-    pie2 = float(abs(file["Regenerative energy without Transformer losses SPT1(kWh)"]))
-    data_labels = ["Supplied energy without losses SPT1(kWh)","Regenerative energy without losses SPT1(kWh)"]
-    data = np.array([pie1,pie2])
-    ax.pie(data)
-    ax.legend(labels = data_labels, bbox_to_anchor=(0.4,1), loc="center")
-    plt.show()
-    canvas = FigureCanvas(fig)
-    canvas.draw()
-    img = Image.fromarray(np.asarray(canvas.buffer_rgba()))
     pdf = FPDF()
     pdf.add_page()
-    pdf.image(img,w=pdf.epw/2, x=120, y=10) 
+    pdf.set_font("Times", size=8)
+    with pdf.table(width=100, text_align="CENTER",align="LEFT") as table:
+        headings = table.row()
+        headings.cell("")
+        for j in range(0, len(file)):
+            headings.cell("TSS"+str(j+1), colspan=2)
+        headings = table.row()
+        headings.cell("")
+        for j in range(0, len(file)):
+            headings.cell("Right Feed")
+            headings.cell("Left Feed")
+        row = table.row()
+        row.cell("Max Insantaneous Current(A)")
+        for j in range(0, len(file)):
+            row.cell(str(file["Max instantaneous current SPT1(A)"][j]))
+            row.cell(str(file["Max instantaneous current SPT2(A)"][j]))
+        row1 = table.row()
+        row1.cell("Max Moving Avg Current (1min)")
+        for j in range(0, len(file)):
+            row1.cell(str(file["Max moving average current SPT1(A,1min)"][j]))
+            row1.cell(str(file["Max moving average current SPT2(A,1min)"][j]))
+        row2=table.row()
+        row2.cell("Max Moving Avg Current (5min)")
+        for j in range(0, len(file)):
+            row2.cell(str(file["Max moving average current SPT1(A,5min)"][j]))
+            row2.cell(str(file["Max moving average current SPT2(A,5min)"][j]))
+    for i in range(0,len(file)):
+        fig1,ax1 = plt.subplots()
+        fig2,ax2 = plt.subplots()
+        pie1 = float(file["Supplied energy without Transformer losses SPT1(kWh)"][i])
+        pie2 = float(abs(file["Regenerative energy without Transformer losses SPT1(kWh)"][i]))
+        pie3 = float(file["Supplied energy without Transformer losses SPT2(kWh)"][i])
+        pie4 = float(abs(file["Regenerative energy without Transformer losses SPT2(kWh)"][i]))
+        data_labels1 = ["Supplied energy without losses SPT1(kWh)","Regenerative energy without losses SPT1(kWh)"]
+        data_labels2 = ["Supplied energy without losses SPT2(kWh)","Regenerative energy without losses SPT2(kWh)"]
+        data1 = np.array([pie1,pie2])
+        data2 = np.array([pie3,pie4])
+        ax1.set_title("Left Feed Data", loc="left")
+        ax1.pie(data1, autopct = '%.2f')
+        ax1.legend(labels = data_labels1, bbox_to_anchor=(0.9,1), loc="center")
+        ax2.set_title("Right Feed Data",loc = "left")
+        ax2.pie(data2, autopct = '%.2f')
+        ax2.legend(labels = data_labels2, bbox_to_anchor=(0.9,1), loc="center")
+        plt.show()
+        canvas1 = FigureCanvas(fig1)
+        canvas2 = FigureCanvas(fig2)
+        canvas1.draw()
+        img1 = Image.fromarray(np.asarray(canvas1.buffer_rgba()))
+        pdf.image(img1,w=pdf.epw/2.5, x=120, y=10*(i+1))
+        canvas2.draw()
+        img2 = Image.fromarray(np.asarray(canvas2.buffer_rgba()))
+        pdf.image(img2,w=pdf.epw/2.5, x=120, y=10+50*(i+1))
     pdf.output("matplotlib.pdf")
     return
 
