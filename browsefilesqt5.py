@@ -834,14 +834,18 @@ class MainWindow(QDialog):
                         if(dict[i]["actualStationName"][k] == dict[0]["stationNameToDisplay"][l]):
                             item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][int(dict[i]["stationNumber"][l])-1])                            
                             item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][int(dict[i]["stationNumber"][l])-1])
+                            item3 = QtWidgets.QTableWidgetItem(dict[i]["departureTime"][int(dict[i]["stationNumber"][l])-1])
                             self.table.setItem(l+1, column, item)
                             self.table.setItem(l+1,column+1,item2)
+                            self.table.setItem(l+1,column+2,item3)
                             break
                         else:
                             item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
                             item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][j])
+                            item3 = QtWidgets.QTableWidgetItem(dict[i]["departureTime"][j])
                             self.table.setItem(j+1, column, item)
                             self.table.setItem(j+1,column+1,item2)
+                            self.table.setItem(j+1, column+2, item3)
         # for i in range(len(dict)):
             # labels.append("Train Number")
             # labels.append("Train Type")
