@@ -20,17 +20,18 @@ def timeTableData(basefolderinput):
     for i in range(0, len(df)):
         if (df[0][i] == "TrainNumber "):
             rows.append(i)
-    for j in range(0, len(rows)-1):
+    rows.append(len(df)+1)
+    for j in range(1, len(rows)):
         stationName = []
         distanceFromStarting = []
         timeFromStarting = []
         timeFromStarting_mins = []
-        for k in range(rows[j]+4, rows[j+1]-1):
+        for k in range(rows[j-1]+4, rows[j]-1):
             stationName.append(df[1][k])
             distanceFromStarting.append(df[3][k])
             timeFromStarting_mins.append(int(df[4][k]))
         for i in range(0, len(timeFromStarting_mins)):
-            values = df[2][rows[j]+1].split(":")
+            values = df[2][rows[j-1]+1].split(":")
             h = int(timeFromStarting_mins[i]) // 60
             m = int(timeFromStarting_mins[i]) % 60
             timeFromStarting.append(str(timedelta(
@@ -38,11 +39,11 @@ def timeTableData(basefolderinput):
             timingGraphInHrsAndMins.append(timeFromStarting[i])
         for i in range(0, len(timeFromStarting_mins)):
             timeFromStarting_mins[i] = timeFromStarting_mins[i] + \
-                int(datetime.strptime(df[2][rows[j]+1], "%H:%M").minute)
+                int(datetime.strptime(df[2][rows[j-1]+1], "%H:%M").minute)
             timingGraph.append(timeFromStarting_mins[i])
             distanceGraph.append(int(distanceFromStarting[i]))
-        temp = {"trainnumber": df[0][rows[j]+1], "startTime": df[2][rows[j]+1], "endDistance": df[3][rows[j]+len(stationName)+3], "startDistance": df[3][rows[j]+4],
-                "trainType": df[6][rows[j]+1],
+        temp = {"trainnumber": df[0][rows[j-1]+1], "startTime": df[2][rows[j-1]+1], "endDistance": df[3][rows[j-1]+len(stationName)+3], "startDistance": df[3][rows[j-1]+4],
+                "trainType": df[6][rows[j-1]+1],
                 "stationName": stationName,
                 "distanceFromStarting": distanceFromStarting,
                 "timeFromStarting": timeFromStarting,

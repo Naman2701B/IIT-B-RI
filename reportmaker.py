@@ -8,8 +8,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 
 outputFolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
+
+def hist_report(outputFolder):
+    file = pd.read_csv(outputFolder+"/TrainResults.csv")
+    print(file)
+
 def startReport(outputFolder):
     file = pd.read_csv(outputFolder+"/SubstationResults.csv")
+    file2 = pd.read_csv(outputFolder+"/TrainResults.csv")
     pdf = FPDF()
     pdf.add_page()
     pdf.set_font("Times", size=8)
@@ -21,8 +27,8 @@ def startReport(outputFolder):
         headings = table.row()
         headings.cell("")
         for j in range(0, len(file)):
-            headings.cell("Right Feed")
             headings.cell("Left Feed")
+            headings.cell("Right Feed")
         row = table.row()
         row.cell("Max Insantaneous Current(A)")
         for j in range(0, len(file)):
@@ -38,6 +44,8 @@ def startReport(outputFolder):
         for j in range(0, len(file)):
             row2.cell(str(file["Max moving average current SPT1(A,5min)"][j]))
             row2.cell(str(file["Max moving average current SPT2(A,5min)"][j]))
+    # with pdf.table() as table:
+        
     for i in range(0,len(file)):
         fig1,ax1 = plt.subplots()
         fig2,ax2 = plt.subplots()
