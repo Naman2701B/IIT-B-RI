@@ -119,7 +119,8 @@ class MainWindow(QDialog):
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
     def reportTrigger(self):
-        startReport(self.final_output_directories[0])
+        data = timeTableData(self.final_input_directories[0])
+        startReport(self.final_output_directories[0], data["calculativeData"])
         msg = QMessageBox()
         msg.setWindowTitle("PDF Notification")
         msg.setText("PDF Successfully Created.")
