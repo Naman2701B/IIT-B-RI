@@ -1,1 +1,3 @@
+*.pdf
 hover.py
+__pycache__

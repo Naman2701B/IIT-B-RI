@@ -7,6 +7,7 @@ import os
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import timedelta
+import re
 
 outputFolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
 
@@ -16,10 +17,39 @@ def hist_report(outputFolder):
     for c in file.columns:
         if "Avg zonal voltage(V)_" in c:
             columns.append(c)
-    x = []
-    for i in range (len(columns)):
-        x.append(file[columns[i]])
-    # print(x)
+    temp = []
+    images = []
+    for i in range(len(columns)):
+        temp.append(re.findall("\d+",columns[i]))
+    for k in range(len(file)):
+        fig,ax = plt.subplots()
+        x_axis = []
+        y_axis = []
+        x_axis.append(0)
+        y_axis.append(0)
+        x = []
+        for i in range (len(columns)):
+            x.append(file.iloc[k][columns[i]])
+        for i in range(len(x)):
+            for m in range(int(temp[i][0]), int(temp[i][1])+1):
+                x_axis.append(m)
+                y_axis.append(x[i]/1000)
+            x_axis.append(int(temp[i][1]))
+            y_axis.append(0)
+        plt.plot(x_axis,y_axis)
+        plt.fill_between(x_axis,y_axis, 0, color='blue', alpha=.1)
+        plt.title(int(file.iloc[k][0]))
+        plt.xlim(left = 0, right = max(x_axis))
+        plt.ylim(bottom = 0)
+        plt.xlabel("Distance in kms")
+        plt.ylabel("Avg Zonal Voltage (kV)")
+        canvas = FigureCanvas(fig)
+        canvas.draw()
+        img1 = Image.fromarray(np.asarray(canvas.buffer_rgba()))
+        images.append(img1)
+        # plt.legend()
+    return images
+
 
 def startReport(outputFolder, data):
     file = pd.read_csv(outputFolder+"/SubstationResults.csv")
@@ -42,20 +72,18 @@ def startReport(outputFolder, data):
         row = table.row()
         row.cell("Max Insantaneous Current(A)")
         for j in range(0, len(file)):
-            row.cell(str(file["Max instantaneous current SPT1(A)"][j]))
-            row.cell(str(file["Max instantaneous current SPT2(A)"][j]))
+            row.cell(str(round(float(file["Max instantaneous current SPT1(A)"][j]),2)))
+            row.cell(str(round(float(file["Max instantaneous current SPT2(A)"][j]),2)))
         row1 = table.row()
         row1.cell("Max Moving Avg Current (1min)")
         for j in range(0, len(file)):
-            row1.cell(str(file["Max moving average current SPT1(A,1min)"][j]))
-            row1.cell(str(file["Max moving average current SPT2(A,1min)"][j]))
+            row1.cell(str(round(float(file["Max moving average current SPT1(A,1min)"][j]),2)))
+            row1.cell(str(round(float(file["Max moving average current SPT2(A,1min)"][j]),2)))
         row2=table.row()
         row2.cell("Max Moving Avg Current (5min)")
         for j in range(0, len(file)):
-            row2.cell(str(file["Max moving average current SPT1(A,5min)"][j]))
-            row2.cell(str(file["Max moving average current SPT2(A,5min)"][j]))
-    
-        
+            row2.cell(str(round(float(file["Max moving average current SPT1(A,5min)"][j]),2)))
+            row2.cell(str(round(float(file["Max moving average current SPT2(A,5min)"][j]),2)))  
     for i in range(0,len(file)):
         fig1,ax1 = plt.subplots()
         fig2,ax2 = plt.subplots()
@@ -73,7 +101,6 @@ def startReport(outputFolder, data):
         ax2.set_title("Right Feed Data",loc = "left")
         ax2.pie(data2, autopct = '%.2f')
         ax2.legend(labels = data_labels2, bbox_to_anchor=(0.9,1), loc="center")
-        plt.show()
         canvas1 = FigureCanvas(fig1)
         canvas2 = FigureCanvas(fig2)
         canvas1.draw()
@@ -98,15 +125,15 @@ def startReport(outputFolder, data):
         row2 = table.row()
         row2.cell("Maximum Voltage (kV)")
         for i in range(len(file2)):
-            row2.cell(str(float(file2["Maximum Voltage (V)"][i])/1000))
+            row2.cell(str(round(float(file2["Maximum Voltage (V)"][i])/1000,2)))
         row3 = table.row()
         row3.cell("Minimum Voltage (kV)")
         for i in range(len(file2)):
-            row3.cell(str(float(file2["Minimum Voltage (V)"][i])/1000))
+            row3.cell(str(round(float(file2["Minimum Voltage (V)"][i])/1000,2)))
         row4 = table.row()
         row4.cell("Mean Useful Voltage (kV)")
         for i in range(len(file2)):
-            row4.cell(str(float(file2["U mean useful (train V)"][i])/1000))
+            row4.cell(str(round(float(file2["U mean useful (train V)"][i])/1000,2)))
         row5 = table.row()
         row5.cell("Travel Time")
         for i in range(len(file2)):
@@ -124,6 +151,11 @@ def startReport(outputFolder, data):
             m = temp // 60
             s = temp % 60
             row6.cell(str(timedelta(hours=hours, minutes=minutes)+timedelta(minutes=m,seconds=s)))
+    values = hist_report(outputFolder)
+    j=-60
+    for i in range(len(values)):
+        pdf.image(values[i],w=pdf.epw/2.5, x=70+j, y=120+60*(i//2))
+        j=j*(-1)
     pdf.output("matplotlib.pdf")
     return
 
@@ -156,5 +188,3 @@ def startReport(outputFolder, data):
 # pdf.add_page()
 # pdf.image(img, w=pdf.epw)  # Make the image full width
 # pdf.output("matplotlib.pdf")
-
-hist_report(outputFolder)

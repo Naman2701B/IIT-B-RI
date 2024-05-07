@@ -1,7 +1,9 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog,QMessageBox
+from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog,QMessageBox, QPushButton
 from PyQt5.uic import loadUi
+from PyQt5.QtGui import QDesktopServices
+from PyQt5.QtCore import QUrl
 import matplotlib.pyplot as plt
 import pandas as pd
 import os
@@ -118,13 +120,22 @@ class MainWindow(QDialog):
         self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
+    def open_pdf(self):
+        pdf_path = os.curdir+"/matplotlib.pdf"
+        QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
+        self.msg.close()
+
     def reportTrigger(self):
         data = timeTableData(self.final_input_directories[0])
         startReport(self.final_output_directories[0], data["calculativeData"])
-        msg = QMessageBox()
-        msg.setWindowTitle("PDF Notification")
-        msg.setText("PDF Successfully Created.")
-        msg.exec()
+        self.msg = QMessageBox()
+        self.msg.setWindowTitle("PDF Notification")
+        button = QPushButton("Open PDF", self.msg)
+        button.setGeometry(15,60,90,30)
+        button.clicked.connect(self.open_pdf)
+        self.msg.setText("PDF Successfully Created.")
+        self.msg.exec()
+    
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
             self, 'Choose a Folder', '')
