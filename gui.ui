@@ -445,50 +445,80 @@
                     <attribute name="title">
                         <string>Tab 1</string>
                     </attribute>
-                    <widget class="QRadioButton" name="lfaradio">
-                        <property name="geometry">
-                            <rect>
-                                <x>10</x>
-                                <y>10</y>
-                                <width>141</width>
-                                <height>31</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>Load Flow Analysis</string>
-                        </property>
+                    <widget class="QButtonGroup" name = "IARadioOptions">
+                        <widget class="QRadioButton" name="IAButton">
+                            <property name="geometry">
+                                <rect>
+                                    <x>10</x>
+                                    <y>10</y>
+                                    <width>150</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Interference Analysis</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" name="TAButton">
+                            <property name="geometry">
+                                <rect>
+                                    <x>180</x>
+                                    <y>10</y>
+                                    <width>150</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Temperature Analysis</string>
+                            </property>
+                        </widget>
                     </widget>
-                    <widget class="QRadioButton" name="scaradio">
-                        <property name="geometry">
-                            <rect>
-                                <x>150</x>
-                                <y>10</y>
-                                <width>145</width>
-                                <height>31</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>Short Circuit Analysis</string>
-                        </property>
-                    </widget>
-                    <widget class="QRadioButton" name="pqaradio">
-                        <property name="geometry">
-                            <rect>
-                                <x>300</x>
-                                <y>10</y>
-                                <width>160</width>
-                                <height>31</height>
-                            </rect>
-                        </property>
-                        <property name="text">
-                            <string>Power Quality Analysis</string>
-                        </property>
+                    <widget class="QButtonGroup" name = "lfaradiooptions">
+                        <widget class="QRadioButton" name="lfaradio">
+                            <property name="geometry">
+                                <rect>
+                                    <x>10</x>
+                                    <y>45</y>
+                                    <width>141</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Load Flow Analysis</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" name="scaradio">
+                            <property name="geometry">
+                                <rect>
+                                    <x>150</x>
+                                    <y>45</y>
+                                    <width>145</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Short Circuit Analysis</string>
+                            </property>
+                        </widget>
+                        <widget class="QRadioButton" name="pqaradio">
+                            <property name="geometry">
+                                <rect>
+                                    <x>300</x>
+                                    <y>45</y>
+                                    <width>160</width>
+                                    <height>31</height>
+                                </rect>
+                            </property>
+                            <property name="text">
+                                <string>Power Quality Analysis</string>
+                            </property>
+                        </widget>
                     </widget>
                     <widget class="QComboBox" name="lfaoptions">
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>50</y>
+                                <y>80</y>
                                 <width>350</width>
                                 <height>24</height>
                             </rect>
@@ -498,7 +528,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>380</x>
-                                <y>50</y>
+                                <y>80</y>
                                 <width>80</width>
                                 <height>25</height>
                             </rect>
@@ -511,7 +541,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>94</y>
+                                <y>120</y>
                                 <width>350</width>
                                 <height>24</height>
                             </rect>
@@ -521,7 +551,30 @@
                         <property name="geometry">
                             <rect>
                                 <x>380</x>
-                                <y>94</y>
+                                <y>120</y>
+                                <width>80</width>
+                                <height>25</height>
+                            </rect>
+                        </property>
+                        <property name="text">
+                            <string>Select</string>
+                        </property>
+                    </widget>
+                    <widget class="QComboBox" name="ia_options">
+                        <property name="geometry">
+                            <rect>
+                                <x>10</x>
+                                <y>160</y>
+                                <width>350</width>
+                                <height>24</height>
+                            </rect>
+                        </property>
+                    </widget>
+                    <widget class="QPushButton" name="ia_select">
+                        <property name="geometry">
+                            <rect>
+                                <x>380</x>
+                                <y>160</y>
                                 <width>80</width>
                                 <height>25</height>
                             </rect>
@@ -534,7 +587,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>600</y>
+                                <y>650</y>
                                 <width>80</width>
                                 <height>25</height>
                             </rect>
@@ -547,7 +600,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>180</x>
-                                <y>600</y>
+                                <y>650</y>
                                 <width>80</width>
                                 <height>25</height>
                             </rect>
@@ -560,7 +613,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>330</x>
-                                <y>600</y>
+                                <y>650</y>
                                 <width>80</width>
                                 <height>25</height>
                             </rect>
@@ -573,7 +626,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>151</y>
+                                <y>200</y>
                                 <width>191</width>
                                 <height>24</height>
                             </rect>
@@ -588,7 +641,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>225</y>
+                                <y>270</y>
                                 <width>191</width>
                                 <height>24</height>
                             </rect>
@@ -603,7 +656,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>210</x>
-                                <y>151</y>
+                                <y>200</y>
                                 <width>211</width>
                                 <height>41</height>
                             </rect>
@@ -613,7 +666,7 @@
                         <property name="geometry">
                             <rect>
                                 <x>210</x>
-                                <y>225</y>
+                                <y>270</y>
                                 <width>211</width>
                                 <height>41</height>
                             </rect>
@@ -624,7 +677,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>210</x>
-                                    <y>191</y>
+                                    <y>240</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -637,7 +690,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>260</x>
-                                    <y>191</y>
+                                    <y>240</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -652,7 +705,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>210</x>
-                                    <y>265</y>
+                                    <y>315</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -665,7 +718,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>260</x>
-                                    <y>265</y>
+                                    <y>315</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -678,8 +731,8 @@
                     <widget class="QListWidget" name="conductorlist">
                         <property name="geometry">
                             <rect>
-                                <x>0</x>
-                                <y>302</y>
+                                <x>10</x>
+                                <y>352</y>
                                 <width>421</width>
                                 <height>250</height>
                             </rect>
@@ -690,8 +743,8 @@
                             <property name="geometry">
                                 <rect>
                                     <x>20</x>
-                                    <y>565</y>
-                                    <width>121</width>
+                                    <y>615</y>
+                                    <width>171</width>
                                     <height>20</height>
                                 </rect>
                             </property>
@@ -703,7 +756,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>190</x>
-                                    <y>565</y>
+                                    <y>615</y>
                                     <width>121</width>
                                     <height>20</height>
                                 </rect>
@@ -714,7 +767,7 @@
                         </widget>
                     </widget>
                 </widget>
-                <widget class="QWidget" name="tab_2">
+                <!-- <widget class="QWidget" name="tab_2">
                     <property name="autoFillBackground">
                         <bool>true</bool>
                     </property>
@@ -790,7 +843,7 @@
                             </property>
                         </item>
                     </widget>
-                </widget>
+                </widget> -->
             </widget>
         </widget>
     </widget>

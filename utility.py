@@ -288,9 +288,9 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors)
                 ztickstoshow.append(zticks[i][j]*50)
         ax.set_yticks(zvaluestoshow, ztickstoshow)
         ax.set(xlabel='Distance (km)',
-            ylabel='Frequencies (Hz)', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)", fontsize=15, fontweight='bold')
+            ylabel='Frequencies (Hz)', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)")
         # plt.legend()
-        plt.title("Power Quality Analysis 3D",fontsize=15, fontweight='bold')
+        plt.title("Power Quality Analysis 3D")
     plt.show(block = False)
 
 
@@ -422,7 +422,3 @@ def calculateTime(time):
     mins = datetime.strptime(time, "%H:%M:%S").minute
     seconds = datetime.strptime(time, "%H:%M:%S").second
     return (hours*3600+mins*60+seconds)
-
-
-# D3plot(x, y, z)
-# powerQualityAnalysis(outputfolder,[0,1],1,0,1 )

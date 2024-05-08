@@ -41,7 +41,7 @@ class MainWindow(QDialog):
         self.Current.setEnabled(False)
         self.Trainplots.setEnabled(False)
         self.Stringline.setEnabled(False)
-        self.Conductorconfig.setEnabled(False)
+        # self.Conductorconfig.setEnabled(False)
         self.Routealtitude.setEnabled(False)
         self.Timetable.setEnabled(False)
         self.Trainplots1.setEnabled(False)
@@ -54,7 +54,7 @@ class MainWindow(QDialog):
         self.lfaradio.setEnabled(False)
         self.pqaradio.setEnabled(False)
         self.scaradio.setEnabled(False)
-        self.analysistab.setTabEnabled(1, False)
+        self.analysistab.setTabEnabled(1, True)
         self.analysistab.setTabEnabled(0, False)
         self.Tractiveeffort.toggled.connect(self.counter)
         self.Reactivepower.toggled.connect(self.counter)
@@ -102,6 +102,15 @@ class MainWindow(QDialog):
         self.frequency_3d.setEnabled(False)
         self.nodeVoltRadio.setEnabled(False)
         self.branchCurrRadio.setEnabled(False)
+        self.IARadioOptions.setExclusive(False)
+        self.IARadioOptions.addButton(self.IAButton,0)
+        self.IARadioOptions.addButton(self.TAButton,1)
+        self.IAButton.clicked.connect(self.IACheck)
+        self.lfaradiooptions.addButton(self.lfaradio,0)
+        self.lfaradiooptions.addButton(self.scaradio,1)
+        self.lfaradiooptions.addButton(self.pqaradio,2)
+        self.ia_options.setHidden(True)
+        self.ia_select.setHidden(True)
         self.tsnap = []
         self.lfadirectories = []
         self.pqadirectories = []
@@ -119,6 +128,16 @@ class MainWindow(QDialog):
         self.final_output_directories = []
         self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+
+
+    def IACheck(self):
+        self.ia_options.setEnabled(False)
+        self.ia_select.setEnabled(False)
+        self.ia_options.setHidden(False)
+        self.ia_select.setHidden(False)
+        if(not self.IAButton.isChecked()):
+            self.ia_options.setHidden(True)
+            self.ia_select.setHidden(True)
 
     def open_pdf(self):
         pdf_path = os.curdir+"/matplotlib.pdf"
@@ -353,6 +372,7 @@ class MainWindow(QDialog):
 
     def activated(self, index):
         if(self.pqaradio.isChecked()):
+            print(self.frequencyAvailable)
             for i in range(len(self.frequencyAvailable)):
                 if (self.frequencyoptions.itemText(index) == self.frequencyAvailable[i]):
                     self.selectedFrequency.append(i)
@@ -387,10 +407,9 @@ class MainWindow(QDialog):
         self.scaradio.setEnabled(True)
         self.pqaradio.setEnabled(True)
         self.file_names.clear()
-        self.reportGenerate.setEnabled(True)
         self.Trainplots.setEnabled(True)
         self.Stringline.setEnabled(True)
-        self.Conductorconfig.setEnabled(True)
+        # self.Conductorconfig.setEnabled(True)
         self.Routealtitude.setEnabled(True)
         self.Timetable.setEnabled(True)
         # self.Trainplots1.setEnabled(True)
@@ -419,7 +438,12 @@ class MainWindow(QDialog):
                     if (len(files) > 0):
                         self.final_output_directories.append(directories)
             #print(output_directory_results)
-            self.LFA_PQA_SCA()
+        self.LFA_PQA_SCA()
+        for i in range(len(self.final_output_directories)):
+            if 'TrainResults.csv' in os.listdir(self.final_output_directories[i]) and 'SubstationResults.csv' in os.listdir(self.final_output_directories[i]):
+                self.reportGenerate.setEnabled(True)
+            else:
+                self.reportGenerate.setEnabled(False)
 
     def MTMM(self):
         self.MTMMList.clear()
@@ -512,7 +536,7 @@ class MainWindow(QDialog):
                 else:
                     x, y = ActivePowerData(
                         self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
-            keys.append("Active Power")
+            keys.append("Active Power (kW)")
             X_axis.append(x)
             Y_axis.append(y)
         if (self.Reactivepower.isChecked()):
@@ -523,7 +547,7 @@ class MainWindow(QDialog):
                 else:
                     x, y = ReactivePowerData(self.final_input_directories[0],
                                              self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
-            keys.append("Reactive Power")
+            keys.append("Reactive Power (kVar)")
             X_axis.append(x)
             Y_axis.append(y)
         if (self.Tractiveeffort.isChecked()):
@@ -556,7 +580,7 @@ class MainWindow(QDialog):
                 else:
                     x, y = VelocityData(
                         self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
-            keys.append("Velocity")
+            keys.append("Velocity (km/hr)")
             X_axis.append(x)
             Y_axis.append(y)
         sender = self.sender()
@@ -600,8 +624,8 @@ class MainWindow(QDialog):
                              label=str(self.MTMMList.currentItem().text()))
                 axis[i].set_ylabel(keys[i])
                 axis[i].legend()
+                axis[i].grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
-        plt.grid(alpha=0.3)
         plt.show(block = False)
 
     def mergeplot(self, X_axis, Y_axis, keys, timeflag):
@@ -617,7 +641,9 @@ class MainWindow(QDialog):
         ax2.plot(X_axis[0][0], Y_axis[1][0], label=(str(
             keys[1])+" "+str(self.MTMMList.currentItem().text())), color='tab:orange')
         ax2.set_ylabel(str(keys[1]))
-        plt.legend()
+        ax1.legend(bbox_to_anchor=(1,0.95))
+        ax2.legend(bbox_to_anchor=(1, 1))
+        # plt.legend()
         plt.grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
         plt.show(block = False)
