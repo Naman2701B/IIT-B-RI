@@ -103,9 +103,10 @@ class MainWindow(QDialog):
         self.nodeVoltRadio.setEnabled(False)
         self.branchCurrRadio.setEnabled(False)
         self.IARadioOptions.setExclusive(False)
+
         self.IARadioOptions.addButton(self.IAButton,0)
         self.IARadioOptions.addButton(self.TAButton,1)
-        self.IAButton.clicked.connect(self.IACheck)
+        self.IARadioOptions.buttonClicked.connect(self.IACheck)
         self.lfaradiooptions.addButton(self.lfaradio,0)
         self.lfaradiooptions.addButton(self.scaradio,1)
         self.lfaradiooptions.addButton(self.pqaradio,2)
@@ -126,18 +127,30 @@ class MainWindow(QDialog):
         self.final_input_directories = []
         self.trains = []
         self.final_output_directories = []
-        self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
-                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+        self.iadirectories=[]
 
-
-    def IACheck(self):
-        self.ia_options.setEnabled(False)
-        self.ia_select.setEnabled(False)
+    def IACheck(self, radiobutton):
+        for button in self.IARadioOptions.buttons():
+            if button is not radiobutton:
+                button.setChecked(False)
+        self.ia_options.setEnabled(True)
+        self.ia_select.setEnabled(True)
         self.ia_options.setHidden(False)
         self.ia_select.setHidden(False)
         if(not self.IAButton.isChecked()):
             self.ia_options.setHidden(True)
             self.ia_select.setHidden(True)
+            self.nodeVoltRadio.setText("Node Voltage")
+            self.branchCurrRadio.setText("Branch Current")
+            self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
+                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+        for i in range(len(self.final_input_directories)):
+            if "IA" in self.final_input_directories[i]:
+                file = pd.read_csv(self.final_input_directories[i]+"/Cable_Data.csv")
+                self.cablelist = file["name "].to_list()
+                self.nodeVoltRadio.setText("Cable Voltage")
+                self.branchCurrRadio.setText("Cable Current")
+                self.conductors=self.cablelist
 
     def open_pdf(self):
         pdf_path = os.curdir+"/matplotlib.pdf"
@@ -289,10 +302,18 @@ class MainWindow(QDialog):
             for i in range(len(file["fh"][0])):
                 self.frequencyAvailable.append(str(file["fh"][0][i]*50))
             self.frequencyoptions.clear()
-            self.frequencyoptions.insertItem(0, "Select Frequency")
+            self.frequencyoptions.insertItem(0, "Select Frequency") 
             self.frequencyoptions.insertItems(1, self.frequencyAvailable)
             self.frequencyoptions.activated.connect(self.activated)
             self.frequencyoptions.setCurrentIndex(0)
+            dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
+            for i in range(0, len(dir)):
+                if 'IA' in dir[i] and '.' not in dir[i]:
+                    self.iadirectories.append(os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()],dir[i]))
+            if self.IAButton.isChecked():
+                for i in range(0,len(self.iadirectories)):
+                    dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
+                    self.ia_options.addItem(dispName)
             
 
     def removeListOptions(self):
@@ -343,11 +364,13 @@ class MainWindow(QDialog):
         for i in range(0, len(self.lfadirectories)):
             dispName = os.path.basename(self.lfadirectories[i]).split('/')[-1]
             self.lfaoptions.addItem(dispName)
-
     def lfaconnect(self):
         self.conductorlist.clear()
         self.conductorlist.setEnabled(True)
-        self.conductorlist.insertItems(0, self.conductors)
+        if(self.IAButton.isChecked()):
+            self.conductorlist.insertItems(0, self.cablelist)
+        else:
+            self.conductorlist.insertItems(0, self.conductors)
         self.nodeVoltRadio.setEnabled(True)
         self.branchCurrRadio.setEnabled(True)
         if (self.pqaradio.isChecked() or self.scaradio.isChecked()):
@@ -369,10 +392,18 @@ class MainWindow(QDialog):
         self.timeoptions.insertItems(1, self.tsnap)
         self.timeoptions.activated.connect(self.activated)
         self.timeoptions.setCurrentIndex(0)
+        dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
+        for i in range(0, len(dir)):
+            if 'IA' in dir[i] and '.' not in dir[i]:
+                self.iadirectories.append(os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()],dir[i]))
+        if self.IAButton.isChecked():
+            for i in range(0,len(self.iadirectories)):
+                dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
+                self.ia_options.addItem(dispName)
+
 
     def activated(self, index):
         if(self.pqaradio.isChecked()):
-            print(self.frequencyAvailable)
             for i in range(len(self.frequencyAvailable)):
                 if (self.frequencyoptions.itemText(index) == self.frequencyAvailable[i]):
                     self.selectedFrequency.append(i)
@@ -437,7 +468,6 @@ class MainWindow(QDialog):
                 for root, dirs, files in os.walk(directories):
                     if (len(files) > 0):
                         self.final_output_directories.append(directories)
-            #print(output_directory_results)
         self.LFA_PQA_SCA()
         for i in range(len(self.final_output_directories)):
             if 'TrainResults.csv' in os.listdir(self.final_output_directories[i]) and 'SubstationResults.csv' in os.listdir(self.final_output_directories[i]):
@@ -657,12 +687,18 @@ class MainWindow(QDialog):
             powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 1)
             return
         else:
-            X,Y = powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0)
+            IAFlag =0
+            if (self.IAButton.isChecked()):
+                IAFlag=1
+                X,Y = powerQualityAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0,IAFlag)
+            else:
+                X,Y = powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0,IAFlag)
+                
         if sender == self.pltlfa_pqa_sca:
             if self.frequency_3d.isChecked()==False:
                 for i in range(0, len(Y)):
                     plt.figure()
-                    plt.title("Power Quality Analysis 2D",fontsize=15, fontweight='bold')
+                    plt.title("Power Quality Analysis 2D" if IAFlag==0 else "Interference Analysis",fontsize=15, fontweight='bold')
                     plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
@@ -682,7 +718,7 @@ class MainWindow(QDialog):
                     j=t
                 if(j==1):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D", fontsize=15, fontweight='bold')
+                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
                     plt.plot(X[t-1], Y[t-1], label = self.selectedFrequencyValue[t-1])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
@@ -712,7 +748,7 @@ class MainWindow(QDialog):
                     plt.show(block = False)
         if (sender == self.mergepltlfa_pqa_sca):
             for i in range(0, len(Y)):
-                plt.title("Power Quality Analysis 2D",fontsize=15, fontweight='bold')
+                plt.title("Power Quality Analysis 2D" if IAFlag==0 else "Interference Analysis",fontsize=15, fontweight='bold')
                 plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
                 plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                 if radioflag == 1:
@@ -736,12 +772,17 @@ class MainWindow(QDialog):
         if self.time_3d.isChecked():
             loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, self.conductorlist.currentRow(), radioflag, 1)
         else:
-            X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0)
+            IAFlag = 0
+            if (self.IAButton.isChecked()):
+                IAFlag = 1
+                X,Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
+            else:
+                X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
         if (sender == self.pltlfa_pqa_sca):
             if self.time_3d.isChecked()==False:
                 for i in range(0, len(Y)):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D", fontsize=15, fontweight='bold')
+                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
                     plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
@@ -763,7 +804,7 @@ class MainWindow(QDialog):
                     j=t
                 if(j==1):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D", fontsize=15, fontweight='bold')
+                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
                     plt.plot(X[t-1], Y[t-1], label = self.selectedTsnapValue[t-1])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
@@ -793,7 +834,7 @@ class MainWindow(QDialog):
                     plt.show(block = False)
         if (sender == self.mergepltlfa_pqa_sca):
             for i in range(0, len(Y)):
-                plt.title("Load Flow Analysis 2D", fontsize=15, fontweight='bold')
+                plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
                 plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
                 plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                 if radioflag == 1:
@@ -855,8 +896,6 @@ class MainWindow(QDialog):
         layout =  QtWidgets.QVBoxLayout(dialog)
         for i in range(len(self.final_input_directories)):
             dict = timeTableExcel(self.final_input_directories[i])
-        # print(len(dict))
-        # print (dict)
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(1+3*(len(dict)))
         self.table.setRowCount(1+len(dict[0]["stationNameToDisplay"]))
@@ -892,7 +931,6 @@ class MainWindow(QDialog):
             # labels.append("Train Number")
             # labels.append("Train Type")
             # self.table.setSpan(0,2+2*i,1,2)
-        # print(labels)
         # header = self.table.horizontalHeader()
         self.table.setHorizontalHeaderLabels(labels)
         # for i in range(len(dict)): 

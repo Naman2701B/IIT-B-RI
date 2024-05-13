@@ -6,8 +6,8 @@ import mplcursors
 from scipy import io
 import os
 
-conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
-                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+# conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
+                        #    "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
 def timeTableData(basefolderinput):
     df = pd.read_csv(os.path.join(basefolderinput,"TimeTableData.csv"), header=None)
@@ -245,7 +245,7 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
 outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_130038_14-03-2024_R/PQA_130818_14-03-2024"
 
 
-def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors):
+def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,conductors):
     ax = plt.figure().add_subplot(projection='3d')
     zticks = []
     # Plot the 3D surface
@@ -294,27 +294,37 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors)
     plt.show(block = False)
 
 
-def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radioflag, flag_3d):
-    file = io.loadmat(file_name=os.path.join(outputfolder,"data_ntwrk.mat"))
+def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radioflag, flag_3d, IAflag):
+    if IAflag == 1:
+        file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
+    else:
+        file = io.loadmat(file_name=os.path.join(outputfolder,"data_ntwrk.mat"))
     x_axis = []
     super_y_axis = []
     super_x_axis = []
     z_values = []
-    for i in range(0, len(file["dev_seqn"])):
-        if "line_" in str(file["dev_seqn"][i][0][0]):
-            x_axis.append(float(file["dev_seqn"][i][3][0][0]))
+    if IAflag==0:
+        for i in range(0, len(file["dev_seqn"])):
+            if "line_" in str(file["dev_seqn"][i][0][0]):
+                x_axis.append(float(file["dev_seqn"][i][3][0][0]))
+    else:
+        for i in range(0,len(file["section_length_main"])):
+            x_axis.append(float(file["section_length_main"][i][0]))
     # x axis label is chainage in kilometers
     tsnap = file["tsnap"]
-    file2 = io.loadmat(file_name=os.path.join(outputfolder,"line_summary.mat"))
+    if IAflag == 0:
+        file2 = io.loadmat(file_name=os.path.join(outputfolder,"line_summary.mat"))
+    else:
+        file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_Output.mat"))
     if radioflag == 1:
         for i in range(len(selectedtsnapindex)):
             y_axis = []
             z_axis = [tsnap[selectedtsnapindex[i]]]
-            y_axis.append(float(abs(file2['Line_Currents']
+            y_axis.append(float(abs(file2['Line_Currents' if IAflag==0 else 'Cable_current']
                                     [selectedconductor][0][selectedtsnapindex[i]])))
-            for j in range(len(file2["Line_Currents"][0])):
-                y_axis.append(float(abs(file2['Line_Currents']
-                                        [selectedconductor+10][j][selectedtsnapindex[i]])))
+            for j in range(len(file2["Line_Currents" if IAflag==0 else 'Cable_current'][0])):
+                y_axis.append(float(abs(file2['Line_Currents' if IAflag==0 else 'Cable_current']
+                                        [selectedconductor+10 if IAflag==0 else selectedconductor][j][selectedtsnapindex[i]])))
                 z_axis.append(tsnap[selectedtsnapindex[i]])
             z_values.append(z_axis)
             super_y_axis.append(y_axis)
@@ -323,11 +333,11 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
             y_axis = []
             z_axis = []
             z_axis = [tsnap[selectedtsnapindex[i]]]
-            y_axis.append(float(abs(file2['Line_Voltages']
+            y_axis.append(float(abs(file2['Line_Voltages' if IAflag==0 else 'Cableterminal_voltage']
                                     [selectedconductor][0][selectedtsnapindex[i]])/1000))
-            for j in range(len(file2["Line_Voltages"][0])):
-                y_axis.append(float(abs(file2['Line_Voltages']
-                                        [selectedconductor+10][j][selectedtsnapindex[i]])/1000))
+            for j in range(len(file2["Line_Voltages" if IAflag==0 else 'Cableterminal_voltage'][0])):
+                y_axis.append(float(abs(file2['Line_Voltages' if IAflag==0 else 'Cableterminal_voltage']
+                                        [selectedconductor+10 if IAflag==0 else selectedconductor][j][selectedtsnapindex[i]])/1000))
                 z_axis.append(tsnap[selectedtsnapindex[i]])
             z_values.append(z_axis)
             super_y_axis.append(y_axis)
@@ -341,27 +351,37 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
     else:
         D3plot(super_x_axis, super_y_axis, z_values, radioflag,0,selectedconductor)
 
-def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radioflag, flag_3d):
-    file = io.loadmat(file_name=os.path.join(outputfolder,"IA_linesummary.mat"))
+def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radioflag, flag_3d,IAflag):
+    if IAflag==0:
+        file = io.loadmat(file_name=os.path.join(outputfolder,"IA_linesummary.mat"))
+    else:
+        file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
     x_axis = []
     super_y_axis = []
     super_x_axis = []
     z_values = []
-    for i in range(0, len(file["dev_seqn"])):
-        if "line_" in str(file["dev_seqn"][i][0][0]):
-            x_axis.append(float(file["dev_seqn"][i][3][0][0]))
+    if IAflag==0:
+        for i in range(0, len(file["dev_seqn"])):
+            if "line_" in str(file["dev_seqn"][i][0][0]):
+                x_axis.append(float(file["dev_seqn"][i][3][0][0]))
+    else:
+        for i in range(0,len(file["section_length_main"])):
+            x_axis.append(float(file["section_length_main"][i][0]))
     # x axis label is chainage in kilometers
     frequency = list(file["fh"][0])
-    file2 = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_PQA.mat"))
+    if IAflag == 0:
+        file2 = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_PQA.mat"))
+    else:
+        file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_Output.mat"))
     if radioflag == 1:
         for i in range(len(selectedfrequency)):
             y_axis = []
             z_axis = [frequency[selectedfrequency[i]]]
-            y_axis.append(float(abs(file2['Line_Currents']
+            y_axis.append(float(abs(file2['Line_Currents'if IAflag==0 else 'Cable_current']
                                     [selectedconductor][0][selectedfrequency[i]])))
-            for j in range(len(file2["Line_Currents"][0])):
-                y_axis.append(float(abs(file2['Line_Currents']
-                                        [selectedconductor+10][j][selectedfrequency[i]])))
+            for j in range(len(file2["Line_Currents"if IAflag==0 else 'Cable_current'][0])):
+                y_axis.append(float(abs(file2['Line_Currents'if IAflag==0 else 'Cable_current']
+                                        [(selectedconductor+10) if IAflag==0 else selectedconductor][j][selectedfrequency[i]])))
                 z_axis.append(frequency[selectedfrequency[i]])
             z_values.append(z_axis)
             super_y_axis.append(y_axis)
@@ -370,11 +390,11 @@ def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radi
             y_axis = []
             z_axis = []
             z_axis = [frequency[selectedfrequency[i]]]
-            y_axis.append(float(abs(file2['Line_Voltages']
+            y_axis.append(float(abs(file2['Line_Voltages'if IAflag==0 else 'Cableterminal_voltage']
                                     [selectedconductor][0][selectedfrequency[i]])/1000))
-            for j in range(len(file2["Line_Voltages"][0])):
-                y_axis.append(float(abs(file2['Line_Voltages']
-                                        [selectedconductor+10][j][selectedfrequency[i]])/1000))
+            for j in range(len(file2["Line_Voltages"if IAflag==0 else 'Cableterminal_voltage'][0])):
+                y_axis.append(float(abs(file2['Line_Voltages'if IAflag==0 else 'Cableterminal_voltage']
+                                        [(selectedconductor+10) if IAflag==0 else selectedconductor][j][selectedfrequency[i]])/1000))
                 z_axis.append(frequency[selectedfrequency[i]])
             z_values.append(z_axis)
             super_y_axis.append(y_axis)
@@ -388,7 +408,7 @@ def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radi
     else:
         D3plot(super_x_axis, super_y_axis, z_values, radioflag,1,selectedconductor)
 
-def ShortCircuitAnalysis(outputfolder, selectedconductor, radioflag):
+def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
     file = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_SCA.mat"))
     file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_linesummary.mat"))
     x_axis = [{"label":file2["dev_seqn"][0][0][0],"data":float(file2["dev_seqn"][0][3][0][0])}]
