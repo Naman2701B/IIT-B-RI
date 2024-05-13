@@ -309,7 +309,7 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
                 x_axis.append(float(file["dev_seqn"][i][3][0][0]))
     else:
         for i in range(0,len(file["section_length_main"])):
-            x_axis.append(float(file["section_length_main"][i][0]))
+            x_axis.append(float(file["section_length_main"][i][1]))
     # x axis label is chainage in kilometers
     tsnap = file["tsnap"]
     if IAflag == 0:
@@ -366,7 +366,7 @@ def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radi
                 x_axis.append(float(file["dev_seqn"][i][3][0][0]))
     else:
         for i in range(0,len(file["section_length_main"])):
-            x_axis.append(float(file["section_length_main"][i][0]))
+            x_axis.append(float(file["section_length_main"][i][1]))
     # x axis label is chainage in kilometers
     frequency = list(file["fh"][0])
     if IAflag == 0:
@@ -436,6 +436,34 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
     plt.grid(alpha=0.3)
     plt.legend()
     plt.show(block = False)
+
+def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag,timesnap):
+    file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
+    # file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_linesummary.mat"))
+    x_axis = []
+    xvalues=[]
+    y_axis = []
+    for i in range(len(file["section_length_main"])):
+        x_axis.append(float(file["section_length_main"][i][1]))
+    if radioflag==1:
+        # y_axis.append(float(abs(file['Cable_current'][selectedconductor][0]))/1000)
+        for j in range(len(file['Cable_current'][0])):
+            y_axis.append(float(abs(file['Cable_current'][selectedconductor][j]))/1000)
+        plt.ylabel((conductors[selectedconductor]+" Currents (kA)"),fontsize=15, fontweight='bold')
+    else:
+        # y_axis.append(float(abs(file['Cableterminal_voltage'][selectedconductor][0]))/1000)
+        for j in range(len(file['Cableterminal_voltage'][0])):
+            y_axis.append(float(abs(file['Cableterminal_voltage'][selectedconductor][j])/1000))
+        plt.ylabel((conductors[selectedconductor]+" Voltages (kV)"),fontsize=15, fontweight='bold')
+    for i in range(len(x_axis)):
+        xvalues.append(x_axis[i])
+    plt.plot(xvalues, y_axis)
+    plt.title("Interference Analysis",fontsize=15, fontweight='bold')
+    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+    plt.grid(alpha=0.3)
+    # plt.legend()
+    plt.show(block = False)
+
 
 def calculateTime(time):
     hours = datetime.strptime(time, "%H:%M:%S").hour

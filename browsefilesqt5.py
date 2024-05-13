@@ -286,6 +286,16 @@ class MainWindow(QDialog):
             self.frequencyList.addItem("50")
             self.subpltlfa_pqa_sca.setEnabled(False)
             self.mergepltlfa_pqa_sca.setEnabled(False)
+            dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
+            self.iadirectories=[]
+            for i in range(0, len(dir)):
+                if 'IA' in dir[i] and '.' not in dir[i]:
+                    self.iadirectories.append(os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()],dir[i]))
+            if self.IAButton.isChecked():
+                self.ia_options.clear()
+                for i in range(0,len(self.iadirectories)):
+                    dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
+                    self.ia_options.addItem(dispName)
         else:
             self.lfaoptions.setEnabled(True)
             self.pqa_scaoptions.setEnabled(True)
@@ -307,10 +317,12 @@ class MainWindow(QDialog):
             self.frequencyoptions.activated.connect(self.activated)
             self.frequencyoptions.setCurrentIndex(0)
             dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
+            self.iadirectories=[]
             for i in range(0, len(dir)):
                 if 'IA' in dir[i] and '.' not in dir[i]:
                     self.iadirectories.append(os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()],dir[i]))
             if self.IAButton.isChecked():
+                self.ia_options.clear()
                 for i in range(0,len(self.iadirectories)):
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
@@ -364,6 +376,7 @@ class MainWindow(QDialog):
         for i in range(0, len(self.lfadirectories)):
             dispName = os.path.basename(self.lfadirectories[i]).split('/')[-1]
             self.lfaoptions.addItem(dispName)
+        
     def lfaconnect(self):
         self.conductorlist.clear()
         self.conductorlist.setEnabled(True)
@@ -393,10 +406,12 @@ class MainWindow(QDialog):
         self.timeoptions.activated.connect(self.activated)
         self.timeoptions.setCurrentIndex(0)
         dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
+        self.iadirectories=[]
         for i in range(0, len(dir)):
             if 'IA' in dir[i] and '.' not in dir[i]:
                 self.iadirectories.append(os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()],dir[i]))
         if self.IAButton.isChecked():
+            self.ia_options.clear()
             for i in range(0,len(self.iadirectories)):
                 dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                 self.ia_options.addItem(dispName)
@@ -769,32 +784,36 @@ class MainWindow(QDialog):
         radioflag = 0
         if self.branchCurrRadio.isChecked():
             radioflag = 1
-        if self.time_3d.isChecked():
-            loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, self.conductorlist.currentRow(), radioflag, 1)
-        else:
-            IAFlag = 0
-            if (self.IAButton.isChecked()):
-                IAFlag = 1
-                X,Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
+        if(self.lfaradio.isChecked()):
+            if self.time_3d.isChecked():
+                loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, self.conductorlist.currentRow(), radioflag, 1)
             else:
-                X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
-        if (sender == self.pltlfa_pqa_sca):
-            if self.time_3d.isChecked()==False:
-                for i in range(0, len(Y)):
-                    plt.figure()
-                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
-                    plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
-                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
-                    if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
-                    else:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
-                    plt.xlim(left=min(X[i]), right = max(X[i]))
-                    plt.grid(alpha=0.3)
-                    plt.legend()
-                    plt.show(block = False)
-            if self.scaradio.isChecked():
-                ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.conductorlist.currentRow(), radioflag)
+                IAFlag = 0
+                if (self.IAButton.isChecked()):
+                    IAFlag = 1
+                    X,Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
+                else:
+                    X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
+            if (sender == self.pltlfa_pqa_sca):
+                if self.time_3d.isChecked()==False:
+                    for i in range(0, len(Y)):
+                        plt.figure()
+                        plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
+                        plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
+                        plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                        if radioflag == 1:
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                        else:
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                        plt.xlim(left=min(X[i]), right = max(X[i]))
+                        plt.grid(alpha=0.3)
+                        plt.legend()
+                        plt.show(block = False)
+        if self.scaradio.isChecked():
+            if(self.IAButton.isChecked()):
+                ShortCircuitAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.conductorlist.currentRow(),self.conductors, radioflag, self.timelist.currentRow())
+            else:
+                ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],self.conductorlist.currentRow(),self.conductors , radioflag)
         if (sender == self.subpltlfa_pqa_sca):
             t=len(Y)
             while(t>0):
