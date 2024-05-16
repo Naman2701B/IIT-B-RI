@@ -733,7 +733,7 @@ class MainWindow(QDialog):
                     j=t
                 if(j==1):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
+                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"), fontsize=15, fontweight='bold')
                     plt.plot(X[t-1], Y[t-1], label = self.selectedFrequencyValue[t-1])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
@@ -763,7 +763,7 @@ class MainWindow(QDialog):
                     plt.show(block = False)
         if (sender == self.mergepltlfa_pqa_sca):
             for i in range(0, len(Y)):
-                plt.title("Power Quality Analysis 2D" if IAFlag==0 else "Interference Analysis",fontsize=15, fontweight='bold')
+                plt.title("Power Quality Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"),fontsize=15, fontweight='bold')
                 plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
                 plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                 if radioflag == 1:
@@ -798,7 +798,7 @@ class MainWindow(QDialog):
                 if self.time_3d.isChecked()==False:
                     for i in range(0, len(Y)):
                         plt.figure()
-                        plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
+                        plt.title("Load Flow Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"), fontsize=15, fontweight='bold')
                         plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
                         plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                         if radioflag == 1:
@@ -823,7 +823,7 @@ class MainWindow(QDialog):
                     j=t
                 if(j==1):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
+                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"), fontsize=15, fontweight='bold')
                     plt.plot(X[t-1], Y[t-1], label = self.selectedTsnapValue[t-1])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
@@ -853,7 +853,7 @@ class MainWindow(QDialog):
                     plt.show(block = False)
         if (sender == self.mergepltlfa_pqa_sca):
             for i in range(0, len(Y)):
-                plt.title("Load Flow Analysis 2D" if IAFlag==0 else "Interference Analysis", fontsize=15, fontweight='bold')
+                plt.title("Load Flow Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"), fontsize=15, fontweight='bold')
                 plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
                 plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                 if radioflag == 1:

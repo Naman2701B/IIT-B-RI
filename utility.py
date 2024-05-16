@@ -458,7 +458,7 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag,t
     for i in range(len(x_axis)):
         xvalues.append(x_axis[i])
     plt.plot(xvalues, y_axis)
-    plt.title("Interference Analysis",fontsize=15, fontweight='bold')
+    plt.title("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables",fontsize=15, fontweight='bold')
     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
     plt.grid(alpha=0.3)
     # plt.legend()
