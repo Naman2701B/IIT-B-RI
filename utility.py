@@ -6,8 +6,8 @@ import mplcursors
 from scipy import io
 import os
 
-# conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
-                        #    "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
+                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
 def timeTableData(basefolderinput):
     df = pd.read_csv(os.path.join(basefolderinput,"TimeTableData.csv"), header=None)
@@ -349,7 +349,7 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
     if flag_3d == 0:
         return super_x_axis, super_y_axis
     else:
-        D3plot(super_x_axis, super_y_axis, z_values, radioflag,0,selectedconductor)
+        D3plot(super_x_axis, super_y_axis, z_values, radioflag,0,selectedconductor,conductors)
 
 def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radioflag, flag_3d,IAflag):
     if IAflag==0:
@@ -460,6 +460,7 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag,t
     plt.plot(xvalues, y_axis)
     plt.title("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables",fontsize=15, fontweight='bold')
     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+    plt.xlim(left=0, right=max(x_axis))
     plt.grid(alpha=0.3)
     # plt.legend()
     plt.show(block = False)

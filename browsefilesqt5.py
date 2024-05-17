@@ -128,6 +128,8 @@ class MainWindow(QDialog):
         self.trains = []
         self.final_output_directories = []
         self.iadirectories=[]
+        self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
+                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
     def IACheck(self, radiobutton):
         for button in self.IARadioOptions.buttons():
@@ -144,22 +146,23 @@ class MainWindow(QDialog):
             self.branchCurrRadio.setText("Branch Current")
             self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
-        for i in range(len(self.final_input_directories)):
-            if "IA" in self.final_input_directories[i]:
-                file = pd.read_csv(self.final_input_directories[i]+"/Cable_Data.csv")
-                self.cablelist = file["name "].to_list()
-                self.nodeVoltRadio.setText("Cable Voltage")
-                self.branchCurrRadio.setText("Cable Current")
-                self.conductors=self.cablelist
+        if(self.IAButton.isChecked()):
+            for i in range(len(self.final_input_directories)):
+                if "IA" in self.final_input_directories[i]:
+                    file = pd.read_csv(self.final_input_directories[i]+"/Cable_Data.csv")
+                    self.cablelist = file["name "].to_list()
+                    self.nodeVoltRadio.setText("Cable Voltage")
+                    self.branchCurrRadio.setText("Cable Current")
+                    self.conductors=self.cablelist
 
     def open_pdf(self):
-        pdf_path = os.curdir+"/matplotlib.pdf"
+        pdf_path = self.final_output_directories[0]+"/"+self.reportName+".pdf"
         QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
         self.msg.close()
 
     def reportTrigger(self):
         data = timeTableData(self.final_input_directories[0])
-        startReport(self.final_output_directories[0], data["calculativeData"])
+        self.reportName = startReport(self.final_output_directories[0], data["calculativeData"])
         self.msg = QMessageBox()
         self.msg.setWindowTitle("PDF Notification")
         button = QPushButton("Open PDF", self.msg)
@@ -718,7 +721,7 @@ class MainWindow(QDialog):
                     plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
                     else:
                         plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
                     plt.xlim(left=min(X[i]), right = max(X[i]))
@@ -738,7 +741,7 @@ class MainWindow(QDialog):
                     plt.plot(X[t-1], Y[t-1], label = self.selectedFrequencyValue[t-1])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
                     else:
                         plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
                     plt.xlim(left=min(X[t-1]), right = max(X[t-1]))
@@ -751,7 +754,7 @@ class MainWindow(QDialog):
                     for i in range (0,len(Y)):
                         axis[i].plot(X[t-1], Y[t-1], label = self.selectedFrequencyValue[t-1])
                         if radioflag==1:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
                         else:
                             axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
                         axis[i].set_xlabel("Distance (km)",fontsize=15, fontweight='bold')
@@ -768,7 +771,7 @@ class MainWindow(QDialog):
                 plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
                 plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                 if radioflag == 1:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
                 else:
                     plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
                 plt.xlim(left=min(X[i]), right=max(X[i]))
@@ -787,7 +790,7 @@ class MainWindow(QDialog):
             radioflag = 1
         if(self.lfaradio.isChecked()):
             if self.time_3d.isChecked():
-                loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, self.conductorlist.currentRow(), radioflag, 1)
+                loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, self.conductorlist.currentRow(), radioflag, 1, 0)
             else:
                 IAFlag = 0
                 if (self.IAButton.isChecked()):
@@ -803,7 +806,7 @@ class MainWindow(QDialog):
                         plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
                         plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                         if radioflag == 1:
-                            plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
                         else:
                             plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
                         plt.xlim(left=min(X[i]), right = max(X[i]))
@@ -828,7 +831,7 @@ class MainWindow(QDialog):
                     plt.plot(X[t-1], Y[t-1], label = self.selectedTsnapValue[t-1])
                     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
                     else:
                         plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
                     plt.xlim(left=min(X[t-1]), right = max(X[t-1]))
@@ -841,7 +844,7 @@ class MainWindow(QDialog):
                     for i in range (0,j):
                         axis[i].plot(X[t-1], Y[t-1], label = self.selectedTsnapValue[t-1])
                         if radioflag==1:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)", fontweight='bold')
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)", fontweight='bold')
                         else:
                             axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)", fontweight='bold')
                         axis[i].set_xlabel("Distance (km)", fontweight='bold')
@@ -858,7 +861,7 @@ class MainWindow(QDialog):
                 plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
                 plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
                 if radioflag == 1:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (kA)",fontsize=15, fontweight='bold')
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
                 else:
                     plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
                 plt.xlim(left=min(X[i]), right=max(X[i]))
