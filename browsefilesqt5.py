@@ -520,9 +520,10 @@ class MainWindow(QDialog):
 
     def getTrainNumberData(self):
         for i in range(0, len(self.final_input_directories)):
-            data = timeTableData(self.final_input_directories[i])
-            for j in range(0, len(data["calculativeData"])):
-                self.trains.append(data["calculativeData"][j]["trainnumber"])
+            if("MTMM" in self.final_input_directories[i]):
+                data = timeTableData(self.final_input_directories[i])
+                for j in range(0, len(data["calculativeData"])):
+                    self.trains.append(data["calculativeData"][j]["trainnumber"])
 
     def current_text_changed(self, text):
         return text
@@ -867,54 +868,56 @@ class MainWindow(QDialog):
 
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
-            data = timeTableData(self.final_input_directories[i])
-            x_axis = []
-            y_axis = []
-            start = 0
-            end = 0
-            output_data = pd.read_csv(os.path.join(
-                self.final_output_directories[i],"TrainModuleOutput.csv"))
-            for j in range(0, len(data["calculativeData"])):
-                self.trains.append(data["calculativeData"][j]["trainnumber"])
-            for j in range(0, len(data["calculativeData"])):
-                if (int(output_data["Up/Downtrack_"+str(self.trains[j])+"_0"][1]) == 0):
-                    partstr = "Uptrack"
-                else:
-                    partstr = "Downtrack"
-                for k in range(0, len(output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'])):
-                    if (float(output_data["Velocity_"+partstr+"_"+str(self.trains[j])+"_0"][k]) > 0.0):
-                        start = k
-                        break
-                for k in range(0, len(output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'])):
-                    if (float(output_data["Velocity_"+partstr+"_"+str(self.trains[j])+"_0"][k]) == 0.0):
-                        if (float(output_data["Distance_"+partstr+"_"+str(self.trains[j])+"_0"][k]) == float(data["calculativeData"][j]["endDistance"])):
-                            end = k
+            if("MTMM" in self.final_input_directories[i]):
+                data = timeTableData(self.final_input_directories[i])
+                x_axis = []
+                y_axis = []
+                start = 0
+                end = 0
+                output_data = pd.read_csv(os.path.join(
+                    self.final_output_directories[i],"TrainModuleOutput.csv"))
+                for j in range(0, len(data["calculativeData"])):
+                    self.trains.append(data["calculativeData"][j]["trainnumber"])
+                for j in range(0, len(data["calculativeData"])):
+                    if (int(output_data["Up/Downtrack_"+str(self.trains[j])+"_0"][1]) == 0):
+                        partstr = "Uptrack"
+                    else:
+                        partstr = "Downtrack"
+                    for k in range(0, len(output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'])):
+                        if (float(output_data["Velocity_"+partstr+"_"+str(self.trains[j])+"_0"][k]) > 0.0):
+                            start = k
                             break
-                x_axis.append(
-                    (output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'][start:end]))
-                y_axis.append(
-                    (output_data['Time_'+partstr+'_'+str(self.trains[j])+'_0'][start:end])*60)
-                plt.plot(x_axis[j], y_axis[j],
-                         label=self.trains[j])
-            plt.gca().invert_yaxis()
-            plt.yticks(data["plottingData"][1], data["plottingData"][0])
-            plt.xticks(data["plottingData"][3], data["plottingData"][2])
-            plt.xlim(left=min(data["plottingData"][3]), right=max(data["plottingData"][3]))
-            plt.legend(loc='center left', bbox_to_anchor=(1, 1))
-            plt.xlabel("Distance from Starting Point (km)",
-                       fontsize=15, fontweight='bold')
-            plt.ylabel("Time", fontsize=15, fontweight='bold')
-            plt.title("String Line Diagram", fontsize=15, fontweight='bold')
-            plt.get_current_fig_manager().resize(950, 500)
-            plt.grid(alpha=0.3)
-            # binding_id = plt.connect('motion_notify_event', on_move)
-            plt.show(block = False)
+                    for k in range(0, len(output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'])):
+                        if (float(output_data["Velocity_"+partstr+"_"+str(self.trains[j])+"_0"][k]) == 0.0):
+                            if (float(output_data["Distance_"+partstr+"_"+str(self.trains[j])+"_0"][k]) == float(data["calculativeData"][j]["endDistance"])):
+                                end = k
+                                break
+                    x_axis.append(
+                        (output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'][start:end]))
+                    y_axis.append(
+                        (output_data['Time_'+partstr+'_'+str(self.trains[j])+'_0'][start:end])*60)
+                    plt.plot(x_axis[j], y_axis[j],
+                            label=self.trains[j])
+                plt.gca().invert_yaxis()
+                plt.yticks(data["plottingData"][1], data["plottingData"][0])
+                plt.xticks(data["plottingData"][3], data["plottingData"][2])
+                plt.xlim(left=min(data["plottingData"][3]), right=max(data["plottingData"][3]))
+                plt.legend(loc='center left', bbox_to_anchor=(1, 1))
+                plt.xlabel("Distance from Starting Point (km)",
+                        fontsize=15, fontweight='bold')
+                plt.ylabel("Time", fontsize=15, fontweight='bold')
+                plt.title("String Line Diagram", fontsize=15, fontweight='bold')
+                plt.get_current_fig_manager().resize(950, 500)
+                plt.grid(alpha=0.3)
+                # binding_id = plt.connect('motion_notify_event', on_move)
+                plt.show(block = False)
 
     def showdialog(self):
         dialog = QDialog()
         layout =  QtWidgets.QVBoxLayout(dialog)
         for i in range(len(self.final_input_directories)):
-            dict = timeTableExcel(self.final_input_directories[i])
+            if("MTMM" in self.final_input_directories[i]):
+                dict = timeTableExcel(self.final_input_directories[i])
         self.table = QtWidgets.QTableWidget()
         self.table.setColumnCount(1+3*(len(dict)))
         self.table.setRowCount(1+len(dict[0]["stationNameToDisplay"]))
@@ -994,7 +997,8 @@ class MainWindow(QDialog):
         if (self.Routealtitude.isChecked()):
             plt.figure()
             for i in range(0, len(self.final_input_directories)):
-                routeAltitudeData(self.final_input_directories[i])
+                if("MTMM" in self.final_input_directories[i]):
+                    routeAltitudeData(self.final_input_directories[i])
 
 
     def findFolders(self, start_dir):

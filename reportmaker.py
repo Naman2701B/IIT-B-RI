@@ -3,7 +3,7 @@ from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 from matplotlib.figure import Figure
 import numpy as np
 from PIL import Image
-import datetime
+from datetime import date
 import pandas as pd
 import matplotlib.pyplot as plt
 from datetime import timedelta
@@ -156,5 +156,5 @@ def startReport(outputFolder, data):
     for i in range(len(values)):
         pdf.image(values[i],w=pdf.epw/2.5, x=70+j, y=120+60*(i//2))
         j=j*(-1)
-    pdf.output("Report-"+datetime.date+".pdf")
+    pdf.output("Report-"+str(date.today())+".pdf")
     return
