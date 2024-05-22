@@ -14,6 +14,7 @@ from utility import loadFlowAnalysis, ShortCircuitAnalysis, powerQualityAnalysis
 from timetableoutput import timeTableExcel
 import mplcursors
 from reportmaker import startReport
+from temperature import D3Plot_TA
 
 class MainWindow(QDialog):
     def __init__(self):
@@ -103,7 +104,6 @@ class MainWindow(QDialog):
         self.nodeVoltRadio.setEnabled(False)
         self.branchCurrRadio.setEnabled(False)
         self.IARadioOptions.setExclusive(False)
-
         self.IARadioOptions.addButton(self.IAButton,0)
         self.IARadioOptions.addButton(self.TAButton,1)
         self.IARadioOptions.buttonClicked.connect(self.IACheck)
@@ -128,6 +128,7 @@ class MainWindow(QDialog):
         self.trains = []
         self.final_output_directories = []
         self.iadirectories=[]
+        self.tadirectories = []
         self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
@@ -154,6 +155,14 @@ class MainWindow(QDialog):
                     self.nodeVoltRadio.setText("Cable Voltage")
                     self.branchCurrRadio.setText("Cable Current")
                     self.conductors=self.cablelist
+
+    def tempcheck(self,radiobutton):
+        for button in self.IARadioOptions.buttons():
+            if button is not radiobutton:
+                button.setChecked(False)
+        if(self.TAButton.isChecked()):
+            self.pqaradio.setEnabled(False)
+
 
     def open_pdf(self):
         pdf_path = self.final_output_directories[0]+"/"+self.reportName+".pdf"
@@ -378,7 +387,12 @@ class MainWindow(QDialog):
         self.pqa_scaoptions.setEnabled(False)
         for i in range(0, len(self.lfadirectories)):
             dispName = os.path.basename(self.lfadirectories[i]).split('/')[-1]
-            self.lfaoptions.addItem(dispName)
+            if("_T" in dispName and self.TAButton.isChecked()):
+                self.tadirectories.append(self.lfadirectories[i])
+                self.lfaoptions.addItem(dispName)
+            else:
+                if not (self.TAButton.isChecked()):
+                    self.lfaoptions.addItem(dispName)
         
     def lfaconnect(self):
         self.conductorlist.clear()
@@ -402,7 +416,10 @@ class MainWindow(QDialog):
         self.selectedTsnaps.clear()
         self.timeoptions.clear()
         self.timeoptions.insertItem(0, "Select Time")
-        self.location = os.path.join(self.lfadirectories[0],"data_ntwrk.mat")
+        if(self.TAButton.isChecked()):
+            self.location = os.path.join(self.tadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat")
+        else:
+            self.location = os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat")            
         file = io.loadmat(self.location)
         self.tsnap = file["tsnap"]
         self.timeoptions.insertItems(1, self.tsnap)
@@ -796,6 +813,8 @@ class MainWindow(QDialog):
                 if (self.IAButton.isChecked()):
                     IAFlag = 1
                     X,Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
+                elif(self.TAButton.isChecked()):
+                    D3Plot_TA(self.tadirectories[self.lfaoptions.currentIndex()],self.selectedTsnaps,)
                 else:
                     X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
             if (sender == self.pltlfa_pqa_sca):
