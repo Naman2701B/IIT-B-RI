@@ -419,7 +419,8 @@ class MainWindow(QDialog):
         if(self.TAButton.isChecked()):
             self.location = os.path.join(self.tadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat")
         else:
-            self.location = os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat")            
+            self.location = os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat") 
+        print(self.location)           
         file = io.loadmat(self.location)
         self.tsnap = file["tsnap"]
         self.timeoptions.insertItems(1, self.tsnap)
@@ -814,7 +815,8 @@ class MainWindow(QDialog):
                     IAFlag = 1
                     X,Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
                 elif(self.TAButton.isChecked()):
-                    D3Plot_TA(self.tadirectories[self.lfaoptions.currentIndex()],self.selectedTsnaps,)
+                    D3Plot_TA(self.tadirectories[self.lfaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag)
+                    return
                 else:
                     X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
             if (sender == self.pltlfa_pqa_sca):

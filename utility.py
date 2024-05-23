@@ -69,6 +69,7 @@ def timeTableData(basefolderinput):
                     "plottingData": [timingGraph, timeToReplaceInMins, distanceGraph, distanceToReplace]}
     return dataToBeSent
 
+
 def routeAltitudeData(basefolder):
     df2 = pd.read_csv(os.path.join(basefolder ,"RouteAltitudeData.csv"))
     df3 = pd.read_csv(os.path.join(basefolder , "AllStationData.csv"))
@@ -95,6 +96,7 @@ def routeAltitudeData(basefolder):
     cursor = mplcursors.cursor(hover=True)
     plt.show(block = False)
 
+
 def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
@@ -114,6 +116,7 @@ def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
                            str(selected_trains)+"_0"])
     return X_axis, Y_axis
 
+
 def BrakingEffortData(basefolderoutput, selected_trains, timeFlag):
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
@@ -132,6 +135,7 @@ def BrakingEffortData(basefolderoutput, selected_trains, timeFlag):
         X_axis.append(df_x["Distance_"+partstr+"_" +
                            str(selected_trains)+"_0"])
     return X_axis, Y_axis
+
 
 def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFlag):
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
@@ -157,6 +161,7 @@ def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFl
                            str(selected_trains)+"_0"])
     return X_axis, Y_axis
 
+
 def ActivePowerData(basefolderoutput, selected_trains, timeFlag):
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     X_axis = []
@@ -174,6 +179,7 @@ def ActivePowerData(basefolderoutput, selected_trains, timeFlag):
         X_axis.append(df_x["Distance_"+partstr+"_" +
                            str(selected_trains)+"_0"])
     return X_axis, Y_axis
+
 
 def CurrentData(basefolderoutput, selected_trains, timeFlag):
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
@@ -195,6 +201,7 @@ def CurrentData(basefolderoutput, selected_trains, timeFlag):
     plt.plot(X_axis, Y_axis)
     plt.show(block = False)
 
+
 def VoltageData(basefolderoutput, selected_trains, timeFlag):
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
@@ -215,6 +222,7 @@ def VoltageData(basefolderoutput, selected_trains, timeFlag):
     plt.plot(X_axis, Y_axis)
     plt.show(block = False)
 
+
 def VelocityData(basefolderoutput, selected_trains, timeFlag):
     X_axis = []
     Y_axis = []
@@ -233,6 +241,10 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
                            str(selected_trains)+"_0"])
     return X_axis, Y_axis
 
+
+outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_130038_14-03-2024_R/PQA_130818_14-03-2024"
+
+
 def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,conductors):
     ax = plt.figure().add_subplot(projection='3d')
     zticks = []
@@ -246,6 +258,7 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,
         zvalue = np.array(zvalue)
         zticks = np.array(zticks)
         super_y_axis = np.array(super_y_axis)
+        print(xvalues,zvalue,super_y_axis)
         ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
         ax.view_init(elev=20, azim=-145, roll=0)
         zvaluestoshow=[]
@@ -281,11 +294,12 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,
         plt.title("Power Quality Analysis 3D")
     plt.show(block = False)
 
+
 def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radioflag, flag_3d, IAflag):
-    if IAflag==0:
-        file = io.loadmat(file_name=os.path.join(outputfolder,"data_ntwrk.mat"))
-    else:
+    if IAflag == 1:
         file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
+    else:
+        file = io.loadmat(file_name=os.path.join(outputfolder,"data_ntwrk.mat"))
     x_axis = []
     super_y_axis = []
     super_x_axis = []
