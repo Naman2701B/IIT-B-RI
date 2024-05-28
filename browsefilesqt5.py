@@ -399,6 +399,9 @@ class MainWindow(QDialog):
         self.conductorlist.setEnabled(True)
         if(self.IAButton.isChecked()):
             self.conductorlist.insertItems(0, self.cablelist)
+        elif(self.TAButton.isChecked()):
+            self.TA_conductors = ["Contact Up-track","Contact Down-track", "Contact Up-track Difference","Contact Down-track Difference"]
+            self.conductorlist.insertItems(0, self.TA_conductors)
         else:
             self.conductorlist.insertItems(0, self.conductors)
         self.nodeVoltRadio.setEnabled(True)
@@ -420,7 +423,6 @@ class MainWindow(QDialog):
             self.location = os.path.join(self.tadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat")
         else:
             self.location = os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat") 
-        print(self.location)           
         file = io.loadmat(self.location)
         self.tsnap = file["tsnap"]
         self.timeoptions.insertItems(1, self.tsnap)
@@ -728,6 +730,9 @@ class MainWindow(QDialog):
             if (self.IAButton.isChecked()):
                 IAFlag=1
                 X,Y = powerQualityAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0,IAFlag)
+            elif(self.TAButton.isCheck()):
+                D3Plot_TA(self.tadirectories[self.pqa_scaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag,self.TA_conductors)
+                return
             else:
                 X,Y = powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0,IAFlag)
                 
@@ -815,7 +820,7 @@ class MainWindow(QDialog):
                     IAFlag = 1
                     X,Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
                 elif(self.TAButton.isChecked()):
-                    D3Plot_TA(self.tadirectories[self.lfaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag)
+                    D3Plot_TA(self.tadirectories[self.lfaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag,self.TA_conductors)
                     return
                 else:
                     X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
@@ -837,6 +842,8 @@ class MainWindow(QDialog):
         if self.scaradio.isChecked():
             if(self.IAButton.isChecked()):
                 ShortCircuitAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.conductorlist.currentRow(),self.conductors, radioflag, self.timelist.currentRow())
+            # elif(self.TAButton.isChecked()):
+            #     D3Plot_TA(self.tadirectories[self.pqa_scaoptions.currentIndex()],self.selectedTsnaps,self.conductorlist.currentRow(),self.conductors,radioflag)
             else:
                 ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],self.conductorlist.currentRow(),self.conductors , radioflag)
         if (sender == self.subpltlfa_pqa_sca):
