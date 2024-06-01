@@ -10,16 +10,20 @@ import os
 from scipy import io
 from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData
 from utility import ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
-from utility import loadFlowAnalysis, ShortCircuitAnalysis, powerQualityAnalysis
+from utility import loadFlowAnalysis, ShortCircuitAnalysis, powerQualityAnalysis, ShortCircuitAnalysis_IA
 from timetableoutput import timeTableExcel
 import mplcursors
 from reportmaker import startReport
-from temperature import D3Plot_TA
+from temperature import D3Plot_TA_LFA,D3Plot_TA_SCA
 
 class MainWindow(QDialog):
     def __init__(self):
         super(MainWindow, self).__init__()
+        
         loadUi("gui.ui", self)
+        flagsWindow = QtCore.Qt.WindowFlags()
+        self.setWindowFlags(flagsWindow)
+        self.selectAllTime.setEnabled(False)
         self.reportGenerate.setEnabled(False)
         self.stringlineplot.setEnabled(False)
         self.velocity.setEnabled(False)
@@ -96,6 +100,7 @@ class MainWindow(QDialog):
         self.timeoptions.setEnabled(False)
         self.frequencyoptions.setEnabled(False)
         self.timelist.setEnabled(False)
+        self.selectAllTime.clicked.connect(self.selectAll)
         self.frequencyList.setEnabled(False)
         self.time_2d.setEnabled(False)
         self.time_3d.setEnabled(False)
@@ -339,6 +344,26 @@ class MainWindow(QDialog):
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
             
+    def selectAll(self):
+        # sender = self.sender()
+        if len(self.selectedTsnaps)<=1:
+            for i in range(0,len(self.tsnap)):
+                self.selectedTsnaps.append(i)
+                self.timelist.addItem(self.timeoptions.itemText(1))
+                self.selectedTsnapValue.append(self.timeoptions.itemText(1))
+                self.timeoptions.removeItem(1)
+                # self.timeoptions.setCurrentIndex(0)
+                self.radiostatus(0)
+                self.time_2d.setEnabled(False)
+                self.time_2d.setChecked(False)
+                self.time_3d.setChecked(True)
+        else:
+            for i in range(len(self.selectedTsnapValue)-1):
+                self.timeoptions.insertItem(self.selectedTsnaps[i]+1,self.selectedTsnapValue[i])
+                self.selectedTsnaps.remove(self.selectedTsnaps[i])
+                self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
+                self.timelist.takeItem(self.timelist.currentRow())
+                self.radiostatus(0)
 
     def removeListOptions(self):
         sender = self.sender()
@@ -364,6 +389,7 @@ class MainWindow(QDialog):
             self.radiostatus(1)
 
     def lfabrowse(self):
+        self.selectAllTime.setEnabled(True)
         self.time_2d.setEnabled(False)
         self.time_3d.setEnabled(False)
         self.time_2d.setChecked(False)
@@ -397,20 +423,24 @@ class MainWindow(QDialog):
     def lfaconnect(self):
         self.conductorlist.clear()
         self.conductorlist.setEnabled(True)
+        self.nodeVoltRadio.setEnabled(True)
+        self.branchCurrRadio.setEnabled(True)
+        self.time_2d.setChecked(True)
         if(self.IAButton.isChecked()):
             self.conductorlist.insertItems(0, self.cablelist)
         elif(self.TAButton.isChecked()):
             self.TA_conductors = ["Contact Up-track","Contact Down-track", "Contact Up-track Difference","Contact Down-track Difference"]
             self.conductorlist.insertItems(0, self.TA_conductors)
+            self.nodeVoltRadio.setEnabled(False)
+            self.branchCurrRadio.setEnabled(False)
+            self.time_2d.setChecked(False)
+            self.time_2d.setEnabled(False)
         else:
             self.conductorlist.insertItems(0, self.conductors)
-        self.nodeVoltRadio.setEnabled(True)
-        self.branchCurrRadio.setEnabled(True)
         if (self.pqaradio.isChecked() or self.scaradio.isChecked()):
             self.pqabrowse()
             return
         self.timeoptions.setEnabled(True)
-        self.time_2d.setChecked(True)
         self.timelist.setEnabled(True)
         self.frequencyoptions.setEnabled(False)
         self.frequencyList.setEnabled(False)
@@ -731,7 +761,7 @@ class MainWindow(QDialog):
                 IAFlag=1
                 X,Y = powerQualityAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0,IAFlag)
             elif(self.TAButton.isCheck()):
-                D3Plot_TA(self.tadirectories[self.pqa_scaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag,self.TA_conductors)
+                D3Plot_TA_LFA(self.tadirectories[self.pqa_scaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag,self.TA_conductors)
                 return
             else:
                 X,Y = powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0,IAFlag)
@@ -820,7 +850,7 @@ class MainWindow(QDialog):
                     IAFlag = 1
                     X,Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
                 elif(self.TAButton.isChecked()):
-                    D3Plot_TA(self.tadirectories[self.lfaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag,self.TA_conductors)
+                    D3Plot_TA_LFA(self.tadirectories[self.lfaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag,self.TA_conductors)
                     return
                 else:
                     X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
@@ -841,9 +871,10 @@ class MainWindow(QDialog):
                         plt.show(block = False)
         if self.scaradio.isChecked():
             if(self.IAButton.isChecked()):
-                ShortCircuitAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.conductorlist.currentRow(),self.conductors, radioflag, self.timelist.currentRow())
-            # elif(self.TAButton.isChecked()):
-            #     D3Plot_TA(self.tadirectories[self.pqa_scaoptions.currentIndex()],self.selectedTsnaps,self.conductorlist.currentRow(),self.conductors,radioflag)
+                ShortCircuitAnalysis_IA(self.iadirectories[self.ia_options.currentIndex()], self.conductorlist.currentRow(),self.conductors, radioflag)
+            elif(self.TAButton.isChecked()):
+                D3Plot_TA_SCA(self.locationDirectories[self.pqa_scaoptions.currentIndex()],self.conductorlist.currentRow(),1,self.conductors)
+                return
             else:
                 ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],self.conductorlist.currentRow(),self.conductors , radioflag)
         if (sender == self.subpltlfa_pqa_sca):
@@ -1057,9 +1088,6 @@ class MainWindow(QDialog):
 
 app = QApplication(sys.argv)
 mainwindow = MainWindow()
+mainwindow.showMaximized()
 widget = QtWidgets.QStackedWidget()
-widget.addWidget(mainwindow)
-widget.setFixedWidth(1129)
-widget.setFixedHeight(976)
-widget.show()
 sys.exit(app.exec_())

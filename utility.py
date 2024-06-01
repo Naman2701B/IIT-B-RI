@@ -247,6 +247,11 @@ outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_
 
 def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,conductors):
     ax = plt.figure().add_subplot(projection='3d')
+    plt.tight_layout()
+    plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
+    ax.set_box_aspect(aspect = (4,2,1))
+    # figsize=[15,10]
+    # figsize=(25,10),dpi=250
     zticks = []
     # Plot the 3D surface
     if(pqa_lfa==0):
@@ -409,6 +414,7 @@ def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radi
         D3plot(super_x_axis, super_y_axis, z_values, radioflag,1,selectedconductor)
 
 def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
+    print(outputfolder)
     file = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_SCA.mat"))
     file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_linesummary.mat"))
     x_axis = [{"label":file2["dev_seqn"][0][0][0],"data":float(file2["dev_seqn"][0][3][0][0])}]
@@ -437,7 +443,7 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
     plt.legend()
     plt.show(block = False)
 
-def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag,timesnap):
+def ShortCircuitAnalysis_IA(outputfolder, selectedconductor,conductors, radioflag):
     file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
     # file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_linesummary.mat"))
     x_axis = []
