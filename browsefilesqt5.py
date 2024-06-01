@@ -15,12 +15,13 @@ from timetableoutput import timeTableExcel
 import mplcursors
 from reportmaker import startReport
 from temperature import D3Plot_TA_LFA,D3Plot_TA_SCA
+from output import Ui_Dialog
 
-class MainWindow(QDialog):
-    def __init__(self):
-        super(MainWindow, self).__init__()
-        
-        loadUi("gui.ui", self)
+class MainWindow(QDialog, Ui_Dialog):
+    def __init__(self,parent=None):
+        super(MainWindow, self).__init__(parent)
+        self.setupUi(self)
+        # loadUi("gui.ui", self)
         flagsWindow = QtCore.Qt.WindowFlags()
         self.setWindowFlags(flagsWindow)
         self.selectAllTime.setEnabled(False)
