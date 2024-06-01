@@ -258,7 +258,6 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,
         zvalue = np.array(zvalue)
         zticks = np.array(zticks)
         super_y_axis = np.array(super_y_axis)
-        print(xvalues,zvalue,super_y_axis)
         ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
         ax.view_init(elev=20, azim=-145, roll=0)
         zvaluestoshow=[]

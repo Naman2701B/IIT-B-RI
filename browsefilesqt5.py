@@ -812,7 +812,7 @@ class MainWindow(QDialog):
         if self.branchCurrRadio.isChecked():
             radioflag = 1
         if(self.lfaradio.isChecked()):
-            if self.time_3d.isChecked():
+            if self.time_3d.isChecked() and not(self.TAButton.isChecked()):
                 loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, self.conductorlist.currentRow(), radioflag, 1, 0)
             else:
                 IAFlag = 0
