@@ -38,14 +38,9 @@ def timeTableExcel(basefolderinput):
                 hours=h, minutes=m) + timedelta(hours=int(values[0]), minutes=int(values[1]))))
             departureTime.append(str(timedelta(
                 hours=h, minutes=m) +timedelta(hours=int(values[0]), minutes=int(values[1]))+timedelta(hours=(int(dwellTime[i-1])//60), minutes=(int(dwellTime[i-1])%60))))
-            # print(timeFromStarting_mins)
-            # print(dwellTime)
-            # print(timeFromStarting)
-            # print(departureTime)
         for i in range(0, len(timeFromStarting_mins)):
             timeFromStarting_mins[i] = timeFromStarting_mins[i] + \
                 int(datetime.strptime(df[2][rows[j]+1], "%H:%M").minute)
-        # print(timeFromStarting_mins)
         temp = {"trainnumber": df[0][rows[j]+1], "startDistance": df[3][rows[j]+4],
                 "trainType": df[6][rows[j]+1],
                 "stationNameToDisplay": station_name,
@@ -63,7 +58,4 @@ def timeTableExcel(basefolderinput):
                 final_dict[i]["timeFromStarting"].insert(j-1, "-")
                 final_dict[i]["dwellTime"].insert(j-1,"-")
                 final_dict[i]["departureTime"].insert(j-1,"-")
-    # print(final_dict)
     return final_dict
-
-# timeTableExcel(basefolderinput)

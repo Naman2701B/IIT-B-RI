@@ -411,10 +411,9 @@ def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radi
     if flag_3d == 0:
         return super_x_axis, super_y_axis
     else:
-        D3plot(super_x_axis, super_y_axis, z_values, radioflag,1,selectedconductor)
+        D3plot(super_x_axis, super_y_axis, z_values, radioflag,1,selectedconductor,conductors)
 
 def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
-    print(outputfolder)
     file = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_SCA.mat"))
     file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_linesummary.mat"))
     x_axis = [{"label":file2["dev_seqn"][0][0][0],"data":float(file2["dev_seqn"][0][3][0][0])}]

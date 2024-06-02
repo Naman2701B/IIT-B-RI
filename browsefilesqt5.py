@@ -1,7 +1,6 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog,QMessageBox, QPushButton
-from PyQt5.uic import loadUi
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
 import matplotlib.pyplot as plt
@@ -25,6 +24,7 @@ class MainWindow(QDialog, Ui_Dialog):
         flagsWindow = QtCore.Qt.WindowFlags()
         self.setWindowFlags(flagsWindow)
         self.selectAllTime.setEnabled(False)
+        self.selectAllFrequency.setEnabled(False)
         self.reportGenerate.setEnabled(False)
         self.stringlineplot.setEnabled(False)
         self.velocity.setEnabled(False)
@@ -102,6 +102,7 @@ class MainWindow(QDialog, Ui_Dialog):
         self.frequencyoptions.setEnabled(False)
         self.timelist.setEnabled(False)
         self.selectAllTime.clicked.connect(self.selectAll)
+        self.selectAllFrequency.clicked.connect(self.selectAll)
         self.frequencyList.setEnabled(False)
         self.time_2d.setEnabled(False)
         self.time_3d.setEnabled(False)
@@ -346,25 +347,49 @@ class MainWindow(QDialog, Ui_Dialog):
                     self.ia_options.addItem(dispName)
             
     def selectAll(self):
-        # sender = self.sender()
-        if len(self.selectedTsnaps)<=1:
-            for i in range(0,len(self.tsnap)):
-                self.selectedTsnaps.append(i)
-                self.timelist.addItem(self.timeoptions.itemText(1))
-                self.selectedTsnapValue.append(self.timeoptions.itemText(1))
-                self.timeoptions.removeItem(1)
-                # self.timeoptions.setCurrentIndex(0)
+        sender = self.sender()
+        if sender == self.selectAllTime:
+            if len(self.selectedTsnaps)<=1:
+                for i in range(0,len(self.tsnap)):
+                    self.selectedTsnaps.append(i)
+                    self.timelist.addItem(self.timeoptions.itemText(1))
+                    self.selectedTsnapValue.append(self.timeoptions.itemText(1))
+                    self.timeoptions.removeItem(1)
+                    # self.timeoptions.setCurrentIndex(0)
+                    self.radiostatus(0)
+                    self.time_2d.setEnabled(False)
+                    self.time_2d.setChecked(False)
+                    self.time_3d.setChecked(True)
+                    self.selectAllTime.setText("Deselect All")
+            else:
+                for i in range(len(self.selectedTsnapValue)-1,-1,-1):
+                    self.timeoptions.insertItem(self.selectedTsnaps[i]+1,self.selectedTsnapValue[i])
+                    self.selectedTsnaps.remove(self.selectedTsnaps[i])
+                    self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
+                self.timelist.clear()
+                self.selectAllTime.setText("Select All")
                 self.radiostatus(0)
-                self.time_2d.setEnabled(False)
-                self.time_2d.setChecked(False)
-                self.time_3d.setChecked(True)
         else:
-            for i in range(len(self.selectedTsnapValue)-1):
-                self.timeoptions.insertItem(self.selectedTsnaps[i]+1,self.selectedTsnapValue[i])
-                self.selectedTsnaps.remove(self.selectedTsnaps[i])
-                self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
-                self.timelist.takeItem(self.timelist.currentRow())
-                self.radiostatus(0)
+            if len(self.selectedFrequency)<1:
+                for i in range(0,len(self.frequencyAvailable)):
+                    self.selectedFrequency.append(i)
+                    self.frequencyList.addItem(self.frequencyoptions.itemText(1))
+                    self.selectedFrequencyValue.append(self.frequencyoptions.itemText(1))
+                    self.frequencyoptions.removeItem(1)
+                    # self.timeoptions.setCurrentIndex(0)
+                    self.radiostatus(1)
+                    self.selectAllFrequency.setText("Deselect All")
+                    self.frequency_2d.setEnabled(False)
+                    self.frequency_2d.setChecked(False)
+                    self.frequency_3d.setChecked(True)
+            else:
+                for i in range(len(self.selectedFrequencyValue)-1,-1,-1):
+                    self.frequencyoptions.insertItem(self.selectedFrequency[i]+1,self.selectedFrequencyValue[i])
+                    self.selectedFrequency.remove(self.selectedFrequency[i])
+                    self.selectedFrequencyValue.remove(self.selectedFrequencyValue[i])
+                self.frequencyList.clear()
+                self.selectAllFrequency.setText("Select All")    
+                self.radiostatus(1)
 
     def removeListOptions(self):
         sender = self.sender()
@@ -391,6 +416,7 @@ class MainWindow(QDialog, Ui_Dialog):
 
     def lfabrowse(self):
         self.selectAllTime.setEnabled(True)
+        self.selectAllFrequency.setEnabled(True)
         self.time_2d.setEnabled(False)
         self.time_3d.setEnabled(False)
         self.time_2d.setChecked(False)
@@ -467,7 +493,7 @@ class MainWindow(QDialog, Ui_Dialog):
         if self.IAButton.isChecked():
             self.ia_options.clear()
             for i in range(0,len(self.iadirectories)):
-                dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
+                dispName = os.path.basename(self.iadirectories[i])  .split('/')[-1]
                 self.ia_options.addItem(dispName)
 
 
@@ -754,7 +780,7 @@ class MainWindow(QDialog, Ui_Dialog):
             radioflag = 1
         sender = self.sender()
         if self.frequency_3d.isChecked():
-            powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 1)
+            powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 1,0)
             return
         else:
             IAFlag =0
