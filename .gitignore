@@ -1,3 +1,4 @@
 *.pdf
 hover.py
 __pycache__
+/output
