@@ -13,25 +13,27 @@ def timeTableExcel(basefolderinput):
     for i in range(0, len(df)):
         if (df[0][i] == "TrainNumber "):
             rows.append(i)
-    for j in range(0, len(rows)-1):
+    rows.append(len(df)+1)    
+    for j in range(1, len(rows)):
         stationName = []
         stationNumber =[]
         dwellTime = []
-        departureTime = [df[2][rows[j]+1]+df[5][0]]
         distanceBetweenStations = []
-        timeFromStarting = [df[2][rows[j]+1]]
+        timeFromStarting = [df[2][rows[j-1]+1]]
         timeFromStarting_mins = []
-        for k in range(rows[j]+4, rows[j+1]-1):
+        values = df[2][rows[j-1]+1].split(":")
+        for k in range(rows[j-1]+4, rows[j]-1):
             stationName.append(df[1][k])
             stationNumber.append(df[2][k])
             dwellTime.append(df[5][k])
-            if(k == rows[j]+4):
+            if(k == rows[j-1]+4):
                 continue
             else:
                 distanceBetweenStations.append(abs(int(df[3][k])-int(df[3][k-1])))
             timeFromStarting_mins.append(int(df[4][k]))
+        temp = str(timedelta(hours=int(values[0]), minutes=int(values[1]))+timedelta(hours=(int(dwellTime[0])//60), minutes=(int(dwellTime[0])%60)))
+        departureTime = [temp]
         for i in range(0, len(timeFromStarting_mins)):
-            values = df[2][rows[j]+1].split(":")
             h = int(timeFromStarting_mins[i]) // 60
             m = int(timeFromStarting_mins[i]) % 60
             timeFromStarting.append(str(timedelta(
@@ -40,9 +42,9 @@ def timeTableExcel(basefolderinput):
                 hours=h, minutes=m) +timedelta(hours=int(values[0]), minutes=int(values[1]))+timedelta(hours=(int(dwellTime[i-1])//60), minutes=(int(dwellTime[i-1])%60))))
         for i in range(0, len(timeFromStarting_mins)):
             timeFromStarting_mins[i] = timeFromStarting_mins[i] + \
-                int(datetime.strptime(df[2][rows[j]+1], "%H:%M").minute)
-        temp = {"trainnumber": df[0][rows[j]+1], "startDistance": df[3][rows[j]+4],
-                "trainType": df[6][rows[j]+1],
+                int(datetime.strptime(df[2][rows[j-1]+1], "%H:%M").minute)
+        temp = {"trainnumber": df[0][rows[j-1]+1], "startDistance": df[3][rows[j-1]+4],
+                "trainType": df[6][rows[j-1]+1],
                 "stationNameToDisplay": station_name,
                 "stationNumber":stationNumber,
                 "distanceBetweenStations": distanceBetweenStations,
