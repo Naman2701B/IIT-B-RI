@@ -9,9 +9,10 @@ import matplotlib.pyplot as plt
 from datetime import timedelta
 import re
 import os
+import sys
 
-outputFolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
-
+# outputFolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
+        
 def hist_report(outputFolder):
     file = pd.read_csv(outputFolder+"/TrainResults.csv")
     columns = []
@@ -159,8 +160,8 @@ def startReport(outputFolder, data):
         pdf.image(values[i],w=pdf.epw/2.5, x=70+j, y=120+60*(i//2))
         j=j*(-1)
     pdf.output("./"+outputFolder+"/Report-"+name+".pdf")
+    plt.close("all")
     return ("Report-"+name)
-
 
 # subscript_5 = '\u2085'
 #         subscript_m = '\u2098'
