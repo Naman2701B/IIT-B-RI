@@ -449,15 +449,15 @@ class MainWindow(QDialog, Ui_Dialog):
             if len(self.selectedFrequency)<=1:
                 for i in range(0,(len(self.frequencyAvailable)-len(self.selectedFrequency))):
                     self.selectedFrequency.append(i)
-                    self.frequencyList.addItem(self.frequencyoptions.itemText(1))
-                    self.selectedFrequencyValue.append(self.frequencyoptions.itemText(1))
-                    self.frequencyoptions.removeItem(1)
+                    self.frequencyList.addItem(self.frequencyoptions.itemText(0))
+                    self.selectedFrequencyValue.append(self.frequencyoptions.itemText(0))
+                    self.frequencyoptions.removeItem(0)
                     # self.timeoptions.setCurrentIndex(0)
-                    self.radiostatus(1)
-                    self.selectAllFrequency.setText("Deselect All")
-                    self.frequency_2d.setEnabled(False)
-                    self.frequency_2d.setChecked(False)
-                    self.frequency_3d.setChecked(True)
+                self.radiostatus(1)
+                self.selectAllFrequency.setText("Deselect All")
+                self.frequency_2d.setEnabled(False)
+                self.frequency_2d.setChecked(False)
+                self.frequency_3d.setChecked(True)
             else:
                 for i in range(len(self.selectedFrequencyValue)-1,-1,-1):
                     self.frequencyoptions.insertItem(self.selectedFrequency[i],self.selectedFrequencyValue[i])
