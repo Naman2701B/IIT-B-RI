@@ -5,6 +5,7 @@ from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
 import matplotlib.pyplot as plt
 import pandas as pd
+import numpy as np
 import os
 from scipy import io
 from utility import timeTableData, routeAltitudeData, VoltageData, CurrentData
@@ -15,7 +16,6 @@ import mplcursors
 from reportmaker import startReport
 from temperature import D3Plot_TA_LFA,D3Plot_TA_SCA
 from output import Ui_Dialog
-
 class MainWindow(QDialog, Ui_Dialog):
     def __init__(self,parent=None):
         super(MainWindow, self).__init__(parent)
@@ -138,7 +138,8 @@ class MainWindow(QDialog, Ui_Dialog):
         self.tadirectories = []
         self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
-
+        return
+    
     def resetState(self):
         self.selectAllTime.setEnabled(False)
         self.selectAllFrequency.setEnabled(False)
@@ -211,6 +212,7 @@ class MainWindow(QDialog, Ui_Dialog):
         self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
         self.showCheckBoxOpt()
+        return
 
 
     def IACheck(self, radiobutton):
@@ -236,11 +238,13 @@ class MainWindow(QDialog, Ui_Dialog):
                     self.nodeVoltRadio.setText("Cable Voltage")
                     self.branchCurrRadio.setText("Cable Current")
                     self.conductors=self.cablelist
+        return
 
     def open_pdf(self):
         pdf_path = self.final_output_directories[0]+"/"+self.reportName+".pdf"
         QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
         self.msg.close()
+        return
 
     def reportTrigger(self):
         data = timeTableData(self.final_input_directories[0])
@@ -252,6 +256,7 @@ class MainWindow(QDialog, Ui_Dialog):
         button.clicked.connect(self.open_pdf)
         self.msg.setText("PDF Successfully Created.")
         self.msg.exec()
+        return
     
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
@@ -261,19 +266,23 @@ class MainWindow(QDialog, Ui_Dialog):
             self.options.clear()
             self.addOpt()
         self.filename.setText(fname)
+        return
 
     def addOpt(self):
         for path in self.folder_paths:
             dispName = os.path.basename(path).split('/')[-1]
             self.options.addItem(dispName)
+        return
 
     def check3dstatus(self):
         self.subpltlfa_pqa_sca.setEnabled(False)
         self.mergepltlfa_pqa_sca.setEnabled(False)
+        return
 
     def check2dstatus(self):
         self.subpltlfa_pqa_sca.setEnabled(True)
         self.mergepltlfa_pqa_sca.setEnabled(True)
+        return
 
     def radiostatus(self, freq):
         if(freq==0):
@@ -323,6 +332,7 @@ class MainWindow(QDialog, Ui_Dialog):
             self.time_2d.setChecked(False)
             self.frequency_2d.setChecked(False)
             self.frequency_2d.setEnabled(False)
+        return
 
     def pqabrowse(self):
         self.pqa_scaoptions.clear()
@@ -361,6 +371,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.pqa_scaoptions.addItems(pqadirectoriesToShow)
                 self.pqa_sca_select.setEnabled(True)
                 self.pqa_scaoptions.setEnabled(True)
+        return
 
     def pqa_sca_connect(self):
         if(self.scaradio.isChecked()):
@@ -421,6 +432,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 for i in range(0,len(self.iadirectories)):
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
+        return
             
     def selectAll(self):
         sender = self.sender()
@@ -466,6 +478,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.frequencyList.clear()
                 self.selectAllFrequency.setText("Select All")    
                 self.radiostatus(1)
+        return
 
     def removeListOptions(self):
         sender = self.sender()
@@ -489,6 +502,7 @@ class MainWindow(QDialog, Ui_Dialog):
                     break
             self.frequencyList.takeItem(self.frequencyList.currentRow())
             self.radiostatus(1)
+        return
 
     def lfabrowse(self):
         self.selectAllTime.setEnabled(True)
@@ -524,8 +538,14 @@ class MainWindow(QDialog, Ui_Dialog):
                     self.lfaoptions.addItem(dispName)
         if(len(self.lfaoptions)==0):
             self.lfaselect.setEnabled(False)
+        return
         
     def lfaconnect(self):
+        self.tsnap=np.array([])
+        self.selectedTsnaps.clear()
+        self.selectedTsnapValue.clear()
+        self.timelist.clear()
+        self.timeoptions.clear()
         self.conductorlist.clear()
         self.conductorlist.setEnabled(True)
         self.nodeVoltRadio.setEnabled(True)
@@ -553,8 +573,6 @@ class MainWindow(QDialog, Ui_Dialog):
         self.frequencyList.setEnabled(False)
         self.frequency_2d.setEnabled(False)
         self.frequency_3d.setEnabled(False)
-        self.selectedTsnaps.clear()
-        self.timeoptions.clear()
         if(self.TAButton.isChecked()):
             self.location = os.path.join(self.tadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat")
         else:
@@ -563,7 +581,7 @@ class MainWindow(QDialog, Ui_Dialog):
         self.tsnap = file["tsnap"]
         self.timeoptions.insertItems(0, self.tsnap)
         self.timeoptions.activated.connect(self.activated)
-        self.timeoptions.setCurrentIndex(0)
+        # self.timeoptions.setCurrentIndex(0)
         dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
         self.iadirectories=[]
         for i in range(0, len(dir)):
@@ -574,9 +592,11 @@ class MainWindow(QDialog, Ui_Dialog):
             for i in range(0,len(self.iadirectories)):
                 dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                 self.ia_options.addItem(dispName)
+        return
 
 
     def activated(self, index):
+        print(index)
         if(self.pqaradio.isChecked()):
             for i in range(len(self.frequencyAvailable)):
                 if (self.frequencyoptions.itemText(index) == self.frequencyAvailable[i]):
@@ -593,6 +613,7 @@ class MainWindow(QDialog, Ui_Dialog):
             self.selectedTsnapValue.append(self.timeoptions.itemText(index))
             self.timeoptions.removeItem(index)
             self.radiostatus(0)
+            return
 
     def LFA_PQA_SCA(self):
         res = self.final_output_directories[0]
@@ -604,6 +625,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.scadirectories.append(os.path.join(res, r1[i]))
             if "PQA" in r1[i]:
                 self.pqadirectories.append(os.path.join(res, r1[i]))
+        return
 
     def showCheckBoxOpt(self):
         self.lfaradio.setEnabled(True)
@@ -659,6 +681,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.reportGenerate.setEnabled(True)
             else:
                 self.reportGenerate.setEnabled(False)
+        return
 
     def MTMM(self):
         self.MTMMList.clear()
@@ -687,6 +710,7 @@ class MainWindow(QDialog, Ui_Dialog):
             self.Time_radio.setEnabled(False)
             self.Distance_radio.setEnabled(False)
             self.velocity.setEnabled(False)
+        return
 
     def getTrainNumberData(self):
         for i in range(0, len(self.final_input_directories)):
@@ -694,6 +718,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 data = timeTableData(self.final_input_directories[i])
                 for j in range(0, len(data["calculativeData"])):
                     self.trains.append(data["calculativeData"][j]["trainnumber"])
+        return
 
     def current_text_changed(self, text):
         return text
@@ -715,6 +740,7 @@ class MainWindow(QDialog, Ui_Dialog):
             self.mergeplotbtn.setEnabled(True)
         else:
             self.mergeplotbtn.setEnabled(False)
+        return
 
     def clickEvent(self):
         self.trains = []
@@ -806,6 +832,7 @@ class MainWindow(QDialog, Ui_Dialog):
             self.subplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
         elif (sender == self.mergeplotbtn):
             self.mergeplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
+        return
 
 
     def plot(self, X_axis, Y_axis, keys, timeflag):
@@ -824,6 +851,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 cursor = mplcursors.cursor(hover=True)
                 plt.grid(alpha=0.3)
                 plt.show(block = False)
+        return
 
     def subplot(self, X_axis, Y_axis, keys, timeflag):
         if(len(Y_axis)==1):
@@ -843,6 +871,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 axis[i].grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
         plt.show(block = False)
+        return
 
     def mergeplot(self, X_axis, Y_axis, keys, timeflag):
         fig, ax1 = plt.subplots()
@@ -863,6 +892,7 @@ class MainWindow(QDialog, Ui_Dialog):
         plt.grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
         plt.show(block = False)
+        return
     
     def PQA(self):
         radioflag = 0
@@ -948,6 +978,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 plt.grid(alpha=0.3)
                 plt.legend()
                 plt.show(block = False)
+        return
 
 
     def LFA(self):
@@ -1044,6 +1075,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 plt.grid(alpha=0.3)
                 plt.legend()
                 plt.show(block = False)
+        return
 
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
@@ -1090,6 +1122,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 plt.grid(alpha=0.3)
                 # binding_id = plt.connect('motion_notify_event', on_move)
                 plt.show(block = False)
+        return
 
     def showdialog(self):
         dialog = QDialog()
@@ -1166,7 +1199,8 @@ class MainWindow(QDialog, Ui_Dialog):
         dialog.setWindowFlags(flags)
         dialog.setWindowTitle("Time Table Data")
         dialog.exec_()
-        
+        return
+    
     def stringLinePlotClick(self):
         if (self.Timetable.isChecked()):
             self.showdialog()
@@ -1178,6 +1212,7 @@ class MainWindow(QDialog, Ui_Dialog):
             for i in range(0, len(self.final_input_directories)):
                 if("MTMM" in self.final_input_directories[i]):
                     routeAltitudeData(self.final_input_directories[i])
+        return
 
 
     def findFolders(self, start_dir):
