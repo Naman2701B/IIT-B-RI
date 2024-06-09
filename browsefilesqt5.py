@@ -593,7 +593,6 @@ class MainWindow(QDialog, Ui_Dialog):
         file = io.loadmat(self.location)
         self.tsnap = file["tsnap"]
         self.timeoptions.addItems(self.tsnap)
-
         if self.isConnected:
             self.timeoptions.activated.disconnect(self.activated)
             self.isConnected = False
@@ -613,7 +612,6 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def activated(self, index):
-        print(index)
         if (self.pqaradio.isChecked()):
             for i in range(len(self.frequencyAvailable)):
                 if (self.frequencyoptions.itemText(index) == self.frequencyAvailable[i]):
