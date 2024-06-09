@@ -1,6 +1,6 @@
 import sys
 from PyQt5 import QtWidgets, QtCore
-from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog,QMessageBox, QPushButton
+from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox, QPushButton
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
 import matplotlib.pyplot as plt
@@ -14,10 +14,12 @@ from utility import loadFlowAnalysis, ShortCircuitAnalysis, powerQualityAnalysis
 from timetableoutput import timeTableExcel
 import mplcursors
 from reportmaker import startReport
-from temperature import D3Plot_TA_LFA,D3Plot_TA_SCA
+from temperature import D3Plot_TA_LFA, D3Plot_TA_SCA
 from output import Ui_Dialog
+
+
 class MainWindow(QDialog, Ui_Dialog):
-    def __init__(self,parent=None):
+    def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
         # loadUi("gui.ui", self)
@@ -111,12 +113,12 @@ class MainWindow(QDialog, Ui_Dialog):
         self.nodeVoltRadio.setEnabled(False)
         self.branchCurrRadio.setEnabled(False)
         self.IARadioOptions.setExclusive(False)
-        self.IARadioOptions.addButton(self.IAButton,0)
-        self.IARadioOptions.addButton(self.TAButton,1)
+        self.IARadioOptions.addButton(self.IAButton, 0)
+        self.IARadioOptions.addButton(self.TAButton, 1)
         self.IARadioOptions.buttonClicked.connect(self.IACheck)
-        self.lfaradiooptions.addButton(self.lfaradio,0)
-        self.lfaradiooptions.addButton(self.scaradio,1)
-        self.lfaradiooptions.addButton(self.pqaradio,2)
+        self.lfaradiooptions.addButton(self.lfaradio, 0)
+        self.lfaradiooptions.addButton(self.scaradio, 1)
+        self.lfaradiooptions.addButton(self.pqaradio, 2)
         self.ia_options.setHidden(True)
         self.ia_select.setHidden(True)
         self.tsnap = []
@@ -134,12 +136,15 @@ class MainWindow(QDialog, Ui_Dialog):
         self.final_input_directories = []
         self.trains = []
         self.final_output_directories = []
-        self.iadirectories=[]
+        self.iadirectories = []
         self.tadirectories = []
-        self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
-                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+        self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)",
+                           "Rail1 (Downtrack)",
+                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)",
+                           "Protective Wire (Downtrack)"]
+        self.isConnected = False  # To check is "self.lfaconnect" has any connections to "self.activated"
         return
-    
+
     def resetState(self):
         self.selectAllTime.setEnabled(False)
         self.selectAllFrequency.setEnabled(False)
@@ -207,13 +212,14 @@ class MainWindow(QDialog, Ui_Dialog):
         self.final_input_directories = []
         self.trains = []
         self.final_output_directories = []
-        self.iadirectories=[]
+        self.iadirectories = []
         self.tadirectories = []
-        self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
-                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+        self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)",
+                           "Rail1 (Downtrack)",
+                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)",
+                           "Protective Wire (Downtrack)"]
         self.showCheckBoxOpt()
         return
-
 
     def IACheck(self, radiobutton):
         for button in self.IARadioOptions.buttons():
@@ -223,25 +229,27 @@ class MainWindow(QDialog, Ui_Dialog):
         self.ia_select.setEnabled(True)
         self.ia_options.setHidden(False)
         self.ia_select.setHidden(False)
-        if(not self.IAButton.isChecked()):
+        if (not self.IAButton.isChecked()):
             self.ia_options.setHidden(True)
             self.ia_select.setHidden(True)
             self.nodeVoltRadio.setText("Node Voltage")
             self.branchCurrRadio.setText("Branch Current")
-            self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
-                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
-        if(self.IAButton.isChecked()):
+            self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)",
+                               "Rail1 (Downtrack)",
+                               "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)",
+                               "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+        if (self.IAButton.isChecked()):
             for i in range(len(self.final_input_directories)):
                 if "IA" in self.final_input_directories[i]:
-                    file = pd.read_csv(self.final_input_directories[i]+"/Cable_Data.csv")
+                    file = pd.read_csv(self.final_input_directories[i] + "/Cable_Data.csv")
                     self.cablelist = file["name "].to_list()
                     self.nodeVoltRadio.setText("Cable Voltage")
                     self.branchCurrRadio.setText("Cable Current")
-                    self.conductors=self.cablelist
+                    self.conductors = self.cablelist
         return
 
     def open_pdf(self):
-        pdf_path = self.final_output_directories[0]+"/"+self.reportName+".pdf"
+        pdf_path = self.final_output_directories[0] + "/" + self.reportName + ".pdf"
         QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
         self.msg.close()
         return
@@ -252,12 +260,12 @@ class MainWindow(QDialog, Ui_Dialog):
         self.msg = QMessageBox()
         self.msg.setWindowTitle("PDF Notification")
         button = QPushButton("Open PDF", self.msg)
-        button.setGeometry(15,60,90,30)
+        button.setGeometry(15, 60, 90, 30)
         button.clicked.connect(self.open_pdf)
         self.msg.setText("PDF Successfully Created.")
         self.msg.exec()
         return
-    
+
     def browsefiles(self):
         fname = QFileDialog.getExistingDirectory(
             self, 'Choose a Folder', '')
@@ -285,7 +293,7 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def radiostatus(self, freq):
-        if(freq==0):
+        if (freq == 0):
             self.time_2d.setEnabled(True)
             if len(self.selectedTsnaps) >= 2:
                 self.time_3d.setEnabled(True)
@@ -325,7 +333,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.pltlfa_pqa_sca.setEnabled(True)
                 self.subpltlfa_pqa_sca.setEnabled(True)
                 self.mergepltlfa_pqa_sca.setEnabled(True)
-        if(self.TAButton.isChecked()):
+        if (self.TAButton.isChecked()):
             self.mergepltlfa_pqa_sca.setEnabled(False)
             self.subpltlfa_pqa_sca.setEnabled(False)
             self.time_2d.setEnabled(False)
@@ -360,7 +368,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.pqa_scaoptions.addItems(scadirectoriesToShow)
                 self.pqa_sca_select.setEnabled(True)
                 self.pqa_scaoptions.setEnabled(True)
-            
+
         if (self.pqaradio.isChecked()):
             self.selectAllFrequency.setEnabled(True)
             self.selectAllTime.setEnabled(False)
@@ -374,7 +382,7 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def pqa_sca_connect(self):
-        if(self.scaradio.isChecked()):
+        if (self.scaradio.isChecked()):
             self.timelist.clear()
             self.timeoptions.setEnabled(False)
             self.frequencyoptions.setEnabled(False)
@@ -387,20 +395,22 @@ class MainWindow(QDialog, Ui_Dialog):
             self.frequency_2d.setChecked(True)
             self.time_2d.setChecked(True)
             self.pltlfa_pqa_sca.setEnabled(True)
-            file = io.loadmat(os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
+            file = io.loadmat(
+                os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
             self.timelist.addItem(file["timesnap"][0])
             self.frequencyList.clear()
             self.frequencyList.addItem("50")
             self.subpltlfa_pqa_sca.setEnabled(False)
             self.mergepltlfa_pqa_sca.setEnabled(False)
             dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
-            self.iadirectories=[]
+            self.iadirectories = []
             for i in range(0, len(dir)):
                 if 'IA' in dir[i] and '.' not in dir[i]:
-                    self.iadirectories.append(os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()],dir[i]))
+                    self.iadirectories.append(
+                        os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], dir[i]))
             if self.IAButton.isChecked():
                 self.ia_options.clear()
-                for i in range(0,len(self.iadirectories)):
+                for i in range(0, len(self.iadirectories)):
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
         else:
@@ -414,31 +424,33 @@ class MainWindow(QDialog, Ui_Dialog):
             self.timelist.setEnabled(False)
             self.time_2d.setEnabled(False)
             self.time_3d.setEnabled(False)
-            file = io.loadmat(os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
+            file = io.loadmat(
+                os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
             self.frequencyAvailable = []
             for i in range(len(file["fh"][0])):
-                self.frequencyAvailable.append(str(file["fh"][0][i]*50))
+                self.frequencyAvailable.append(str(file["fh"][0][i] * 50))
             self.frequencyoptions.clear()
             self.frequencyoptions.insertItems(0, self.frequencyAvailable)
             self.frequencyoptions.activated.connect(self.activated)
             self.frequencyoptions.setCurrentIndex(0)
             dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
-            self.iadirectories=[]
+            self.iadirectories = []
             for i in range(0, len(dir)):
                 if 'IA' in dir[i] and '.' not in dir[i]:
-                    self.iadirectories.append(os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()],dir[i]))
+                    self.iadirectories.append(
+                        os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], dir[i]))
             if self.IAButton.isChecked():
                 self.ia_options.clear()
-                for i in range(0,len(self.iadirectories)):
+                for i in range(0, len(self.iadirectories)):
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
         return
-            
+
     def selectAll(self):
         sender = self.sender()
         if sender == self.selectAllTime:
-            if len(self.selectedTsnaps)<=1:
-                for i in range(0,(len(self.tsnap)-len(self.selectedTsnaps))):
+            if len(self.selectedTsnaps) <= 1:
+                for i in range(0, (len(self.tsnap) - len(self.selectedTsnaps))):
                     self.selectedTsnaps.append(i)
                     self.timelist.addItem(self.timeoptions.itemText(0))
                     self.selectedTsnapValue.append(self.timeoptions.itemText(0))
@@ -450,16 +462,16 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.time_3d.setChecked(True)
                 self.selectAllTime.setText("Deselect All")
             else:
-                for i in range(len(self.selectedTsnapValue)-1,-1,-1):
-                    self.timeoptions.insertItem(self.selectedTsnaps[i],self.selectedTsnapValue[i])
+                for i in range(len(self.selectedTsnapValue) - 1, -1, -1):
+                    self.timeoptions.insertItem(self.selectedTsnaps[i], self.selectedTsnapValue[i])
                     self.selectedTsnaps.remove(self.selectedTsnaps[i])
                     self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
                 self.timelist.clear()
                 self.selectAllTime.setText("Select All")
                 self.radiostatus(0)
         else:
-            if len(self.selectedFrequency)<=1:
-                for i in range(0,(len(self.frequencyAvailable)-len(self.selectedFrequency))):
+            if len(self.selectedFrequency) <= 1:
+                for i in range(0, (len(self.frequencyAvailable) - len(self.selectedFrequency))):
                     self.selectedFrequency.append(i)
                     self.frequencyList.addItem(self.frequencyoptions.itemText(0))
                     self.selectedFrequencyValue.append(self.frequencyoptions.itemText(0))
@@ -471,18 +483,18 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.frequency_2d.setChecked(False)
                 self.frequency_3d.setChecked(True)
             else:
-                for i in range(len(self.selectedFrequencyValue)-1,-1,-1):
-                    self.frequencyoptions.insertItem(self.selectedFrequency[i],self.selectedFrequencyValue[i])
+                for i in range(len(self.selectedFrequencyValue) - 1, -1, -1):
+                    self.frequencyoptions.insertItem(self.selectedFrequency[i], self.selectedFrequencyValue[i])
                     self.selectedFrequency.remove(self.selectedFrequency[i])
                     self.selectedFrequencyValue.remove(self.selectedFrequencyValue[i])
                 self.frequencyList.clear()
-                self.selectAllFrequency.setText("Select All")    
+                self.selectAllFrequency.setText("Select All")
                 self.radiostatus(1)
         return
 
     def removeListOptions(self):
         sender = self.sender()
-        if(sender == self.timelist):
+        if (sender == self.timelist):
             for i in range(0, len(self.selectedTsnapValue)):
                 if self.selectedTsnapValue[i] == self.timelist.currentItem().text():
                     self.timeoptions.insertItem(
@@ -492,7 +504,7 @@ class MainWindow(QDialog, Ui_Dialog):
                     break
             self.timelist.takeItem(self.timelist.currentRow())
             self.radiostatus(0)
-        if(sender == self.frequencyList):
+        if (sender == self.frequencyList):
             for i in range(0, len(self.selectedFrequencyValue)):
                 if self.selectedFrequencyValue[i] == self.frequencyList.currentItem().text():
                     self.frequencyoptions.insertItem(
@@ -530,18 +542,18 @@ class MainWindow(QDialog, Ui_Dialog):
         self.pqa_scaoptions.setEnabled(False)
         for i in range(0, len(self.lfadirectories)):
             dispName = os.path.basename(self.lfadirectories[i]).split('/')[-1]
-            if("_T" in dispName and self.TAButton.isChecked()):
+            if ("_T" in dispName and self.TAButton.isChecked()):
                 self.tadirectories.append(self.lfadirectories[i])
                 self.lfaoptions.addItem(dispName)
             else:
                 if not (self.TAButton.isChecked()):
                     self.lfaoptions.addItem(dispName)
-        if(len(self.lfaoptions)==0):
+        if (len(self.lfaoptions) == 0):
             self.lfaselect.setEnabled(False)
         return
-        
+
     def lfaconnect(self):
-        self.tsnap=np.array([])
+        self.tsnap = np.array([])
         self.selectedTsnaps.clear()
         self.selectedTsnapValue.clear()
         self.timelist.clear()
@@ -553,10 +565,11 @@ class MainWindow(QDialog, Ui_Dialog):
         self.time_2d.setChecked(True)
         self.selectAllFrequency.setEnabled(False)
         self.selectAllTime.setEnabled(True)
-        if(self.IAButton.isChecked()):
+        if (self.IAButton.isChecked()):
             self.conductorlist.insertItems(0, self.cablelist)
-        elif(self.TAButton.isChecked()):
-            self.TA_conductors = ["Contact Up-track","Contact Down-track", "Contact Up-track Difference","Contact Down-track Difference"]
+        elif (self.TAButton.isChecked()):
+            self.TA_conductors = ["Contact Up-track", "Contact Down-track", "Contact Up-track Difference",
+                                  "Contact Down-track Difference"]
             self.conductorlist.insertItems(0, self.TA_conductors)
             self.nodeVoltRadio.setEnabled(False)
             self.branchCurrRadio.setEnabled(False)
@@ -573,31 +586,35 @@ class MainWindow(QDialog, Ui_Dialog):
         self.frequencyList.setEnabled(False)
         self.frequency_2d.setEnabled(False)
         self.frequency_3d.setEnabled(False)
-        if(self.TAButton.isChecked()):
-            self.location = os.path.join(self.tadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat")
+        if (self.TAButton.isChecked()):
+            self.location = os.path.join(self.tadirectories[self.lfaoptions.currentIndex()], "data_ntwrk.mat")
         else:
-            self.location = os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()],"data_ntwrk.mat") 
+            self.location = os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()], "data_ntwrk.mat")
         file = io.loadmat(self.location)
         self.tsnap = file["tsnap"]
-        self.timeoptions.insertItems(0, self.tsnap)
+        self.timeoptions.addItems(self.tsnap)
+
+        if self.isConnected:
+            self.timeoptions.activated.disconnect(self.activated)
+            self.isConnected = False
         self.timeoptions.activated.connect(self.activated)
-        # self.timeoptions.setCurrentIndex(0)
+        self.isConnected = True
+
         dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
-        self.iadirectories=[]
+        self.iadirectories = []
         for i in range(0, len(dir)):
             if 'IA' in dir[i] and '.' not in dir[i]:
-                self.iadirectories.append(os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()],dir[i]))
+                self.iadirectories.append(os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()], dir[i]))
         if self.IAButton.isChecked():
             self.ia_options.clear()
-            for i in range(0,len(self.iadirectories)):
+            for i in range(0, len(self.iadirectories)):
                 dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                 self.ia_options.addItem(dispName)
         return
 
-
     def activated(self, index):
         print(index)
-        if(self.pqaradio.isChecked()):
+        if (self.pqaradio.isChecked()):
             for i in range(len(self.frequencyAvailable)):
                 if (self.frequencyoptions.itemText(index) == self.frequencyAvailable[i]):
                     self.selectedFrequency.append(i)
@@ -662,22 +679,27 @@ class MainWindow(QDialog, Ui_Dialog):
                         self.final_output_directories.append(directories)
                         break
         for i in range(len(self.final_input_directories)):
-            if 'TimeTableData.csv' in os.listdir(self.final_input_directories[i]) and ('TrainModuleOutput.csv' in os.listdir(self.final_output_directories[0])):
+            if 'TimeTableData.csv' in os.listdir(self.final_input_directories[i]) and (
+                    'TrainModuleOutput.csv' in os.listdir(self.final_output_directories[0])):
                 self.Stringline.setEnabled(True)
                 break
         for i in range(len(self.final_input_directories)):
-            if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and ('TimeTableData.csv' in os.listdir(self.final_input_directories[i])):
+            if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and (
+                    'TimeTableData.csv' in os.listdir(self.final_input_directories[i])):
                 self.Routealtitude.setEnabled(True)
                 break
         for i in range(len(self.final_input_directories)):
-            if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and ('RouteAltitudeData.csv' in os.listdir(self.final_input_directories[i])):
+            if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and (
+                    'RouteAltitudeData.csv' in os.listdir(self.final_input_directories[i])):
                 self.Timetable.setEnabled(True)
                 break
         if (self.Stringline.isEnabled() or self.Routealtitude.isEnabled() or self.Timetable.isEnabled()):
             self.stringlineplot.setEnabled(True)
         self.LFA_PQA_SCA()
         for i in range(len(self.final_output_directories)):
-            if 'TrainResults.csv' in os.listdir(self.final_output_directories[i]) and 'SubstationResults.csv' in os.listdir(self.final_output_directories[i]):
+            if 'TrainResults.csv' in os.listdir(
+                    self.final_output_directories[i]) and 'SubstationResults.csv' in os.listdir(
+                    self.final_output_directories[i]):
                 self.reportGenerate.setEnabled(True)
             else:
                 self.reportGenerate.setEnabled(False)
@@ -714,7 +736,7 @@ class MainWindow(QDialog, Ui_Dialog):
 
     def getTrainNumberData(self):
         for i in range(0, len(self.final_input_directories)):
-            if("MTMM" in self.final_input_directories[i]):
+            if ("MTMM" in self.final_input_directories[i]):
                 data = timeTableData(self.final_input_directories[i])
                 for j in range(0, len(data["calculativeData"])):
                     self.trains.append(data["calculativeData"][j]["trainnumber"])
@@ -834,35 +856,34 @@ class MainWindow(QDialog, Ui_Dialog):
             self.mergeplot(X_axis, Y_axis, keys, self.Time_radio.isChecked())
         return
 
-
     def plot(self, X_axis, Y_axis, keys, timeflag):
         for i in range(0, len(Y_axis)):
             for j in range(0, len(Y_axis[i])):
                 plt.figure()
                 if (timeflag == True):
-                    plt.xlabel("Time in Minutes",fontsize=15, fontweight='bold')
+                    plt.xlabel("Time in Minutes", fontsize=15, fontweight='bold')
                 else:
-                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
-                plt.title(keys[i],fontsize=15, fontweight='bold')
+                    plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
+                plt.title(keys[i], fontsize=15, fontweight='bold')
                 plt.plot(X_axis[i][j], Y_axis[i][j],
                          label=str(self.MTMMList.currentItem().text()))
                 plt.legend()
-                plt.ylabel(keys[i],fontsize=15, fontweight='bold')
+                plt.ylabel(keys[i], fontsize=15, fontweight='bold')
                 cursor = mplcursors.cursor(hover=True)
                 plt.grid(alpha=0.3)
-                plt.show(block = False)
+                plt.show(block=False)
         return
 
     def subplot(self, X_axis, Y_axis, keys, timeflag):
-        if(len(Y_axis)==1):
-            self.plot(X_axis,Y_axis,keys,timeflag)
+        if (len(Y_axis) == 1):
+            self.plot(X_axis, Y_axis, keys, timeflag)
             return
         figure, axis = plt.subplots(len(Y_axis))
         for i in range(0, len(Y_axis)):
             if (timeflag == True):
-                plt.xlabel("Time in Minutes",fontsize=15, fontweight='bold')
+                plt.xlabel("Time in Minutes", fontsize=15, fontweight='bold')
             else:
-                plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
             for j in range(0, len(Y_axis[i])):
                 axis[i].plot(X_axis[i][j], Y_axis[i][j],
                              label=str(self.MTMMList.currentItem().text()))
@@ -870,328 +891,371 @@ class MainWindow(QDialog, Ui_Dialog):
                 axis[i].legend()
                 axis[i].grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
-        plt.show(block = False)
+        plt.show(block=False)
         return
 
     def mergeplot(self, X_axis, Y_axis, keys, timeflag):
         fig, ax1 = plt.subplots()
         if (timeflag == True):
-            plt.xlabel("Time in Minutes",fontsize=15, fontweight='bold')
+            plt.xlabel("Time in Minutes", fontsize=15, fontweight='bold')
         else:
-            plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+            plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
         ax2 = ax1.twinx()
         ax1.plot(X_axis[0][0], Y_axis[0][0], label=(str(
-            keys[0])+" "+str(self.MTMMList.currentItem().text())), color='tab:cyan')
+            keys[0]) + " " + str(self.MTMMList.currentItem().text())), color='tab:cyan')
         ax1.set_ylabel(str(keys[0]))
         ax2.plot(X_axis[0][0], Y_axis[1][0], label=(str(
-            keys[1])+" "+str(self.MTMMList.currentItem().text())), color='tab:orange')
+            keys[1]) + " " + str(self.MTMMList.currentItem().text())), color='tab:orange')
         ax2.set_ylabel(str(keys[1]))
-        ax1.legend(bbox_to_anchor=(1,0.95))
+        ax1.legend(bbox_to_anchor=(1, 0.95))
         ax2.legend(bbox_to_anchor=(1, 1))
         # plt.legend()
         plt.grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
-        plt.show(block = False)
+        plt.show(block=False)
         return
-    
+
     def PQA(self):
         radioflag = 0
         if self.branchCurrRadio.isChecked():
             radioflag = 1
         sender = self.sender()
         if self.frequency_3d.isChecked():
-            powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 1,0)
+            powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,
+                                 self.conductorlist.currentRow(), radioflag, 1, 0)
             return
         else:
-            IAFlag =0
+            IAFlag = 0
             if (self.IAButton.isChecked()):
-                IAFlag=1
-                X,Y = powerQualityAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0,IAFlag)
-            elif(self.TAButton.isCheck()):
-                D3Plot_TA_LFA(self.tadirectories[self.pqa_scaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag,self.TA_conductors)
+                IAFlag = 1
+                X, Y = powerQualityAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedFrequency,
+                                            self.conductorlist.currentRow(), radioflag, 0, IAFlag)
+            elif (self.TAButton.isCheck()):
+                D3Plot_TA_LFA(self.tadirectories[self.pqa_scaoptions.currentIndex()], self.selectedTsnaps,
+                              (self.conductorlist.currentRow()), radioflag, self.TA_conductors)
                 return
             else:
-                X,Y = powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,self.conductorlist.currentRow(), radioflag, 0,IAFlag)
-                
+                X, Y = powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
+                                            self.selectedFrequency, self.conductorlist.currentRow(), radioflag, 0,
+                                            IAFlag)
+
         if sender == self.pltlfa_pqa_sca:
-            if self.frequency_3d.isChecked()==False:
+            if self.frequency_3d.isChecked() == False:
                 for i in range(0, len(Y)):
                     plt.figure()
-                    plt.title("Power Quality Analysis 2D" if IAFlag==0 else "Interference Analysis",fontsize=15, fontweight='bold')
-                    plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
-                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                    plt.title("Power Quality Analysis 2D" if IAFlag == 0 else "Interference Analysis", fontsize=15,
+                              fontweight='bold')
+                    plt.plot(X[i], Y[i], label=self.selectedFrequencyValue[i])
+                    plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                                   fontweight='bold')
                     else:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
-                    plt.xlim(left=min(X[i]), right = max(X[i]))
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                                   fontweight='bold')
+                    plt.xlim(left=min(X[i]), right=max(X[i]))
                     plt.grid(alpha=0.3)
                     plt.legend()
-                    plt.show(block = False)
+                    plt.show(block=False)
         if (sender == self.subpltlfa_pqa_sca):
-            t=len(Y)
-            while(t>0):
-                if(t//3>0):
-                    j=3
+            t = len(Y)
+            while (t > 0):
+                if (t // 3 > 0):
+                    j = 3
                 else:
-                    j=t
-                if(j==1):
+                    j = t
+                if (j == 1):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"), fontsize=15, fontweight='bold')
-                    plt.plot(X[t-1], Y[t-1], label = self.selectedFrequencyValue[t-1])
-                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                    plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
+                        "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                              fontsize=15, fontweight='bold')
+                    plt.plot(X[t - 1], Y[t - 1], label=self.selectedFrequencyValue[t - 1])
+                    plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                                   fontweight='bold')
                     else:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
-                    plt.xlim(left=min(X[t-1]), right = max(X[t-1]))
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                                   fontweight='bold')
+                    plt.xlim(left=min(X[t - 1]), right=max(X[t - 1]))
                     plt.grid(alpha=0.3)
                     plt.legend()
-                    plt.show(block = False)
+                    plt.show(block=False)
                     break
                 else:
                     figure, axis = plt.subplots(j)
-                    for i in range (0,len(Y)):
-                        axis[i].plot(X[t-1], Y[t-1], label = self.selectedFrequencyValue[t-1])
-                        if radioflag==1:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
+                    for i in range(0, len(Y)):
+                        axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedFrequencyValue[t - 1])
+                        if radioflag == 1:
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)",
+                                               fontsize=15, fontweight='bold')
                         else:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
-                        axis[i].set_xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)",
+                                               fontsize=15, fontweight='bold')
+                        axis[i].set_xlabel("Distance (km)", fontsize=15, fontweight='bold')
                         axis[i].legend()
-                        axis[i].set_xlim(left=min(X[t-1]), right=max(X[t-1]))
+                        axis[i].set_xlim(left=min(X[t - 1]), right=max(X[t - 1]))
                         axis[i].grid(alpha=0.3)
-                        t-=1
-                        if(t==0):
+                        t -= 1
+                        if (t == 0):
                             break
-                    plt.show(block = False)
+                    plt.show(block=False)
         if (sender == self.mergepltlfa_pqa_sca):
             for i in range(0, len(Y)):
-                plt.title("Power Quality Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"),fontsize=15, fontweight='bold')
-                plt.plot(X[i], Y[i], label = self.selectedFrequencyValue[i])
-                plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                plt.title("Power Quality Analysis 2D" if IAFlag == 0 else (
+                    "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                          fontsize=15, fontweight='bold')
+                plt.plot(X[i], Y[i], label=self.selectedFrequencyValue[i])
+                plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                 if radioflag == 1:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                               fontweight='bold')
                 else:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                               fontweight='bold')
                 plt.xlim(left=min(X[i]), right=max(X[i]))
                 plt.grid(alpha=0.3)
                 plt.legend()
-                plt.show(block = False)
+                plt.show(block=False)
         return
 
-
     def LFA(self):
-        if(self.pqaradio.isChecked()):
+        if (self.pqaradio.isChecked()):
             self.PQA()
             return
         sender = self.sender()
         radioflag = 0
         if self.branchCurrRadio.isChecked():
             radioflag = 1
-        if(self.lfaradio.isChecked()):
-            if self.time_3d.isChecked() and not(self.TAButton.isChecked()):
-                loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, self.conductorlist.currentRow(), radioflag, 1, 0)
+        if (self.lfaradio.isChecked()):
+            if self.time_3d.isChecked() and not (self.TAButton.isChecked()):
+                loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
+                                 self.conductorlist.currentRow(), radioflag, 1, 0)
             else:
                 IAFlag = 0
                 if (self.IAButton.isChecked()):
                     IAFlag = 1
-                    X,Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
-                elif(self.TAButton.isChecked()):
-                    D3Plot_TA_LFA(self.tadirectories[self.lfaoptions.currentIndex()],self.selectedTsnaps,(self.conductorlist.currentRow()),radioflag,self.TA_conductors)
+                    X, Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps,
+                                            (self.conductorlist.currentRow()), radioflag, 0, IAFlag)
+                elif (self.TAButton.isChecked()):
+                    D3Plot_TA_LFA(self.tadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
+                                  (self.conductorlist.currentRow()), radioflag, self.TA_conductors)
                     return
                 else:
-                    X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps, (self.conductorlist.currentRow()), radioflag, 0,IAFlag)
+                    X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
+                                            (self.conductorlist.currentRow()), radioflag, 0, IAFlag)
             if (sender == self.pltlfa_pqa_sca):
-                if self.time_3d.isChecked()==False:
+                if self.time_3d.isChecked() == False:
                     for i in range(0, len(Y)):
                         plt.figure()
-                        plt.title("Load Flow Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"), fontsize=15, fontweight='bold')
-                        plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
-                        plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                        plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
+                            "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                                  fontsize=15, fontweight='bold')
+                        plt.plot(X[i], Y[i], label=self.selectedTsnapValue[i])
+                        plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                         if radioflag == 1:
-                            plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                                       fontweight='bold')
                         else:
-                            plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
-                        plt.xlim(left=min(X[i]), right = max(X[i]))
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                                       fontweight='bold')
+                        plt.xlim(left=min(X[i]), right=max(X[i]))
                         plt.grid(alpha=0.3)
                         plt.legend()
-                        plt.show(block = False)
+                        plt.show(block=False)
         if self.scaradio.isChecked():
-            if(self.IAButton.isChecked()):
-                ShortCircuitAnalysis_IA(self.iadirectories[self.ia_options.currentIndex()], self.conductorlist.currentRow(),self.conductors, radioflag)
-            elif(self.TAButton.isChecked()):
-                D3Plot_TA_SCA(self.locationDirectories[self.pqa_scaoptions.currentIndex()],self.conductorlist.currentRow(),1,self.conductors)
+            if (self.IAButton.isChecked()):
+                ShortCircuitAnalysis_IA(self.iadirectories[self.ia_options.currentIndex()],
+                                        self.conductorlist.currentRow(), self.conductors, radioflag)
+            elif (self.TAButton.isChecked()):
+                D3Plot_TA_SCA(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
+                              self.conductorlist.currentRow(), 1, self.conductors)
                 return
             else:
-                ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],self.conductorlist.currentRow(),self.conductors , radioflag)
+                ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
+                                     self.conductorlist.currentRow(), self.conductors, radioflag)
         if (sender == self.subpltlfa_pqa_sca):
-            t=len(Y)
-            while(t>0):
-                if(t//3>0):
-                    j=3
+            t = len(Y)
+            while (t > 0):
+                if (t // 3 > 0):
+                    j = 3
                 else:
-                    j=t
-                if(j==1):
+                    j = t
+                if (j == 1):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"), fontsize=15, fontweight='bold')
-                    plt.plot(X[t-1], Y[t-1], label = self.selectedTsnapValue[t-1])
-                    plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                    plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
+                        "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                              fontsize=15, fontweight='bold')
+                    plt.plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
+                    plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                                   fontweight='bold')
                     else:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
-                    plt.xlim(left=min(X[t-1]), right = max(X[t-1]))
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                                   fontweight='bold')
+                    plt.xlim(left=min(X[t - 1]), right=max(X[t - 1]))
                     plt.grid(alpha=0.3)
                     plt.legend()
-                    plt.show(block = False)
+                    plt.show(block=False)
                     break
                 else:
                     figure, axis = plt.subplots(j)
-                    for i in range (0,j):
-                        axis[i].plot(X[t-1], Y[t-1], label = self.selectedTsnapValue[t-1])
-                        if radioflag==1:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)", fontweight='bold')
+                    for i in range(0, j):
+                        axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
+                        if radioflag == 1:
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)",
+                                               fontweight='bold')
                         else:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)", fontweight='bold')
+                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)",
+                                               fontweight='bold')
                         axis[i].set_xlabel("Distance (km)", fontweight='bold')
                         axis[i].legend()
-                        axis[i].set_xlim(left=min(X[t-1]), right=max(X[t-1]))
+                        axis[i].set_xlim(left=min(X[t - 1]), right=max(X[t - 1]))
                         axis[i].grid(alpha=0.3)
-                        t-=1
-                        if(t==0):
+                        t -= 1
+                        if (t == 0):
                             break
-                    plt.show(block = False)
+                    plt.show(block=False)
         if (sender == self.mergepltlfa_pqa_sca):
             for i in range(0, len(Y)):
-                plt.title("Load Flow Analysis 2D" if IAFlag==0 else ("Current in Signalling Cables" if radioflag==1 else "Terminal Voltage in Signalling Cables"), fontsize=15, fontweight='bold')
-                plt.plot(X[i], Y[i], label = self.selectedTsnapValue[i])
-                plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
+                plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
+                    "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                          fontsize=15, fontweight='bold')
+                plt.plot(X[i], Y[i], label=self.selectedTsnapValue[i])
+                plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                 if radioflag == 1:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Current (A)",fontsize=15, fontweight='bold')
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                               fontweight='bold')
                 else:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()]+" Voltage (kV)",fontsize=15, fontweight='bold')
+                    plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                               fontweight='bold')
                 plt.xlim(left=min(X[i]), right=max(X[i]))
                 plt.grid(alpha=0.3)
                 plt.legend()
-                plt.show(block = False)
+                plt.show(block=False)
         return
 
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
-            if("MTMM" in self.final_input_directories[i]):
+            if ("MTMM" in self.final_input_directories[i]):
                 data = timeTableData(self.final_input_directories[i])
                 x_axis = []
                 y_axis = []
                 start = 0
                 end = 0
                 output_data = pd.read_csv(os.path.join(
-                    self.final_output_directories[i],"TrainModuleOutput.csv"))
+                    self.final_output_directories[i], "TrainModuleOutput.csv"))
                 for j in range(0, len(data["calculativeData"])):
                     self.trains.append(data["calculativeData"][j]["trainnumber"])
                 for j in range(0, len(data["calculativeData"])):
-                    if (int(output_data["Up/Downtrack_"+str(self.trains[j])+"_0"][1]) == 0):
+                    if (int(output_data["Up/Downtrack_" + str(self.trains[j]) + "_0"][1]) == 0):
                         partstr = "Uptrack"
                     else:
                         partstr = "Downtrack"
-                    for k in range(0, len(output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'])):
-                        if (float(output_data["Velocity_"+partstr+"_"+str(self.trains[j])+"_0"][k]) > 0.0):
+                    for k in range(0, len(output_data['Distance_' + partstr + '_' + str(self.trains[j]) + '_0'])):
+                        if (float(output_data["Velocity_" + partstr + "_" + str(self.trains[j]) + "_0"][k]) > 0.0):
                             start = k
                             break
-                    for k in range(0, len(output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'])):
-                        if (float(output_data["Velocity_"+partstr+"_"+str(self.trains[j])+"_0"][k]) == 0.0):
-                            if (float(output_data["Distance_"+partstr+"_"+str(self.trains[j])+"_0"][k]) == float(data["calculativeData"][j]["endDistance"])):
+                    for k in range(0, len(output_data['Distance_' + partstr + '_' + str(self.trains[j]) + '_0'])):
+                        if (float(output_data["Velocity_" + partstr + "_" + str(self.trains[j]) + "_0"][k]) == 0.0):
+                            if (float(
+                                    output_data["Distance_" + partstr + "_" + str(self.trains[j]) + "_0"][k]) == float(
+                                    data["calculativeData"][j]["endDistance"])):
                                 end = k
                                 break
                     x_axis.append(
-                        (output_data['Distance_'+partstr+'_'+str(self.trains[j])+'_0'][start:end]))
+                        (output_data['Distance_' + partstr + '_' + str(self.trains[j]) + '_0'][start:end]))
                     y_axis.append(
-                        (output_data['Time_'+partstr+'_'+str(self.trains[j])+'_0'][start:end])*60)
+                        (output_data['Time_' + partstr + '_' + str(self.trains[j]) + '_0'][start:end]) * 60)
                     plt.plot(x_axis[j], y_axis[j],
-                            label=self.trains[j])
+                             label=self.trains[j])
                 plt.gca().invert_yaxis()
                 plt.yticks(data["plottingData"][1], data["plottingData"][0])
                 plt.xticks(data["plottingData"][3], data["plottingData"][2])
                 plt.xlim(left=min(data["plottingData"][3]), right=max(data["plottingData"][3]))
                 plt.legend(loc='center left', bbox_to_anchor=(1, 1))
                 plt.xlabel("Distance from Starting Point (km)",
-                        fontsize=15, fontweight='bold')
+                           fontsize=15, fontweight='bold')
                 plt.ylabel("Time", fontsize=15, fontweight='bold')
                 plt.title("String Line Diagram", fontsize=15, fontweight='bold')
                 plt.get_current_fig_manager().resize(950, 500)
                 plt.grid(alpha=0.3)
                 # binding_id = plt.connect('motion_notify_event', on_move)
-                plt.show(block = False)
+                plt.show(block=False)
         return
 
     def showdialog(self):
         dialog = QDialog()
-        layout =  QtWidgets.QVBoxLayout(dialog)
+        layout = QtWidgets.QVBoxLayout(dialog)
         for i in range(len(self.final_input_directories)):
-            if("MTMM" in self.final_input_directories[i]):
+            if ("MTMM" in self.final_input_directories[i]):
                 dict = timeTableExcel(self.final_input_directories[i])
         self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(1+3*(len(dict)))
-        self.table.setRowCount(1+len(dict[0]["stationNameToDisplay"]))
+        self.table.setColumnCount(1 + 3 * (len(dict)))
+        self.table.setRowCount(1 + len(dict[0]["stationNameToDisplay"]))
         labels = ["Station Name"]
         for i in range(len(dict)):
-            column = (i*3)+1
+            column = (i * 3) + 1
             item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
-            self.table.setSpan(0,column,1,3)
-            self.table.setItem(0,column,item)
+            self.table.setSpan(0, column, 1, 3)
+            self.table.setItem(0, column, item)
             temp = ["Arrival Time", "Dwell Time (in mins)", "Departure Time"]
             labels.extend(temp)
-            for j in range (len(dict[0]["stationNameToDisplay"])):
+            for j in range(len(dict[0]["stationNameToDisplay"])):
                 item3 = QtWidgets.QTableWidgetItem(dict[0]["stationNameToDisplay"][j])
-                self.table.setItem(j+1,0,item3)
+                self.table.setItem(j + 1, 0, item3)
                 for k in range(len(dict[i]["actualStationName"])):
                     for l in range(len(dict[0]["stationNameToDisplay"])):
-                        if(dict[i]["actualStationName"][k] == dict[0]["stationNameToDisplay"][l]):
-                            item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][int(dict[i]["stationNumber"][l])-1])                            
-                            item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][int(dict[i]["stationNumber"][l])-1])
-                            item3 = QtWidgets.QTableWidgetItem(dict[i]["departureTime"][int(dict[i]["stationNumber"][l])-1])
-                            self.table.setItem(l+1, column, item)
-                            self.table.setItem(l+1,column+1,item2)
-                            self.table.setItem(l+1,column+2,item3)
+                        if (dict[i]["actualStationName"][k] == dict[0]["stationNameToDisplay"][l]):
+                            item = QtWidgets.QTableWidgetItem(
+                                dict[i]["timeFromStarting"][int(dict[i]["stationNumber"][l]) - 1])
+                            item2 = QtWidgets.QTableWidgetItem(
+                                dict[i]["dwellTime"][int(dict[i]["stationNumber"][l]) - 1])
+                            item3 = QtWidgets.QTableWidgetItem(
+                                dict[i]["departureTime"][int(dict[i]["stationNumber"][l]) - 1])
+                            self.table.setItem(l + 1, column, item)
+                            self.table.setItem(l + 1, column + 1, item2)
+                            self.table.setItem(l + 1, column + 2, item3)
                             break
                         else:
                             item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
                             item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][j])
                             item3 = QtWidgets.QTableWidgetItem(dict[i]["departureTime"][j])
-                            self.table.setItem(j+1, column, item)
-                            self.table.setItem(j+1,column+1,item2)
-                            self.table.setItem(j+1, column+2, item3)
+                            self.table.setItem(j + 1, column, item)
+                            self.table.setItem(j + 1, column + 1, item2)
+                            self.table.setItem(j + 1, column + 2, item3)
         # for i in range(len(dict)):
-            # labels.append("Train Number")
-            # labels.append("Train Type")
-            # self.table.setSpan(0,2+2*i,1,2)
+        # labels.append("Train Number")
+        # labels.append("Train Type")
+        # self.table.setSpan(0,2+2*i,1,2)
         # header = self.table.horizontalHeader()
         self.table.setHorizontalHeaderLabels(labels)
         # for i in range(len(dict)): 
-            # labels2 = ["Train Number", "Train Type"]
-            # self.table.setRowCount(2+len(dict[i]["stationName"]))
-            # header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
-            # item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
-            # item2 = QtWidgets.QTableWidgetItem(dict[i]["trainType"])
-            # item3 = QtWidgets.QTableWidgetItem("Station Name")
-            # item4 = QtWidgets.QTableWidgetItem("Station Number")
-            # item5 = QtWidgets.QTableWidgetItem("Travel Time")
-            # item6 = QtWidgets.QTableWidgetItem("Dwell Time (in mins)")
-            # self.table.setItem(0,0,item)
-            # self.table.setItem(0,1,item2)
-            # self.table.setItem(1,0,item3)
-            # self.table.setItem(1,1,item4)
-            # self.table.setItem(1,2,item5)
-            # self.table.setItem(1,3,item6)
-            # for j in range(len(dict[i]["stationName"])):
-                # item = QtWidgets.QTableWidgetItem(dict[i]["stationName"][j])
-                # item2 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
-                # item3 = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
-                # item4 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
-                # self.table.setItem(j+2,0,item)
-                # self.table.setItem(j+2,1,item2)
-                # self.table.setItem(j+2,2,item3)
-                # self.table.setItem(j+2,3,item4)
+        # labels2 = ["Train Number", "Train Type"]
+        # self.table.setRowCount(2+len(dict[i]["stationName"]))
+        # header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
+        # item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
+        # item2 = QtWidgets.QTableWidgetItem(dict[i]["trainType"])
+        # item3 = QtWidgets.QTableWidgetItem("Station Name")
+        # item4 = QtWidgets.QTableWidgetItem("Station Number")
+        # item5 = QtWidgets.QTableWidgetItem("Travel Time")
+        # item6 = QtWidgets.QTableWidgetItem("Dwell Time (in mins)")
+        # self.table.setItem(0,0,item)
+        # self.table.setItem(0,1,item2)
+        # self.table.setItem(1,0,item3)
+        # self.table.setItem(1,1,item4)
+        # self.table.setItem(1,2,item5)
+        # self.table.setItem(1,3,item6)
+        # for j in range(len(dict[i]["stationName"])):
+        # item = QtWidgets.QTableWidgetItem(dict[i]["stationName"][j])
+        # item2 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
+        # item3 = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
+        # item4 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
+        # self.table.setItem(j+2,0,item)
+        # self.table.setItem(j+2,1,item2)
+        # self.table.setItem(j+2,2,item3)
+        # self.table.setItem(j+2,3,item4)
         self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
         self.table.resizeColumnsToContents()
         layout.addWidget(self.table)
@@ -1200,7 +1264,7 @@ class MainWindow(QDialog, Ui_Dialog):
         dialog.setWindowTitle("Time Table Data")
         dialog.exec_()
         return
-    
+
     def stringLinePlotClick(self):
         if (self.Timetable.isChecked()):
             self.showdialog()
@@ -1210,10 +1274,9 @@ class MainWindow(QDialog, Ui_Dialog):
         if (self.Routealtitude.isChecked()):
             plt.figure()
             for i in range(0, len(self.final_input_directories)):
-                if("MTMM" in self.final_input_directories[i]):
+                if ("MTMM" in self.final_input_directories[i]):
                     routeAltitudeData(self.final_input_directories[i])
         return
-
 
     def findFolders(self, start_dir):
         directory_results = []
@@ -1236,6 +1299,7 @@ class MainWindow(QDialog, Ui_Dialog):
                         file_path = os.path.join(root, file)
                         file_results_path.append(file_path)
         return file_results_path
+
 
 app = QApplication(sys.argv)
 mainwindow = MainWindow()
