@@ -120,7 +120,9 @@ class MainWindow(QDialog, Ui_Dialog):
         self.lfaradiooptions.addButton(self.scaradio, 1)
         self.lfaradiooptions.addButton(self.pqaradio, 2)
         self.ia_options.setHidden(True)
+        self.ia_options.setEnabled(False)
         self.ia_select.setHidden(True)
+        self.ia_select.setEnabled(False)
         self.tsnap = []
         self.lfadirectories = []
         self.pqadirectories = []
@@ -142,7 +144,8 @@ class MainWindow(QDialog, Ui_Dialog):
                            "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)",
                            "Protective Wire (Downtrack)"]
-        self.isConnected = False  # To check is "self.lfaconnect" has any connections to "self.activated"
+        self.isConnectedTime = False  # To check is "self.lfaconnect" has any connections to "self.activated"
+        self.isConnectedFrequency = False
         return
 
     def resetState(self):
@@ -225,8 +228,6 @@ class MainWindow(QDialog, Ui_Dialog):
         for button in self.IARadioOptions.buttons():
             if button is not radiobutton:
                 button.setChecked(False)
-        self.ia_options.setEnabled(True)
-        self.ia_select.setEnabled(True)
         self.ia_options.setHidden(False)
         self.ia_select.setHidden(False)
         if (not self.IAButton.isChecked()):
@@ -340,6 +341,11 @@ class MainWindow(QDialog, Ui_Dialog):
             self.time_2d.setChecked(False)
             self.frequency_2d.setChecked(False)
             self.frequency_2d.setEnabled(False)
+        if(self.IAButton.isChecked()):
+            self.time_3d.setEnabled(False)
+            self.time_3d.setChecked(False)
+            self.frequency_3d.setEnabled(False)
+            self.frequency_3d.setChecked(False)
         return
 
     def pqabrowse(self):
@@ -370,7 +376,6 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.pqa_scaoptions.setEnabled(True)
 
         if (self.pqaradio.isChecked()):
-            self.selectAllFrequency.setEnabled(True)
             self.selectAllTime.setEnabled(False)
             if len(pqadirectoriesToShow) == 0:
                 self.pqa_sca_select.setEnabled(False)
@@ -414,6 +419,7 @@ class MainWindow(QDialog, Ui_Dialog):
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
         else:
+            self.selectAllFrequency.setEnabled(True)
             self.lfaoptions.setEnabled(True)
             self.pqa_scaoptions.setEnabled(True)
             self.frequencyoptions.setEnabled(True)
@@ -431,7 +437,11 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.frequencyAvailable.append(str(file["fh"][0][i] * 50))
             self.frequencyoptions.clear()
             self.frequencyoptions.insertItems(0, self.frequencyAvailable)
+            if(self.isConnectedFrequency):
+                self.frequencyoptions.activated.disconnect(self.activated)
+                self.isConnectedFrequency=False
             self.frequencyoptions.activated.connect(self.activated)
+            self.isConnectedFrequency = True
             self.frequencyoptions.setCurrentIndex(0)
             dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
             self.iadirectories = []
@@ -442,6 +452,8 @@ class MainWindow(QDialog, Ui_Dialog):
             if self.IAButton.isChecked():
                 self.ia_options.clear()
                 for i in range(0, len(self.iadirectories)):
+                    self.ia_options.setEnabled(True)
+                    self.ia_select.setEnabled(True)
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
         return
@@ -457,9 +469,6 @@ class MainWindow(QDialog, Ui_Dialog):
                     self.timeoptions.removeItem(0)
                     # self.timeoptions.setCurrentIndex(0)
                 self.radiostatus(0)
-                self.time_2d.setEnabled(False)
-                self.time_2d.setChecked(False)
-                self.time_3d.setChecked(True)
                 self.selectAllTime.setText("Deselect All")
             else:
                 for i in range(len(self.selectedTsnapValue) - 1, -1, -1):
@@ -479,9 +488,6 @@ class MainWindow(QDialog, Ui_Dialog):
                     # self.timeoptions.setCurrentIndex(0)
                 self.radiostatus(1)
                 self.selectAllFrequency.setText("Deselect All")
-                self.frequency_2d.setEnabled(False)
-                self.frequency_2d.setChecked(False)
-                self.frequency_3d.setChecked(True)
             else:
                 for i in range(len(self.selectedFrequencyValue) - 1, -1, -1):
                     self.frequencyoptions.insertItem(self.selectedFrequency[i], self.selectedFrequencyValue[i])
@@ -517,8 +523,8 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def lfabrowse(self):
-        self.selectAllTime.setEnabled(True)
-        self.selectAllFrequency.setEnabled(True)
+        self.selectAllTime.setEnabled(False)
+        self.selectAllFrequency.setEnabled(False)
         self.time_2d.setEnabled(False)
         self.time_3d.setEnabled(False)
         self.time_2d.setChecked(False)
@@ -593,11 +599,11 @@ class MainWindow(QDialog, Ui_Dialog):
         file = io.loadmat(self.location)
         self.tsnap = file["tsnap"]
         self.timeoptions.addItems(self.tsnap)
-        if self.isConnected:
+        if self.isConnectedTime:
             self.timeoptions.activated.disconnect(self.activated)
-            self.isConnected = False
+            self.isConnectedTime = False
         self.timeoptions.activated.connect(self.activated)
-        self.isConnected = True
+        self.isConnectedTime = True
 
         dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
         self.iadirectories = []
@@ -608,6 +614,8 @@ class MainWindow(QDialog, Ui_Dialog):
             self.ia_options.clear()
             for i in range(0, len(self.iadirectories)):
                 dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
+                self.ia_select.setEnabled(True)
+                self.ia_options.setEnabled(True)
                 self.ia_options.addItem(dispName)
         return
 
@@ -928,7 +936,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 IAFlag = 1
                 X, Y = powerQualityAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedFrequency,
                                             self.conductorlist.currentRow(), radioflag, 0, IAFlag)
-            elif (self.TAButton.isCheck()):
+            elif (self.TAButton.isChecked()):
                 D3Plot_TA_LFA(self.tadirectories[self.pqa_scaoptions.currentIndex()], self.selectedTsnaps,
                               (self.conductorlist.currentRow()), radioflag, self.TA_conductors)
                 return
@@ -946,10 +954,10 @@ class MainWindow(QDialog, Ui_Dialog):
                     plt.plot(X[i], Y[i], label=self.selectedFrequencyValue[i])
                     plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=12,
                                    fontweight='bold')
                     else:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=12,
                                    fontweight='bold')
                     plt.xlim(left=min(X[i]), right=max(X[i]))
                     plt.grid(alpha=0.3)
@@ -964,11 +972,11 @@ class MainWindow(QDialog, Ui_Dialog):
                     j = t
                 if (j == 1):
                     plt.figure()
-                    plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
+                    plt.title("Power Quality Analysis 2D" if not self.IAButton.isChecked() else (
                         "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
                               fontsize=15, fontweight='bold')
                     plt.plot(X[t - 1], Y[t - 1], label=self.selectedFrequencyValue[t - 1])
-                    plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
+                    plt.xlabel("Distance (km)", fontsize=12, fontweight='bold')
                     if radioflag == 1:
                         plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
                                    fontweight='bold')
@@ -982,15 +990,18 @@ class MainWindow(QDialog, Ui_Dialog):
                     break
                 else:
                     figure, axis = plt.subplots(j)
+                    plt.suptitle("Power Quality Analysis 2D" if not self.IAButton.isChecked() else (
+                        "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                              fontsize=15, fontweight='bold')
                     for i in range(0, len(Y)):
                         axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedFrequencyValue[t - 1])
                         if radioflag == 1:
                             axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)",
-                                               fontsize=15, fontweight='bold')
+                                               fontsize=12, fontweight='bold')
                         else:
                             axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)",
-                                               fontsize=15, fontweight='bold')
-                        axis[i].set_xlabel("Distance (km)", fontsize=15, fontweight='bold')
+                                               fontsize=12, fontweight='bold')
+                        axis[i].set_xlabel("Distance (km)", fontsize=12, fontweight='bold')
                         axis[i].legend()
                         axis[i].set_xlim(left=min(X[t - 1]), right=max(X[t - 1]))
                         axis[i].grid(alpha=0.3)
@@ -1099,6 +1110,9 @@ class MainWindow(QDialog, Ui_Dialog):
                     break
                 else:
                     figure, axis = plt.subplots(j)
+                    plt.suptitle("Load Flow Analysis 2D" if IAFlag == 0 else (
+                        "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                              fontsize=15, fontweight='bold')
                     for i in range(0, j):
                         axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
                         if radioflag == 1:
