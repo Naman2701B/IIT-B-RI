@@ -552,8 +552,9 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.tadirectories.append(self.lfadirectories[i])
                 self.lfaoptions.addItem(dispName)
             else:
-                if not (self.TAButton.isChecked()):
-                    self.lfaoptions.addItem(dispName)
+                if not (self.TAButton.isChecked()): 
+                    if not ("_T" in dispName):
+                        self.lfaoptions.addItem(dispName)
         if (len(self.lfaoptions) == 0):
             self.lfaselect.setEnabled(False)
         return
