@@ -1,5 +1,5 @@
 import sys
-from PyQt5 import QtWidgets, QtCore
+from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox, QPushButton
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
@@ -30,6 +30,8 @@ class MainWindow(QDialog, Ui_Dialog):
         self.reportGenerate.setEnabled(False)
         self.stringlineplot.setEnabled(False)
         self.velocity.setEnabled(False)
+        self.selectbtn.setEnabled(False)
+        self.options.setEnabled(False)
         self.stringlineplot.clicked.connect(self.stringLinePlotClick)
         self.browse.clicked.connect(self.browsefiles)
         self.plotbtn.clicked.connect(self.clickEvent)
@@ -278,9 +280,13 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def addOpt(self):
+        self.options.setEnabled(True)
+        self.selectbtn.setEnabled(True)
         for path in self.folder_paths:
             dispName = os.path.basename(path).split('/')[-1]
             self.options.addItem(dispName)
+        if(len(self.folder_paths)==0):
+            self.selectbtn.setEnabled(False)
         return
 
     def check3dstatus(self):
@@ -418,6 +424,9 @@ class MainWindow(QDialog, Ui_Dialog):
                 for i in range(0, len(self.iadirectories)):
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
+                if(len(self.iadirectories)==0):
+                    self.ia_options.setEnabled(False)
+                    self.ia_select.setEnabled(False)
         else:
             self.selectAllFrequency.setEnabled(True)
             self.lfaoptions.setEnabled(True)
@@ -456,6 +465,9 @@ class MainWindow(QDialog, Ui_Dialog):
                     self.ia_select.setEnabled(True)
                     dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
                     self.ia_options.addItem(dispName)
+                if(len(self.iadirectories)==0):
+                    self.ia_options.setEnabled(False)
+                    self.ia_select.setEnabled(False)
         return
 
     def selectAll(self):
@@ -618,6 +630,9 @@ class MainWindow(QDialog, Ui_Dialog):
                 self.ia_select.setEnabled(True)
                 self.ia_options.setEnabled(True)
                 self.ia_options.addItem(dispName)
+            if(len(self.iadirectories)==0):
+                self.ia_options.setEnabled(False)
+                self.ia_select.setEnabled(False)
         return
 
     def activated(self, index):
@@ -729,6 +744,7 @@ class MainWindow(QDialog, Ui_Dialog):
             self.Time_radio.setEnabled(True)
             self.Distance_radio.setEnabled(True)
             self.Time_radio.setChecked(True)
+            self.counter()
         else:
             self.Tractiveeffort.setEnabled(False)
             self.Reactivepower.setEnabled(False)
@@ -739,6 +755,9 @@ class MainWindow(QDialog, Ui_Dialog):
             self.Time_radio.setEnabled(False)
             self.Distance_radio.setEnabled(False)
             self.velocity.setEnabled(False)
+            self.plotbtn.setEnabled(False)
+            self.subplotbtn.setEnabled(False)
+            self.mergeplotbtn.setEnabled(False)
         return
 
     def getTrainNumberData(self):
@@ -757,7 +776,8 @@ class MainWindow(QDialog, Ui_Dialog):
         if (sender in self.checkedButtons):
             self.checkedButtons.remove(sender)
         else:
-            self.checkedButtons.append(sender)
+            if not (sender == self.Trainplots):
+                self.checkedButtons.append(sender)
         if (len(self.checkedButtons) > 0):
             self.plotbtn.setEnabled(True)
             self.subplotbtn.setEnabled(True)
@@ -1194,6 +1214,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 plt.title("String Line Diagram", fontsize=15, fontweight='bold')
                 plt.get_current_fig_manager().resize(950, 500)
                 plt.grid(alpha=0.3)
+                cursor = mplcursors.cursor(hover=True)
                 # binding_id = plt.connect('motion_notify_event', on_move)
                 plt.show(block=False)
         return
@@ -1315,6 +1336,9 @@ class MainWindow(QDialog, Ui_Dialog):
 
 
 app = QApplication(sys.argv)
+font = QtGui.QFont()
+font.setPointSize(12)
+app.setFont(font)
 mainwindow = MainWindow()
 mainwindow.showMaximized()
 widget = QtWidgets.QStackedWidget()

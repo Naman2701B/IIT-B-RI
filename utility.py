@@ -52,8 +52,7 @@ def timeTableData(basefolderinput):
     splitDuration = (max(timingGraph) - min(timingGraph))//8
     splitDistance = (max(distanceGraph)-min(distanceGraph))//5
     timingGraph = [min(timingGraphInHrsAndMins)]
-    distanceToReplace = df2["DistanceKMWithReferenceToStartingStation"].to_list(
-    )
+    distanceToReplace = df2["DistanceKMWithReferenceToStartingStation"].to_list()
     distanceGraph = [min(distanceGraph)]
     timeToReplaceInMins = [0]
     values = timingGraph[0].split(":")
@@ -263,7 +262,7 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,
         zvalue = np.array(zvalue)
         zticks = np.array(zticks)
         super_y_axis = np.array(super_y_axis)
-        ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
+        ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue',shade=True)
         ax.view_init(elev=20, azim=-145, roll=0)
         zvaluestoshow=[]
         ztickstoshow =[]
