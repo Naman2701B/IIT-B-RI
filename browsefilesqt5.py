@@ -1365,9 +1365,9 @@ class MainWindow(QDialog, Ui_Dialog):
 
 
 app = QApplication(sys.argv)
-# font = QtGui.QFont()
-# font.setPointSize(12)
-# app.setFont(font)
+font = QtGui.QFont()
+font.setPointSize(12)
+app.setFont(font)
 mainwindow = MainWindow()
 mainwindow.showMaximized()
 widget = QtWidgets.QStackedWidget()
