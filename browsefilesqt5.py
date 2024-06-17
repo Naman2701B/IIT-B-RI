@@ -766,6 +766,20 @@ class MainWindow(QDialog, Ui_Dialog):
                 data = timeTableData(self.final_input_directories[i])
                 for j in range(0, len(data["calculativeData"])):
                     self.trains.append(data["calculativeData"][j]["trainnumber"])
+                output_data = pd.read_csv(os.path.join(
+                    self.final_output_directories[i], "TrainModuleOutput.csv"))
+                for k in range(0, len(self.trains)):
+                    popflag = False
+                    if (k<len(self.trains)):
+                        for j in range(0, len(output_data.columns)//5):
+                            if (self.trains[k] in output_data.columns[5*j]):
+                                popflag = True
+                                break
+                    else:
+                        continue
+                    if not(popflag):
+                        self.trains.pop(k)
+                        data["calculativeData"].pop(k)
         return
 
     def current_text_changed(self, text):
@@ -1172,15 +1186,30 @@ class MainWindow(QDialog, Ui_Dialog):
     def getStringLineData(self):
         for i in range(0, len(self.final_input_directories)):
             if ("MTMM" in self.final_input_directories[i]):
-                data = timeTableData(self.final_input_directories[i])
                 x_axis = []
                 y_axis = []
                 start = 0
                 end = 0
                 output_data = pd.read_csv(os.path.join(
                     self.final_output_directories[i], "TrainModuleOutput.csv"))
+                data = timeTableData(self.final_input_directories[i])
+
                 for j in range(0, len(data["calculativeData"])):
                     self.trains.append(data["calculativeData"][j]["trainnumber"])
+
+                for k in range(0, len(self.trains)):
+                    popflag = False
+                    if (k<len(self.trains)):
+                        for j in range(0, len(output_data.columns)//5):
+                            if (self.trains[k] in output_data.columns[5*j]):
+                                popflag = True
+                                break
+                    else:
+                        continue
+                    if not(popflag):
+                        self.trains.pop(k)
+                        data["calculativeData"].pop(k)
+                    
                 for j in range(0, len(data["calculativeData"])):
                     if (int(output_data["Up/Downtrack_" + str(self.trains[j]) + "_0"][1]) == 0):
                         partstr = "Uptrack"
@@ -1336,9 +1365,9 @@ class MainWindow(QDialog, Ui_Dialog):
 
 
 app = QApplication(sys.argv)
-font = QtGui.QFont()
-font.setPointSize(12)
-app.setFont(font)
+# font = QtGui.QFont()
+# font.setPointSize(12)
+# app.setFont(font)
 mainwindow = MainWindow()
 mainwindow.showMaximized()
 widget = QtWidgets.QStackedWidget()
