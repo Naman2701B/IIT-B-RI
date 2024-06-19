@@ -61,7 +61,7 @@
                 <rect>
                     <x>10</x>
                     <y>50</y>
-                    <width>1374</width>
+                    <width>1704</width>
                     <height>910</height>
                 </rect>
             </property>
@@ -71,10 +71,10 @@
             <widget class="QGroupBox" name="groupBox_3">
                 <property name="geometry">
                     <rect>
-                        <x>10</x>
-                        <y>435</y>
-                        <width>350</width>
-                        <height>510</height>
+                        <x>520</x>
+                        <y>30</y>
+                        <width>610</width>
+                        <height>340</height>
                     </rect>
                 </property>
                 <property name="title">
@@ -84,19 +84,19 @@
                     <property name="geometry">
                         <rect>
                             <x>20</x>
-                            <y>50</y>
+                            <y>60</y>
                             <width>161</width>
-                            <height>221</height>
+                            <height>273</height>
                         </rect>
                     </property>
                 </widget>
                 <widget class="QCheckBox" name="Tractiveeffort">
                     <property name="geometry">
                         <rect>
-                            <x>20</x>
-                            <y>390</y>
-                            <width>171</width>
-                            <height>22</height>
+                            <x>201</x>
+                            <y>180</y>
+                            <width>200</width>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -106,10 +106,10 @@
                 <widget class="Line" name="line_4">
                     <property name="geometry">
                         <rect>
-                            <x>140</x>
-                            <y>290</y>
+                            <x>395</x>
+                            <y>60</y>
                             <width>20</width>
-                            <height>141</height>
+                            <height>210</height>
                         </rect>
                     </property>
                     <property name="orientation">
@@ -119,10 +119,10 @@
                 <widget class="QLabel" name="label_5">
                     <property name="geometry">
                         <rect>
-                            <x>20</x>
-                            <y>290</y>
-                            <width>55</width>
-                            <height>16</height>
+                            <x>281</x>
+                            <y>30</y>
+                            <width>90</width>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -132,10 +132,10 @@
                 <widget class="QCheckBox" name="Reactivepower">
                     <property name="geometry">
                         <rect>
-                            <x>20</x>
-                            <y>370</y>
-                            <width>171</width>
-                            <height>22</height>
+                            <x>201</x>
+                            <y>150</y>
+                            <width>200</width>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -145,10 +145,10 @@
                 <widget class="QCheckBox" name="Activepower">
                     <property name="geometry">
                         <rect>
-                            <x>20</x>
-                            <y>350</y>
+                            <x>201</x>
+                            <y>120</y>
                             <width>171</width>
-                            <height>22</height>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -158,10 +158,10 @@
                 <widget class="QCheckBox" name="Voltage">
                     <property name="geometry">
                         <rect>
-                            <x>20</x>
-                            <y>310</y>
+                            <x>201</x>
+                            <y>60</y>
                             <width>171</width>
-                            <height>22</height>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -171,10 +171,10 @@
                 <widget class="QCheckBox" name="Brakingeffort">
                     <property name="geometry">
                         <rect>
-                            <x>20</x>
-                            <y>410</y>
-                            <width>171</width>
-                            <height>22</height>
+                            <x>201</x>
+                            <y>210</y>
+                            <width>200</width>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -184,10 +184,10 @@
                 <widget class="QCheckBox" name="velocity">
                     <property name="geometry">
                         <rect>
-                            <x>20</x>
-                            <y>430</y>
+                            <x>201</x>
+                            <y>240</y>
                             <width>171</width>
-                            <height>22</height>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -197,10 +197,10 @@
                 <widget class="QCheckBox" name="Current">
                     <property name="geometry">
                         <rect>
-                            <x>20</x>
-                            <y>330</y>
+                            <x>201</x>
+                            <y>90</y>
                             <width>171</width>
-                            <height>22</height>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -210,10 +210,10 @@
                 <widget class="QLabel" name="label_7">
                     <property name="geometry">
                         <rect>
-                            <x>170</x>
-                            <y>290</y>
-                            <width>55</width>
-                            <height>16</height>
+                            <x>471</x>
+                            <y>30</y>
+                            <width>90</width>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -223,10 +223,10 @@
                 <widget class="QPushButton" name="mergeplotbtn">
                     <property name="geometry">
                         <rect>
-                            <x>236</x>
-                            <y>470</y>
-                            <width>93</width>
-                            <height>28</height>
+                            <x>501</x>
+                            <y>300</y>
+                            <width>100</width>
+                            <height>36</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -236,10 +236,10 @@
                 <widget class="QPushButton" name="subplotbtn">
                     <property name="geometry">
                         <rect>
-                            <x>123</x>
-                            <y>470</y>
-                            <width>93</width>
-                            <height>28</height>
+                            <x>351</x>
+                            <y>300</y>
+                            <width>100</width>
+                            <height>36</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -249,10 +249,10 @@
                 <widget class="QPushButton" name="plotbtn">
                     <property name="geometry">
                         <rect>
-                            <x>10</x>
-                            <y>470</y>
-                            <width>93</width>
-                            <height>28</height>
+                            <x>201</x>
+                            <y>300</y>
+                            <width>100</width>
+                            <height>36</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -265,7 +265,7 @@
                             <x>20</x>
                             <y>30</y>
                             <width>161</width>
-                            <height>21</height>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -275,10 +275,10 @@
                 <widget class="QRadioButton" name="Time_radio">
                     <property name="geometry">
                         <rect>
-                            <x>170</x>
-                            <y>310</y>
-                            <width>84</width>
-                            <height>19</height>
+                            <x>411</x>
+                            <y>60</y>
+                            <width>171</width>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -288,10 +288,10 @@
                 <widget class="QRadioButton" name="Distance_radio">
                     <property name="geometry">
                         <rect>
-                            <x>170</x>
-                            <y>340</y>
-                            <width>84</width>
-                            <height>19</height>
+                            <x>411</x>
+                            <y>90</y>
+                            <width>171</width>
+                            <height>30</height>
                         </rect>
                     </property>
                     <property name="text">
@@ -305,7 +305,7 @@
                         <x>10</x>
                         <y>30</y>
                         <width>500</width>
-                        <height>301</height>
+                        <height>340</height>
                     </rect>
                 </property>
                 <property name="title">
@@ -338,8 +338,8 @@
                     <property name="geometry">
                         <rect>
                             <x>275</x>
-                            <y>210</y>
-                            <width>219</width>
+                            <y>250</y>
+                            <width>200</width>
                             <height>35</height>
                         </rect>
                     </property>
@@ -351,7 +351,7 @@
                     <property name="geometry">
                         <rect>
                             <x>275</x>
-                            <y>261</y>
+                            <y>301</y>
                             <width>93</width>
                             <height>30</height>
                         </rect>
@@ -418,7 +418,7 @@
                             <x>30</x>
                             <y>210</y>
                             <width>161</width>
-                            <height>81</height>
+                            <height>122</height>
                         </rect>
                     </property>
                 </widget>
@@ -426,10 +426,10 @@
             <widget class="QTabWidget" name="analysistab">
                 <property name="geometry">
                     <rect>
-                        <x>870</x>
+                        <x>1140</x>
                         <y>30</y>
-                        <width>480</width>
-                        <height>820</height>
+                        <width>550</width>
+                        <height>865</height>
                     </rect>
                 </property>
                 <property name="currentIndex">
@@ -445,13 +445,26 @@
                     <attribute name="title">
                         <string>Tab 1</string>
                     </attribute>
+                    <widget class="Line" name="line_4">
+                    <property name="geometry">
+                        <rect>
+                            <x>0</x>
+                            <y>40</y>
+                            <width>550</width>
+                            <height>10</height>
+                        </rect>
+                    </property>
+                    <property name="orientation">
+                        <enum>Qt::Horizontal</enum>
+                    </property>
+                    </widget>
                     <widget class="QButtonGroup" name = "IARadioOptions">
                         <widget class="QRadioButton" name="IAButton">
                             <property name="geometry">
                                 <rect>
                                     <x>10</x>
                                     <y>10</y>
-                                    <width>150</width>
+                                    <width>260</width>
                                     <height>31</height>
                                 </rect>
                             </property>
@@ -462,9 +475,9 @@
                         <widget class="QRadioButton" name="TAButton">
                             <property name="geometry">
                                 <rect>
-                                    <x>180</x>
+                                    <x>280</x>
                                     <y>10</y>
-                                    <width>150</width>
+                                    <width>260</width>
                                     <height>31</height>
                                 </rect>
                             </property>
@@ -478,8 +491,8 @@
                             <property name="geometry">
                                 <rect>
                                     <x>10</x>
-                                    <y>45</y>
-                                    <width>141</width>
+                                    <y>50</y>
+                                    <width>230</width>
                                     <height>31</height>
                                 </rect>
                             </property>
@@ -490,9 +503,9 @@
                         <widget class="QRadioButton" name="scaradio">
                             <property name="geometry">
                                 <rect>
-                                    <x>150</x>
-                                    <y>45</y>
-                                    <width>145</width>
+                                    <x>10</x>
+                                    <y>80</y>
+                                    <width>250</width>
                                     <height>31</height>
                                 </rect>
                             </property>
@@ -503,9 +516,9 @@
                         <widget class="QRadioButton" name="pqaradio">
                             <property name="geometry">
                                 <rect>
-                                    <x>300</x>
-                                    <y>45</y>
-                                    <width>160</width>
+                                    <x>10</x>
+                                    <y>110</y>
+                                    <width>250</width>
                                     <height>31</height>
                                 </rect>
                             </property>
@@ -518,9 +531,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>80</y>
+                                <y>150</y>
                                 <width>350</width>
-                                <height>24</height>
+                                <height>30</height>
                             </rect>
                         </property>
                     </widget>
@@ -528,9 +541,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>380</x>
-                                <y>80</y>
+                                <y>150</y>
                                 <width>80</width>
-                                <height>25</height>
+                                <height>30</height>
                             </rect>
                         </property>
                         <property name="text">
@@ -541,9 +554,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>120</y>
+                                <y>185</y>
                                 <width>350</width>
-                                <height>24</height>
+                                <height>30</height>
                             </rect>
                         </property>
                     </widget>
@@ -551,9 +564,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>380</x>
-                                <y>120</y>
+                                <y>185</y>
                                 <width>80</width>
-                                <height>25</height>
+                                <height>30</height>
                             </rect>
                         </property>
                         <property name="text">
@@ -564,9 +577,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>160</y>
+                                <y>220</y>
                                 <width>350</width>
-                                <height>24</height>
+                                <height>30</height>
                             </rect>
                         </property>
                     </widget>
@@ -574,9 +587,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>380</x>
-                                <y>160</y>
+                                <y>220</y>
                                 <width>80</width>
-                                <height>25</height>
+                                <height>30</height>
                             </rect>
                         </property>
                         <property name="text">
@@ -587,9 +600,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>650</y>
-                                <width>80</width>
-                                <height>25</height>
+                                <y>750</y>
+                                <width>120</width>
+                                <height>40</height>
                             </rect>
                         </property>
                         <property name="text">
@@ -599,10 +612,10 @@
                     <widget class="QPushButton" name="subpltlfa_pqa_sca">
                         <property name="geometry">
                             <rect>
-                                <x>180</x>
-                                <y>650</y>
-                                <width>80</width>
-                                <height>25</height>
+                                <x>210</x>
+                                <y>750</y>
+                                <width>120</width>
+                                <height>40</height>
                             </rect>
                         </property>
                         <property name="text">
@@ -612,10 +625,10 @@
                     <widget class="QPushButton" name="mergepltlfa_pqa_sca">
                         <property name="geometry">
                             <rect>
-                                <x>330</x>
-                                <y>650</y>
-                                <width>80</width>
-                                <height>25</height>
+                                <x>410</x>
+                                <y>750</y>
+                                <width>120</width>
+                                <height>40</height>
                             </rect>
                         </property>
                         <property name="text">
@@ -626,9 +639,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>200</y>
+                                <y>270</y>
                                 <width>191</width>
-                                <height>24</height>
+                                <height>30</height>
                             </rect>
                         </property>
                         <item>
@@ -641,8 +654,8 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>230</y>
-                                <width>101</width>
+                                <y>305</y>
+                                <width>161</width>
                                 <height>31</height>
                             </rect>
                         </property>
@@ -654,9 +667,9 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>270</y>
+                                <y>345</y>
                                 <width>191</width>
-                                <height>24</height>
+                                <height>30</height>
                             </rect>
                         </property>
                         <item>
@@ -669,8 +682,8 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>300</y>
-                                <width>101</width>
+                                <y>380</y>
+                                <width>161</width>
                                 <height>31</height>
                             </rect>
                         </property>
@@ -682,8 +695,8 @@
                         <property name="geometry">
                             <rect>
                                 <x>210</x>
-                                <y>200</y>
-                                <width>211</width>
+                                <y>270</y>
+                                <width>321</width>
                                 <height>41</height>
                             </rect>
                         </property>
@@ -692,8 +705,8 @@
                         <property name="geometry">
                             <rect>
                                 <x>210</x>
-                                <y>270</y>
-                                <width>211</width>
+                                <y>345</y>
+                                <width>321</width>
                                 <height>41</height>
                             </rect>
                         </property>
@@ -703,7 +716,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>210</x>
-                                    <y>240</y>
+                                    <y>310</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -715,8 +728,8 @@
                         <widget class="QRadioButton" name="time_3d">
                             <property name="geometry">
                                 <rect>
-                                    <x>260</x>
-                                    <y>240</y>
+                                    <x>460</x>
+                                    <y>310</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -731,7 +744,7 @@
                             <property name="geometry">
                                 <rect>
                                     <x>210</x>
-                                    <y>315</y>
+                                    <y>385</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -743,8 +756,8 @@
                         <widget class="QRadioButton" name="frequency_3d">
                             <property name="geometry">
                                 <rect>
-                                    <x>260</x>
-                                    <y>315</y>
+                                    <x>460</x>
+                                    <y>385</y>
                                     <width>141</width>
                                     <height>31</height>
                                 </rect>
@@ -758,8 +771,8 @@
                         <property name="geometry">
                             <rect>
                                 <x>10</x>
-                                <y>352</y>
-                                <width>421</width>
+                                <y>430</y>
+                                <width>521</width>
                                 <height>250</height>
                             </rect>
                         </property>
@@ -768,10 +781,10 @@
                         <widget class="QRadioButton" name="nodeVoltRadio">
                             <property name="geometry">
                                 <rect>
-                                    <x>20</x>
-                                    <y>615</y>
-                                    <width>171</width>
-                                    <height>20</height>
+                                    <x>10</x>
+                                    <y>690</y>
+                                    <width>200</width>
+                                    <height>30</height>
                                 </rect>
                             </property>
                             <property name="text">
@@ -781,10 +794,10 @@
                         <widget class="QRadioButton" name="branchCurrRadio">
                             <property name="geometry">
                                 <rect>
-                                    <x>190</x>
-                                    <y>615</y>
-                                    <width>121</width>
-                                    <height>20</height>
+                                    <x>340</x>
+                                    <y>690</y>
+                                    <width>200</width>
+                                    <height>30</height>
                                 </rect>
                             </property>
                             <property name="text">
