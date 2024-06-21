@@ -334,7 +334,19 @@
                         </rect>
                     </property>
                 </widget>
-
+                <widget class="QPushButton" name="trainStat">
+                    <property name="geometry">
+                        <rect>
+                            <x>275</x>
+                            <y>150</y>
+                            <width>200</width>
+                            <height>35</height>
+                        </rect>
+                    </property>
+                    <property name="text">
+                        <string>Show Train Statistics</string>
+                    </property>
+                </widget>
                 <widget class="QPushButton" name="reportGenerate">
                     <property name="geometry">
                         <rect>

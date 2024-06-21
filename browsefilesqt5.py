@@ -3,7 +3,6 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox, QPushButton
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
-from PyQt5.uic import loadUi
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -18,7 +17,7 @@ from reportmaker import startReport
 from temperature import D3Plot_TA_LFA, D3Plot_TA_SCA
 from output import Ui_Dialog
 from PyQt5.uic import loadUi
-
+from datetime import timedelta
 
 class MainWindow(QDialog, Ui_Dialog):
     def __init__(self, parent=None):
@@ -27,7 +26,9 @@ class MainWindow(QDialog, Ui_Dialog):
         # loadUi("gui.ui", self)
         flagsWindow = QtCore.Qt.WindowFlags()
         self.setWindowFlags(flagsWindow)
-        self.timetable_table.setHidden(True)
+        self.timetable_trainstat.setHidden(True)
+        self.trainStat.setEnabled(False)
+        self.trainStat.clicked.connect(self.reportTrigger)
         self.selectAllTime.setEnabled(False)
         self.selectAllFrequency.setEnabled(False)
         self.reportGenerate.setEnabled(False)
@@ -57,6 +58,7 @@ class MainWindow(QDialog, Ui_Dialog):
         self.Routealtitude.setEnabled(False)
         self.showTimeTable.setEnabled(False)
         self.timetableflag= False
+        self.trainstatflag= False
         self.showTimeTable.clicked.connect(self.showdialog)
         self.Trainplots1.setEnabled(False)
         self.Substationplots.setEnabled(False)
@@ -258,15 +260,67 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def reportTrigger(self):
-        data = timeTableData(self.final_input_directories[0])
-        self.reportName = startReport(self.final_output_directories[0], data["calculativeData"])
-        self.msg = QMessageBox()
-        self.msg.setWindowTitle("PDF Notification")
-        button = QPushButton("Open PDF", self.msg)
-        button.setGeometry(15, 60, 90, 30)
-        button.clicked.connect(self.open_pdf)
-        self.msg.setText("PDF Successfully Created.")
-        self.msg.exec()
+        sender = self.sender()
+        if(sender == self.trainStat):
+            self.trainstatflag = not (self.trainstatflag)
+            if(self.trainstatflag):
+                data = timeTableData(self.final_input_directories[0])
+                file = pd.read_csv(self.final_output_directories[0]+"/TrainResults.csv",header=None)
+                self.timetable_trainstat.setColumnCount(len(file[0]))
+                self.timetable_trainstat.setRowCount(6)
+                self.timetable_trainstat.setHorizontalHeaderLabels(file[0])
+                self.timetable_trainstat.setColumnWidth(0,250)
+                self.timetable_trainstat.setHidden(False)
+                for j in range(len(data["calculativeData"])):
+                    item = QtWidgets.QTableWidgetItem("Start Time (HH:MM)")
+                    self.timetable_trainstat.setItem(0,0,item)
+                    item = QtWidgets.QTableWidgetItem(data["calculativeData"][j]["startTime"])
+                    self.timetable_trainstat.setItem(0,j+1,item)
+                for i in range(1,len(file[0])):
+                    item = QtWidgets.QTableWidgetItem("Travel Time (HH:MM:SS)")
+                    self.timetable_trainstat.setItem(4,0,item)
+                    temp = int(file[1][i])
+                    h = temp // 3600
+                    m = (temp % 3600) // 60
+                    s = temp % 60
+                    item = QtWidgets.QTableWidgetItem(str(timedelta(hours=h, minutes=m, seconds=s)))
+                    self.timetable_trainstat.setItem(4,i,item)
+                    item = QtWidgets.QTableWidgetItem("End Time (HH:MM:SS)")
+                    self.timetable_trainstat.setItem(5,0,item)
+                    temp1 = data["calculativeData"][i-1]["startTime"].split(":")
+                    hours = int(temp1[0])
+                    minutes = int(temp1[1])
+                    item = QtWidgets.QTableWidgetItem(str(timedelta(hours=hours, minutes=minutes)+timedelta(hours= h, minutes=m,seconds=s)))
+                    self.timetable_trainstat.setItem(5,i,item)
+                for i in range(1, len(file[0])):
+                    item = QtWidgets.QTableWidgetItem("Maximum Voltage (kV)")
+                    self.timetable_trainstat.setItem(1,0,item)
+                    item = QtWidgets.QTableWidgetItem(str(round(float(file[4][i])/1000,2)))
+                    self.timetable_trainstat.setItem(1,i,item)
+                    item = QtWidgets.QTableWidgetItem("Minimum Voltage (kV)")
+                    self.timetable_trainstat.setItem(2,0,item)
+                    item = QtWidgets.QTableWidgetItem(str(round(float(file[3][i])/1000,2)))
+                    self.timetable_trainstat.setItem(2,i,item)
+                    item = QtWidgets.QTableWidgetItem("Mean Useful Voltage (kV)")
+                    self.timetable_trainstat.setItem(3,0,item)
+                    item = QtWidgets.QTableWidgetItem(str(round(float(file[2][i])/1000,2)))
+                    self.timetable_trainstat.setItem(3,i,item)
+                self.showTimeTable.setText("Show Time Table")
+                self.trainStat.setText("Hide Train Statistics")
+                self.timetableflag = False
+            else:
+                self.trainStat.setText("Show Train Statistics")
+                self.timetable_trainstat.setHidden(True)
+        else:
+            data = timeTableData(self.final_input_directories[0])
+            self.reportName = startReport(self.final_output_directories[0], data["calculativeData"])
+            self.msg = QMessageBox()
+            self.msg.setWindowTitle("PDF Notification")
+            button = QPushButton("Open PDF", self.msg)
+            button.setGeometry(15, 60, 110, 30)
+            button.clicked.connect(self.open_pdf)
+            self.msg.setText("PDF Successfully Created.")
+            self.msg.exec()
         return
 
     def browsefiles(self):
@@ -717,8 +771,10 @@ class MainWindow(QDialog, Ui_Dialog):
             if 'TrainResults.csv' in os.listdir(
                     self.final_output_directories[i]) and 'SubstationResults.csv' in os.listdir(
                     self.final_output_directories[i]):
+                self.trainStat.setEnabled(True)
                 self.reportGenerate.setEnabled(True)
             else:
+                self.trainStat.setEnabled(False)
                 self.reportGenerate.setEnabled(False)
         return
 
@@ -1256,19 +1312,19 @@ class MainWindow(QDialog, Ui_Dialog):
             for i in range(len(self.final_input_directories)):
                 if ("MTMM" in self.final_input_directories[i]):
                     dict = timeTableExcel(self.final_input_directories[i])
-            self.timetable_table.setColumnCount(1 + 3 * (len(dict)))
-            self.timetable_table.setRowCount(1 + len(dict[0]["stationNameToDisplay"]))
+            self.timetable_trainstat.setColumnCount(1 + 3 * (len(dict)))
+            self.timetable_trainstat.setRowCount(1 + len(dict[0]["stationNameToDisplay"]))
             labels = ["Station Name"]
             for i in range(len(dict)):
                 column = (i * 3) + 1
                 item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
-                self.timetable_table.setSpan(0, column, 1, 3)
-                self.timetable_table.setItem(0, column, item)
+                self.timetable_trainstat.setSpan(0, column, 1, 3)
+                self.timetable_trainstat.setItem(0, column, item)
                 temp = ["Arrival Time", "Dwell Time (in mins)", "Departure Time"]
                 labels.extend(temp)
                 for j in range(len(dict[0]["stationNameToDisplay"])):
                     item3 = QtWidgets.QTableWidgetItem(dict[0]["stationNameToDisplay"][j])
-                    self.timetable_table.setItem(j + 1, 0, item3)
+                    self.timetable_trainstat.setItem(j + 1, 0, item3)
                     for k in range(len(dict[i]["actualStationName"])):
                         for l in range(len(dict[0]["stationNameToDisplay"])):
                             if (dict[i]["actualStationName"][k] == dict[0]["stationNameToDisplay"][l]):
@@ -1278,26 +1334,28 @@ class MainWindow(QDialog, Ui_Dialog):
                                     dict[i]["dwellTime"][int(dict[i]["stationNumber"][l]) - 1])
                                 item3 = QtWidgets.QTableWidgetItem(
                                     dict[i]["departureTime"][int(dict[i]["stationNumber"][l]) - 1])
-                                self.timetable_table.setItem(l + 1, column, item)
-                                self.timetable_table.setItem(l + 1, column + 1, item2)
-                                self.timetable_table.setItem(l + 1, column + 2, item3)
+                                self.timetable_trainstat.setItem(l + 1, column, item)
+                                self.timetable_trainstat.setItem(l + 1, column + 1, item2)
+                                self.timetable_trainstat.setItem(l + 1, column + 2, item3)
                                 break
                             else:
                                 item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
                                 item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][j])
                                 item3 = QtWidgets.QTableWidgetItem(dict[i]["departureTime"][j])
-                                self.timetable_table.setItem(j + 1, column, item)
-                                self.timetable_table.setItem(j + 1, column + 1, item2)
-                                self.timetable_table.setItem(j + 1, column + 2, item3)
-            self.timetable_table.setHorizontalHeaderLabels(labels)
-            self.timetable_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
-            self.timetable_table.resizeColumnsToContents()
-            self.timetable_table.setHidden(False)
+                                self.timetable_trainstat.setItem(j + 1, column, item)
+                                self.timetable_trainstat.setItem(j + 1, column + 1, item2)
+                                self.timetable_trainstat.setItem(j + 1, column + 2, item3)
+            self.timetable_trainstat.setHorizontalHeaderLabels(labels)
+            self.timetable_trainstat.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+            self.timetable_trainstat.resizeColumnsToContents()
+            self.timetable_trainstat.setHidden(False)
             self.showTimeTable.setText("Hide Time Table")
+            self.trainStat.setText("Show Train Statistics")
+            self.trainstatflag = False
             return
         else:
             self.showTimeTable.setText("Show Time Table")
-            self.timetable_table.setHidden(True)
+            self.timetable_trainstat.setHidden(True)
             return
 
     def stringLinePlotClick(self):

@@ -138,9 +138,10 @@ def startReport(outputFolder, data):
         row5.cell("Travel Time (HH:MM:SS)")
         for i in range(len(file2)):
             temp = int(file2["Travelling time (in second)"][i])
-            m = temp // 60
+            h = temp // 3600
+            m = (temp % 3600) // 60
             s = temp % 60
-            row5.cell(str(timedelta(minutes=m, seconds=s)))
+            row5.cell(str(timedelta(hours=h, minutes=m, seconds=s)))
         row6 = table.row()
         row6.cell("End Time (HH:MM:SS)")
         for i in range(len(file2)):
@@ -148,9 +149,10 @@ def startReport(outputFolder, data):
             hours = int(temp1[0])
             minutes = int(temp1[1])
             temp = int(file2["Travelling time (in second)"][i])
-            m = temp // 60
+            h = temp // 3600
+            m = (temp % 3600) // 60
             s = temp % 60
-            row6.cell(str(timedelta(hours=hours, minutes=minutes)+timedelta(minutes=m,seconds=s)))
+            row6.cell(str(timedelta(hours=hours, minutes=minutes)+timedelta(hours= h, minutes=m,seconds=s)))
     values = hist_report(outputFolder)
     j=-60
     for i in range(len(values)):
