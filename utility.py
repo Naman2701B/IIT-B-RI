@@ -241,33 +241,20 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
                            str(selected_trains)+"_0"])
     return X_axis, Y_axis
 
-
-outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_130038_14-03-2024_R/PQA_130818_14-03-2024"
-
-
 def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,conductors):
     ax = plt.figure().add_subplot(projection='3d')
     plt.tight_layout()
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
     ax.set_box_aspect(aspect = (4,2,1))
-    # figsize=[15,10]
-    # figsize=(25,10),dpi=250
-    # Plot the 3D surface
     if(pqa_lfa==0):
         for i in range(0, len(zvalue)):
             for j in range(0, len(zvalue[i])):
                 zvalue[i][j] = calculateTime(zvalue[i][j])
         zvalue = np.array(zvalue)
         super_y_axis = np.array(super_y_axis)
-        print(zvalue)
-        # for i in range(0, len(zvalue)):
-        #     for j in range(0, len(zticks)):
-        #         zvalue[i][j] = zvalue[i][j]/3600
         ax.plot_surface(xvalues, zvalue, super_y_axis,edgecolor = 'black',cmap = cm.Spectral, rstride=1, cstride=8,linewidth = 0.3, antialiased=False, shade=True, alpha = 0.3)
         ax.view_init(elev=20, azim=-145, roll=0)
-        # ax.set_yticks(zvaluestoshow, ztickstoshow)
         ax.set(xlabel='Distance (km)',ylabel='Time (Hrs)', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)")
-        # plt.legend()
         plt.title("Load Flow Analysis 3D")
     else:
         for i in range(0, len(zvalue)):
@@ -288,7 +275,6 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,
         ax.set_yticks(zvaluestoshow, ztickstoshow)
         ax.set(xlabel='Distance (km)',
             ylabel='Frequencies (Hz)', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)")
-        # plt.legend()
         plt.title("Power Quality Analysis 3D")
     plt.show(block = False)
 
@@ -416,7 +402,6 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
     for i in range(len(file2["dev_seqn"])):
         if "line_" in str(file2["dev_seqn"][i][0][0]):
             x_axis.append({"label": file2["dev_seqn"][i][0][0], "data": float(file2["dev_seqn"][i][3][0][0])})
-            #x_axis.append(float(file2["dev_seqn"][i][3][0][0]))
     if radioflag==1:
         y_axis.append(float(abs(file['Line_Currents'][selectedconductor][0]))/1000)
         for j in range(len(file["Line_Currents"][0])):
@@ -438,19 +423,16 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
 
 def ShortCircuitAnalysis_IA(outputfolder, selectedconductor,conductors, radioflag):
     file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
-    # file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_linesummary.mat"))
     x_axis = []
     xvalues=[]
     y_axis = []
     for i in range(len(file["section_length_main"])):
         x_axis.append(float(file["section_length_main"][i][1]))
     if radioflag==1:
-        # y_axis.append(float(abs(file['Cable_current'][selectedconductor][0]))/1000)
         for j in range(len(file['Cable_current'][0])):
             y_axis.append(float(abs(file['Cable_current'][selectedconductor][j]))/1000)
         plt.ylabel((conductors[selectedconductor]+" Currents (kA)"),fontsize=15, fontweight='bold')
     else:
-        # y_axis.append(float(abs(file['Cableterminal_voltage'][selectedconductor][0]))/1000)
         for j in range(len(file['Cableterminal_voltage'][0])):
             y_axis.append(float(abs(file['Cableterminal_voltage'][selectedconductor][j])/1000))
         plt.ylabel((conductors[selectedconductor]+" Voltages (kV)"),fontsize=15, fontweight='bold')
@@ -461,7 +443,6 @@ def ShortCircuitAnalysis_IA(outputfolder, selectedconductor,conductors, radiofla
     plt.xlabel("Distance (km)",fontsize=15, fontweight='bold')
     plt.xlim(left=0, right=max(x_axis))
     plt.grid(alpha=0.3)
-    # plt.legend()
     plt.show(block = False)
 
 

@@ -213,10 +213,7 @@ class MainWindow(QDialog, Ui_Dialog):
         self.selectedTsnapValue = []
         self.selectedFrequency = []
         self.selectedFrequencyValue = []
-        # self.file_paths = []
         self.checkedButtons = []
-        # self.file_names = []
-        # self.folder_paths = []
         self.final_input_directories = []
         self.trains = []
         self.final_output_directories = []
@@ -675,11 +672,7 @@ class MainWindow(QDialog, Ui_Dialog):
         self.pqaradio.setEnabled(True)
         self.file_names.clear()
         self.Trainplots.setEnabled(True)
-        # self.Conductorconfig.setEnabled(True)
-        # self.Routealtitude.setEnabled(True)
-        # self.Trainplots1.setEnabled(True)
         self.Substationplots.setEnabled(True)
-        # self.stringlineplot.setEnabled(True)
         self.Time_radio.setChecked(True)
         self.analysistab.setTabEnabled(0, True)
         output_directory_results = []

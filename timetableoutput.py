@@ -1,5 +1,4 @@
 """
-timetableoutput.py
 
 This Python script processes railway timetable data and generates a structured output with various details for each train.
 
