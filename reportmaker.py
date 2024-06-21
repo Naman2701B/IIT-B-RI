@@ -10,8 +10,6 @@ from datetime import timedelta
 import re
 import os
 import sys
-
-# outputFolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output"
         
 def hist_report(outputFolder):
     file = pd.read_csv(outputFolder+"/TrainResults.csv")
@@ -49,7 +47,6 @@ def hist_report(outputFolder):
         canvas.draw()
         img1 = Image.fromarray(np.asarray(canvas.buffer_rgba()))
         images.append(img1)
-        # plt.legend()
     return images
 
 
@@ -163,9 +160,5 @@ def startReport(outputFolder, data):
     plt.close("all")
     return ("Report-"+name)
 
-# subscript_5 = '\u2085'
-#         subscript_m = '\u2098'
-#         subscript_i = '\u1D62'
-#         subscript_n = '\u2099'
-#         subscript_5min = f'{subscript_5}{subscript_m}{subscript_i}{subscript_n}'
-#         row2.cell(f'Max Current(A {subscript_5min})')
+# self.timetable_table = QtWidgets.QTableWidget(parent=self.groupBox_2)
+#         self.timetable_table.setGeometry(QtCore.QRect(10,380,1120,500))

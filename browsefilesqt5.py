@@ -3,6 +3,7 @@ from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox, QPushButton
 from PyQt5.QtGui import QDesktopServices
 from PyQt5.QtCore import QUrl
+from PyQt5.uic import loadUi
 import matplotlib.pyplot as plt
 import pandas as pd
 import numpy as np
@@ -22,10 +23,11 @@ from PyQt5.uic import loadUi
 class MainWindow(QDialog, Ui_Dialog):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
-        # self.setupUi(self)
-        loadUi("gui.ui", self)
+        self.setupUi(self)
+        # loadUi("gui.ui", self)
         flagsWindow = QtCore.Qt.WindowFlags()
         self.setWindowFlags(flagsWindow)
+        self.timetable_table.setHidden(True)
         self.selectAllTime.setEnabled(False)
         self.selectAllFrequency.setEnabled(False)
         self.reportGenerate.setEnabled(False)
@@ -52,9 +54,10 @@ class MainWindow(QDialog, Ui_Dialog):
         self.Current.setEnabled(False)
         self.Trainplots.setEnabled(False)
         self.Stringline.setEnabled(False)
-        # self.Conductorconfig.setEnabled(False)
         self.Routealtitude.setEnabled(False)
-        self.Timetable.setEnabled(False)
+        self.showTimeTable.setEnabled(False)
+        self.timetableflag= False
+        self.showTimeTable.clicked.connect(self.showdialog)
         self.Trainplots1.setEnabled(False)
         self.Substationplots.setEnabled(False)
         self.Time_radio.setEnabled(False)
@@ -168,8 +171,7 @@ class MainWindow(QDialog, Ui_Dialog):
         self.Stringline.setEnabled(False)
         self.Stringline.setChecked(False)
         self.Routealtitude.setEnabled(False)
-        self.Timetable.setEnabled(False)
-        self.Timetable.setChecked(False)
+        self.showTimeTable.setEnabled(False)
         self.Trainplots1.setEnabled(False)
         self.Substationplots.setEnabled(False)
         self.Time_radio.setEnabled(False)
@@ -675,7 +677,6 @@ class MainWindow(QDialog, Ui_Dialog):
         self.Trainplots.setEnabled(True)
         # self.Conductorconfig.setEnabled(True)
         # self.Routealtitude.setEnabled(True)
-        # self.Timetable.setEnabled(True)
         # self.Trainplots1.setEnabled(True)
         self.Substationplots.setEnabled(True)
         # self.stringlineplot.setEnabled(True)
@@ -714,9 +715,9 @@ class MainWindow(QDialog, Ui_Dialog):
         for i in range(len(self.final_input_directories)):
             if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and (
                     'RouteAltitudeData.csv' in os.listdir(self.final_input_directories[i])):
-                self.Timetable.setEnabled(True)
+                self.showTimeTable.setEnabled(True)
                 break
-        if (self.Stringline.isEnabled() or self.Routealtitude.isEnabled() or self.Timetable.isEnabled()):
+        if (self.Stringline.isEnabled() or self.Routealtitude.isEnabled()):
             self.stringlineplot.setEnabled(True)
         self.LFA_PQA_SCA()
         for i in range(len(self.final_output_directories)):
@@ -998,6 +999,9 @@ class MainWindow(QDialog, Ui_Dialog):
                     plt.xlim(left=min(X[i]), right=max(X[i]))
                     plt.grid(alpha=0.3)
                     plt.legend()
+                    for j in range(len(X[i])):
+                            if (j%6==0):
+                                plt.scatter(X[i][j],Y[i][j],c="red",marker='x')
                     plt.show(block=False)
         if (sender == self.subpltlfa_pqa_sca):
             t = len(Y)
@@ -1107,6 +1111,9 @@ class MainWindow(QDialog, Ui_Dialog):
                         plt.xlim(left=min(X[i]), right=max(X[i]))
                         plt.grid(alpha=0.3)
                         plt.legend()
+                        for j in range(len(X[i])):
+                            if (j%6==0):
+                                plt.scatter(X[i][j],Y[i][j],c="red",marker='x')
                         plt.show(block=False)
         if self.scaradio.isChecked():
             if (self.IAButton.isChecked()):
@@ -1250,88 +1257,56 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def showdialog(self):
-        dialog = QDialog()
-        layout = QtWidgets.QVBoxLayout(dialog)
-        for i in range(len(self.final_input_directories)):
-            if ("MTMM" in self.final_input_directories[i]):
-                dict = timeTableExcel(self.final_input_directories[i])
-        self.table = QtWidgets.QTableWidget()
-        self.table.setColumnCount(1 + 3 * (len(dict)))
-        self.table.setRowCount(1 + len(dict[0]["stationNameToDisplay"]))
-        labels = ["Station Name"]
-        for i in range(len(dict)):
-            column = (i * 3) + 1
-            item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
-            self.table.setSpan(0, column, 1, 3)
-            self.table.setItem(0, column, item)
-            temp = ["Arrival Time", "Dwell Time (in mins)", "Departure Time"]
-            labels.extend(temp)
-            for j in range(len(dict[0]["stationNameToDisplay"])):
-                item3 = QtWidgets.QTableWidgetItem(dict[0]["stationNameToDisplay"][j])
-                self.table.setItem(j + 1, 0, item3)
-                for k in range(len(dict[i]["actualStationName"])):
-                    for l in range(len(dict[0]["stationNameToDisplay"])):
-                        if (dict[i]["actualStationName"][k] == dict[0]["stationNameToDisplay"][l]):
-                            item = QtWidgets.QTableWidgetItem(
-                                dict[i]["timeFromStarting"][int(dict[i]["stationNumber"][l]) - 1])
-                            item2 = QtWidgets.QTableWidgetItem(
-                                dict[i]["dwellTime"][int(dict[i]["stationNumber"][l]) - 1])
-                            item3 = QtWidgets.QTableWidgetItem(
-                                dict[i]["departureTime"][int(dict[i]["stationNumber"][l]) - 1])
-                            self.table.setItem(l + 1, column, item)
-                            self.table.setItem(l + 1, column + 1, item2)
-                            self.table.setItem(l + 1, column + 2, item3)
-                            break
-                        else:
-                            item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
-                            item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][j])
-                            item3 = QtWidgets.QTableWidgetItem(dict[i]["departureTime"][j])
-                            self.table.setItem(j + 1, column, item)
-                            self.table.setItem(j + 1, column + 1, item2)
-                            self.table.setItem(j + 1, column + 2, item3)
-        # for i in range(len(dict)):
-        # labels.append("Train Number")
-        # labels.append("Train Type")
-        # self.table.setSpan(0,2+2*i,1,2)
-        # header = self.table.horizontalHeader()
-        self.table.setHorizontalHeaderLabels(labels)
-        # for i in range(len(dict)): 
-        # labels2 = ["Train Number", "Train Type"]
-        # self.table.setRowCount(2+len(dict[i]["stationName"]))
-        # header.setSectionResizeMode(3, QtWidgets.QHeaderView.ResizeToContents)
-        # item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
-        # item2 = QtWidgets.QTableWidgetItem(dict[i]["trainType"])
-        # item3 = QtWidgets.QTableWidgetItem("Station Name")
-        # item4 = QtWidgets.QTableWidgetItem("Station Number")
-        # item5 = QtWidgets.QTableWidgetItem("Travel Time")
-        # item6 = QtWidgets.QTableWidgetItem("Dwell Time (in mins)")
-        # self.table.setItem(0,0,item)
-        # self.table.setItem(0,1,item2)
-        # self.table.setItem(1,0,item3)
-        # self.table.setItem(1,1,item4)
-        # self.table.setItem(1,2,item5)
-        # self.table.setItem(1,3,item6)
-        # for j in range(len(dict[i]["stationName"])):
-        # item = QtWidgets.QTableWidgetItem(dict[i]["stationName"][j])
-        # item2 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
-        # item3 = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
-        # item4 = QtWidgets.QTableWidgetItem(dict[i]["stationNumber"][j])
-        # self.table.setItem(j+2,0,item)
-        # self.table.setItem(j+2,1,item2)
-        # self.table.setItem(j+2,2,item3)
-        # self.table.setItem(j+2,3,item4)
-        self.table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
-        self.table.resizeColumnsToContents()
-        layout.addWidget(self.table)
-        flags = QtCore.Qt.WindowFlags()
-        dialog.setWindowFlags(flags)
-        dialog.setWindowTitle("Time Table Data")
-        dialog.exec_()
-        return
+        self.timetableflag = not (self.timetableflag)
+        if self.timetableflag:
+            for i in range(len(self.final_input_directories)):
+                if ("MTMM" in self.final_input_directories[i]):
+                    dict = timeTableExcel(self.final_input_directories[i])
+            self.timetable_table.setColumnCount(1 + 3 * (len(dict)))
+            self.timetable_table.setRowCount(1 + len(dict[0]["stationNameToDisplay"]))
+            labels = ["Station Name"]
+            for i in range(len(dict)):
+                column = (i * 3) + 1
+                item = QtWidgets.QTableWidgetItem(dict[i]["trainnumber"])
+                self.timetable_table.setSpan(0, column, 1, 3)
+                self.timetable_table.setItem(0, column, item)
+                temp = ["Arrival Time", "Dwell Time (in mins)", "Departure Time"]
+                labels.extend(temp)
+                for j in range(len(dict[0]["stationNameToDisplay"])):
+                    item3 = QtWidgets.QTableWidgetItem(dict[0]["stationNameToDisplay"][j])
+                    self.timetable_table.setItem(j + 1, 0, item3)
+                    for k in range(len(dict[i]["actualStationName"])):
+                        for l in range(len(dict[0]["stationNameToDisplay"])):
+                            if (dict[i]["actualStationName"][k] == dict[0]["stationNameToDisplay"][l]):
+                                item = QtWidgets.QTableWidgetItem(
+                                    dict[i]["timeFromStarting"][int(dict[i]["stationNumber"][l]) - 1])
+                                item2 = QtWidgets.QTableWidgetItem(
+                                    dict[i]["dwellTime"][int(dict[i]["stationNumber"][l]) - 1])
+                                item3 = QtWidgets.QTableWidgetItem(
+                                    dict[i]["departureTime"][int(dict[i]["stationNumber"][l]) - 1])
+                                self.timetable_table.setItem(l + 1, column, item)
+                                self.timetable_table.setItem(l + 1, column + 1, item2)
+                                self.timetable_table.setItem(l + 1, column + 2, item3)
+                                break
+                            else:
+                                item = QtWidgets.QTableWidgetItem(dict[i]["timeFromStarting"][j])
+                                item2 = QtWidgets.QTableWidgetItem(dict[i]["dwellTime"][j])
+                                item3 = QtWidgets.QTableWidgetItem(dict[i]["departureTime"][j])
+                                self.timetable_table.setItem(j + 1, column, item)
+                                self.timetable_table.setItem(j + 1, column + 1, item2)
+                                self.timetable_table.setItem(j + 1, column + 2, item3)
+            self.timetable_table.setHorizontalHeaderLabels(labels)
+            self.timetable_table.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+            self.timetable_table.resizeColumnsToContents()
+            self.timetable_table.setHidden(False)
+            self.showTimeTable.setText("Hide Time Table")
+            return
+        else:
+            self.showTimeTable.setText("Show Time Table")
+            self.timetable_table.setHidden(True)
+            return
 
     def stringLinePlotClick(self):
-        if (self.Timetable.isChecked()):
-            self.showdialog()
         if (self.Stringline.isChecked()):
             plt.figure()
             self.getStringLineData()
@@ -1371,5 +1346,4 @@ font.setPointSize(12)
 app.setFont(font)
 mainwindow = MainWindow()
 mainwindow.showMaximized()
-widget = QtWidgets.QStackedWidget()
 sys.exit(app.exec_())

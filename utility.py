@@ -1,5 +1,6 @@
 import pandas as pd
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from datetime import datetime, timedelta
 import numpy as np
 import mplcursors
@@ -251,27 +252,21 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,
     ax.set_box_aspect(aspect = (4,2,1))
     # figsize=[15,10]
     # figsize=(25,10),dpi=250
-    zticks = []
     # Plot the 3D surface
     if(pqa_lfa==0):
         for i in range(0, len(zvalue)):
-            zticks.append([])
             for j in range(0, len(zvalue[i])):
-                zticks[i].append(zvalue[i][j])
                 zvalue[i][j] = calculateTime(zvalue[i][j])
         zvalue = np.array(zvalue)
-        zticks = np.array(zticks)
         super_y_axis = np.array(super_y_axis)
-        ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue',shade=True)
+        print(zvalue)
+        # for i in range(0, len(zvalue)):
+        #     for j in range(0, len(zticks)):
+        #         zvalue[i][j] = zvalue[i][j]/3600
+        ax.plot_surface(xvalues, zvalue, super_y_axis,edgecolor = 'black',cmap = cm.Spectral, rstride=1, cstride=8,linewidth = 0.3, antialiased=False, shade=True, alpha = 0.3)
         ax.view_init(elev=20, azim=-145, roll=0)
-        zvaluestoshow=[]
-        ztickstoshow =[]
-        for i in range(0, len(zvalue)):
-            for j in range(0, len(zticks)):
-                zvaluestoshow.append(zvalue[i][j])
-                ztickstoshow.append(zticks[i][j])
-        ax.set_yticks(zvaluestoshow, ztickstoshow)
-        ax.set(xlabel='Distance (km)',ylabel='Time Snaps', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)")
+        # ax.set_yticks(zvaluestoshow, ztickstoshow)
+        ax.set(xlabel='Distance (km)',ylabel='Time (Hrs)', zlabel=conductors[selectedconductors]+" Voltage (kV)" if radioflag == 0 else conductors[selectedconductors]+" Current (kA)")
         # plt.legend()
         plt.title("Load Flow Analysis 3D")
     else:
@@ -282,7 +277,7 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,
         zvalue = np.array(zvalue)   
         zticks = np.array(zticks)
         super_y_axis = np.array(super_y_axis)
-        ax.plot_surface(xvalues, zvalue, super_y_axis,  edgecolor='royalblue')
+        ax.plot_surface(xvalues, zvalue, super_y_axis, edgecolor='black',cmap = cm.Spectral, rstride=1, cstride=8, linewidth=0.3, antialiased=False,shade = True, alpha = 0.3)
         ax.view_init(elev=20, azim=-145, roll=0)
         zvaluestoshow=[]
         ztickstoshow =[]
@@ -474,4 +469,4 @@ def calculateTime(time):
     hours = datetime.strptime(time, "%H:%M:%S").hour
     mins = datetime.strptime(time, "%H:%M:%S").minute
     seconds = datetime.strptime(time, "%H:%M:%S").second
-    return (hours*3600+mins*60+seconds)
+    return (hours+mins/60+seconds/3600)

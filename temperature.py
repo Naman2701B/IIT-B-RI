@@ -62,7 +62,7 @@ def D3Plot_TA_LFA(outputfolder,selectedtsnapindex,selectedconductor,scaflag,TACo
     #               margin=dict(l=65, r=50, b=65, t=90))
     # fig.show()
     ax.set_box_aspect(aspect = (10,8,6))
-    surf = ax.plot_surface(super_x_axis,final_z, super_y_axis,cmap = cm.YlOrRd, rstride=1, cstride=1, linewidth=0, antialiased=False, shade=False)
+    surf = ax.plot_surface(super_x_axis,final_z, super_y_axis,cmap = cm.YlOrRd, rstride=1, cstride=1, linewidth=0, antialiased=False, shade=False, alpha = 0.3)
     fig.colorbar(surf, ax=ax,shrink=0.5, aspect=5,pad=0.2)
     # for showing all the z ticks
     # zticks = []
