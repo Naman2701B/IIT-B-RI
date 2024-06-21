@@ -1,8 +1,48 @@
+"""
+timetableoutput.py
+
+This Python script processes railway timetable data and generates a structured output with various details for each train.
+
+Dependencies:
+- pandas: Used for data manipulation and reading CSV files.
+- os: Used for file path manipulations.
+- datetime: Used for handling time-related data.
+
+Functions:
+    timeTableExcel(basefolderinput)
+        Processes timetable data from CSV files and generates a structured dictionary containing train details,
+        including train number, station names, distances between stations, dwell times, and departure times.
+
+        Parameters:
+        - basefolderinput (str): The base folder path where the input CSV files (TimeTableData.csv and AllStationData.csv) are located.
+
+        Returns:
+        - final_dict (list of dict): A list of dictionaries, each containing the following keys:
+            - trainnumber (str): The train number.
+            - startDistance (str): The starting distance of the train route.
+            - trainType (str): The type of the train.
+            - stationNameToDisplay (list of str): A list of all station names to display.
+            - stationNumber (list of str): A list of station numbers.
+            - distanceBetweenStations (list of int): Distances between consecutive stations.
+            - dwellTime (list of str): The dwell time at each station.
+            - timeFromStarting (list of str): Times from the starting station.
+            - actualStationName (list of str): Names of the actual stations on the route.
+            - departureTime (list of str): Departure times from each station.
+
+Example Usage:
+    # Assuming the input files are located in the specified directory
+    basefolderinput = "/path/to/input/files"
+    result = timeTableExcel(basefolderinput)
+
+    # The result is a list of dictionaries with train timetable details
+    for train in result:
+        print(train)
+"""
+
 import pandas as pd
 import os
 from datetime import datetime, timedelta
 
-# basefolderinput = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Input_01_MTMM"
 def timeTableExcel(basefolderinput):
     df = pd.read_csv(os.path.join(basefolderinput,"TimeTableData.csv"), header=None)
     df2 = pd.read_csv(os.path.join(basefolderinput,"AllStationData.csv"))
@@ -41,8 +81,7 @@ def timeTableExcel(basefolderinput):
             departureTime.append(str(timedelta(
                 hours=h, minutes=m) +timedelta(hours=int(values[0]), minutes=int(values[1]))+timedelta(hours=(int(dwellTime[i-1])//60), minutes=(int(dwellTime[i-1])%60))))
         for i in range(0, len(timeFromStarting_mins)):
-            timeFromStarting_mins[i] = timeFromStarting_mins[i] + \
-                int(datetime.strptime(df[2][rows[j-1]+1], "%H:%M").minute)
+            timeFromStarting_mins[i] = timeFromStarting_mins[i] + int(datetime.strptime(df[2][rows[j-1]+1], "%H:%M").minute)
         temp = {"trainnumber": df[0][rows[j-1]+1], "startDistance": df[3][rows[j-1]+4],
                 "trainType": df[6][rows[j-1]+1],
                 "stationNameToDisplay": station_name,

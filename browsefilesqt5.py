@@ -150,7 +150,7 @@ class MainWindow(QDialog, Ui_Dialog):
                            "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)",
                            "Protective Wire (Downtrack)"]
-        self.isConnectedTime = False  # To check is "self.lfaconnect" has any connections to "self.activated"
+        self.isConnectedTime = False
         self.isConnectedFrequency = False
         return
 
@@ -736,16 +736,17 @@ class MainWindow(QDialog, Ui_Dialog):
             self.getTrainNumberData()
             self.MTMMList.addItems(self.trains)
             self.MTMMList.setCurrentItem(self.MTMMList.item(0))
-            self.velocity.setEnabled(True)
-            self.Tractiveeffort.setEnabled(True)
-            self.Reactivepower.setEnabled(True)
-            self.Activepower.setEnabled(True)
-            self.Voltage.setEnabled(False)
-            self.Brakingeffort.setEnabled(True)
-            self.Current.setEnabled(False)
-            self.Time_radio.setEnabled(True)
-            self.Distance_radio.setEnabled(True)
-            self.Time_radio.setChecked(True)
+            if(len(self.trains)):
+                self.velocity.setEnabled(True)
+                self.Tractiveeffort.setEnabled(True)
+                self.Reactivepower.setEnabled(True)
+                self.Activepower.setEnabled(True)
+                self.Voltage.setEnabled(False)
+                self.Brakingeffort.setEnabled(True)
+                self.Current.setEnabled(False)
+                self.Time_radio.setEnabled(True)
+                self.Distance_radio.setEnabled(True)
+                self.Time_radio.setChecked(True)
             self.counter()
         else:
             self.Tractiveeffort.setEnabled(False)
@@ -1201,45 +1202,45 @@ class MainWindow(QDialog, Ui_Dialog):
                 output_data = pd.read_csv(os.path.join(
                     self.final_output_directories[i], "TrainModuleOutput.csv"))
                 data = timeTableData(self.final_input_directories[i])
-
+                trains = []
                 for j in range(0, len(data["calculativeData"])):
-                    self.trains.append(data["calculativeData"][j]["trainnumber"])
+                    trains.append(data["calculativeData"][j]["trainnumber"])
 
-                for k in range(0, len(self.trains)):
+                for k in range(0, len(trains)):
                     popflag = False
-                    if (k<len(self.trains)):
+                    if (k<len(trains)):
                         for j in range(0, len(output_data.columns)//5):
-                            if (self.trains[k] in output_data.columns[5*j]):
+                            if (trains[k] in output_data.columns[5*j]):
                                 popflag = True
                                 break
                     else:
                         continue
                     if not(popflag):
-                        self.trains.pop(k)
+                        trains.pop(k)
                         data["calculativeData"].pop(k)
                     
                 for j in range(0, len(data["calculativeData"])):
-                    if (int(output_data["Up/Downtrack_" + str(self.trains[j]) + "_0"][1]) == 0):
+                    if (int(output_data["Up/Downtrack_" + str(trains[j]) + "_0"][1]) == 0):
                         partstr = "Uptrack"
                     else:
                         partstr = "Downtrack"
-                    for k in range(0, len(output_data['Distance_' + partstr + '_' + str(self.trains[j]) + '_0'])):
-                        if (float(output_data["Velocity_" + partstr + "_" + str(self.trains[j]) + "_0"][k]) > 0.0):
+                    for k in range(0, len(output_data['Distance_' + partstr + '_' + str(trains[j]) + '_0'])):
+                        if (float(output_data["Velocity_" + partstr + "_" + str(trains[j]) + "_0"][k]) > 0.0):
                             start = k
                             break
-                    for k in range(0, len(output_data['Distance_' + partstr + '_' + str(self.trains[j]) + '_0'])):
-                        if (float(output_data["Velocity_" + partstr + "_" + str(self.trains[j]) + "_0"][k]) == 0.0):
+                    for k in range(0, len(output_data['Distance_' + partstr + '_' + str(trains[j]) + '_0'])):
+                        if (float(output_data["Velocity_" + partstr + "_" + str(trains[j]) + "_0"][k]) == 0.0):
                             if (float(
-                                    output_data["Distance_" + partstr + "_" + str(self.trains[j]) + "_0"][k]) == float(
+                                    output_data["Distance_" + partstr + "_" + str(trains[j]) + "_0"][k]) == float(
                                     data["calculativeData"][j]["endDistance"])):
                                 end = k
                                 break
                     x_axis.append(
-                        (output_data['Distance_' + partstr + '_' + str(self.trains[j]) + '_0'][start:end]))
+                        (output_data['Distance_' + partstr + '_' + str(trains[j]) + '_0'][start:end]))
                     y_axis.append(
-                        (output_data['Time_' + partstr + '_' + str(self.trains[j]) + '_0'][start:end]) * 60)
+                        (output_data['Time_' + partstr + '_' + str(trains[j]) + '_0'][start:end]) * 60)
                     plt.plot(x_axis[j], y_axis[j],
-                             label=self.trains[j])
+                             label=trains[j])
                 plt.gca().invert_yaxis()
                 plt.yticks(data["plottingData"][1], data["plottingData"][0])
                 plt.xticks(data["plottingData"][3], data["plottingData"][2])
