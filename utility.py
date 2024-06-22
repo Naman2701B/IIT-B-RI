@@ -284,6 +284,12 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
         file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
     else:
         file = io.loadmat(file_name=os.path.join(outputfolder,"data_ntwrk.mat"))
+        TSS_name = []
+        TSS_distance = []
+        for i in range (len(file["Reconfig_file_name"])):
+            TSS_name.append(file["Reconfig_file_name"][i][0])
+            TSS_distance.append(file["Reconfig_file_name"][i][1])
+        TSS = {'name':TSS_name, 'distance':TSS_distance}
     x_axis = []
     super_y_axis = []
     super_x_axis = []
@@ -332,7 +338,10 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
             xvalues.append(x_axis[i])
         super_x_axis.append(xvalues)
     if flag_3d == 0:
-        return super_x_axis, super_y_axis
+        if IAflag==0:
+            return super_x_axis, super_y_axis, TSS
+        else:
+            return super_x_axis,super_y_axis
     else:
         D3plot(super_x_axis, super_y_axis, z_values, radioflag,0,selectedconductor,conductors)
 

@@ -1141,7 +1141,7 @@ class MainWindow(QDialog, Ui_Dialog):
                                   (self.conductorlist.currentRow()), radioflag, self.TA_conductors)
                     return
                 else:
-                    X, Y = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
+                    X, Y, TSS = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
                                             (self.conductorlist.currentRow()), radioflag, 0, IAFlag)
             if (sender == self.pltlfa_pqa_sca):
                 if self.time_3d.isChecked() == False:
@@ -1151,6 +1151,11 @@ class MainWindow(QDialog, Ui_Dialog):
                             "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
                                   fontsize=15, fontweight='bold')
                         plt.plot(X[i], Y[i], label=self.selectedTsnapValue[i])
+                        if not(self.IAButton.isChecked()):
+                            for j in range (0, len(TSS['distance'])):
+                                xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
+                                plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
+                                plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
                         plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                         if radioflag == 1:
                             plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
@@ -1189,6 +1194,11 @@ class MainWindow(QDialog, Ui_Dialog):
                         "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
                               fontsize=15, fontweight='bold')
                     plt.plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
+                    if not(self.IAButton.isChecked()):
+                        for j in range (0, len(TSS['distance'])):
+                                xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
+                                plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
+                                plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
                     plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                     if radioflag == 1:
                         plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
@@ -1207,6 +1217,12 @@ class MainWindow(QDialog, Ui_Dialog):
                         "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
                               fontsize=15, fontweight='bold')
                     for i in range(0, j):
+                        if not(self.IAButton.isChecked()):
+                            for k in range (0, len(TSS['distance'])):
+                                xcoord = float(TSS['distance'][k][0][0])/max(X[i]) +0.005
+                                axis[i].text(xcoord, 0.97, TSS['name'][k][0],transform=plt.gca().transAxes)
+                                axis[i].axvline(x = float(TSS['distance'][k][0][0]), linestyle = '--',color = 'b')
+                        
                         axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
                         if radioflag == 1:
                             axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)",
@@ -1227,6 +1243,11 @@ class MainWindow(QDialog, Ui_Dialog):
                 plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
                     "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
                           fontsize=15, fontweight='bold')
+                if not(self.IAButton.isChecked()):
+                    for j in range (0, len(TSS['distance'])):
+                        xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
+                        plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
+                        plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
                 plt.plot(X[i], Y[i], label=self.selectedTsnapValue[i])
                 plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                 if radioflag == 1:
