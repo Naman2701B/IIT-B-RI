@@ -1,3 +1,52 @@
+
+"""ETPSSModule.py
+
+This module is part of the railway simulation software and provides a graphical user interface (GUI) for interacting with various data analysis functionalities. 
+It uses PyQt5 for the GUI components and includes several functions for loading and processing data, as well as generating plots and reports.
+
+Imports:
+    - sys: Provides access to some variables used or maintained by the Python interpreter.
+    - PyQt5: Used for creating the graphical user interface.
+        - QtWidgets, QtCore, QtGui: Core classes for GUI components.
+        - QDialog, QApplication, QFileDialog, QMessageBox, QPushButton: Specific classes for dialog, application, file dialog, message box, and push button.
+        - QDesktopServices: Provides methods for accessing desktop services.
+        - QUrl: Provides methods for handling URLs.
+    - matplotlib.pyplot: Used for creating static, animated, and interactive visualizations.
+    - pandas: Used for data manipulation and analysis.
+    - numpy: Used for numerical operations.
+    - os: Provides a way of using operating system dependent functionality.
+    - scipy.io: Used for reading and writing MATLAB files.
+    - Dependencies: Contains various data processing functions.
+        - timeTableData, routeAltitudeData, VoltageData, CurrentData, ReactivePowerData, ActivePowerData, BrakingEffortData, TractiveEffortData, VelocityData
+        - loadFlowAnalysis, ShortCircuitAnalysis, powerQualityAnalysis, ShortCircuitAnalysis_IA
+    - TimeTableOutput: Contains the function to export timetable data to Excel.
+    - mplcursors: Used for interactive data cursors in matplotlib.
+    - ReportGenerator: Contains the function to start the report generation.
+    - TemperatureAnalysis: Contains functions for temperature analysis plots.
+        - D3Plot_TA_LFA, D3Plot_TA_SCA
+    - UIFile: Contains the user interface definition.
+
+Classes:
+    - MainWindow: Inherits from QDialog and Ui_Dialog, handles the main operations and interactions with the GUI.
+
+Functions:
+    - __init__(self, parent=None): Initializes the main window.
+    - loadData(self): Loads the required data for analysis.
+    - showMessage(self, title, message): Displays a message box with a given title and message.
+    - saveFileDialog(self): Opens a file dialog to select a file for saving.
+    - openFileDialog(self): Opens a file dialog to select a file for opening.
+    - loadDataForAnalysis(self): Loads data for analysis.
+    - plotGraph(self): Plots the required graphs based on user selection.
+    - generateReport(self): Generates a report based on the loaded data.
+    - timetablePlotClick(self): Handles the event when the timetable plot button is clicked.
+    - stringLinePlotClick(self): Handles the event when the string line plot button is clicked.
+    - findFolders(self, start_dir): Finds and returns a list of directories containing output files.
+    - findFiles(self, start_dir): Finds and returns a list of files with specified extensions.
+
+Usage:
+    This module is designed to be used as part of a larger railway simulation software. 
+    It provides a user-friendly GUI for interacting with the simulation data, performing analysis, and generating reports.
+"""
 import sys
 from PyQt5 import QtWidgets, QtCore, QtGui
 from PyQt5.QtWidgets import QDialog, QApplication, QFileDialog, QMessageBox, QPushButton
@@ -229,6 +278,18 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def IACheck(self, radiobutton):
+        """Handles the selection of an IA (Insulation Assessment) option from a set of radio buttons.
+    
+         This function ensures that only the selected radio button remains checked, updates UI elements
+         visibility based on the selection, and modifies internal variables and texts based on whether the
+         IA option is selected or not.
+    
+         Parameters:
+         radiobutton (QRadioButton): The radio button that was selected.
+
+        Returns:
+        None"""
+        
         for button in self.IARadioOptions.buttons():
             if button is not radiobutton:
                 button.setChecked(False)
@@ -254,12 +315,35 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def open_pdf(self):
+        """Opens a PDF report using the default PDF viewer on the user's system.
+    
+        This function constructs the file path of the PDF report from the specified directory and report name,
+        then uses QDesktopServices to open the PDF file. It also closes any message dialog that may be open.
+    
+        Parameters:
+        None
+    
+        Returns:
+        None"""
+        
         pdf_path = self.final_output_directories[0] + "/" + self.reportName + ".pdf"
         QDesktopServices.openUrl(QUrl.fromLocalFile(pdf_path))
         self.msg.close()
         return
 
     def reportTrigger(self):
+        """Triggers the report generation or toggles the display of train statistics based on the sender.
+
+        This function checks which UI element triggered the event and either shows/hides train statistics 
+        or generates a PDF report. If the train statistics button is toggled, it updates the table with relevant data.
+        If another button is clicked, it generates a PDF report and displays a notification with an option to open the PDF.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
+        
         sender = self.sender()
         if(sender == self.trainStat):
             self.trainstatflag = not (self.trainstatflag)
@@ -324,6 +408,18 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def browsefiles(self):
+        """Opens a file dialog for the user to select a directory and processes the selected directory.
+
+        This function opens a QFileDialog to allow the user to select a folder. If a folder is selected,
+        it finds subfolders within the selected directory, updates the options in the UI, and displays
+        the selected folder path.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
+        
         fname = QFileDialog.getExistingDirectory(
             self, 'Choose a Folder', '')
         if (fname):
@@ -334,6 +430,18 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def addOpt(self):
+        """Adds options to the UI based on the found folder paths and enables relevant UI elements.
+
+        This function enables the options UI element and the select button. It iterates over the folder
+        paths and adds each folder's display name to the options list. If no folder paths are found, it
+        disables the select button.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
+        
         self.options.setEnabled(True)
         self.selectbtn.setEnabled(True)
         for path in self.folder_paths:
@@ -344,16 +452,49 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def check3dstatus(self):
+        """Disables the 3D plotting options in the UI.
+
+        This function disables specific UI elements related to 3D plotting. It is used to ensure
+        that the options for 3D plotting are not available for the user.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
+        
         self.subpltlfa_pqa_sca.setEnabled(False)
         self.mergepltlfa_pqa_sca.setEnabled(False)
         return
 
     def check2dstatus(self):
+        """Enables the 2D plotting options in the UI.
+
+        This function enables specific UI elements related to 2D plotting. It is used to ensure
+        that the options for 2D plotting are available for the user.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
+        
         self.subpltlfa_pqa_sca.setEnabled(True)
         self.mergepltlfa_pqa_sca.setEnabled(True)
         return
 
     def radiostatus(self, freq):
+        """Updates the status of various UI elements based on the selected frequency and other conditions.
+
+        This function enables or disables specific UI elements related to 2D and 3D plotting based on the
+        frequency parameter and the length of selected time snapshots or selected frequencies. It also
+        checks the state of the TA and IA buttons to further adjust the UI elements' statuses.
+
+        Parameters:
+        freq (int): The selected frequency (0 for time-based, non-zero for frequency-based).
+
+        Returns:
+        None"""
         if (freq == 0):
             self.time_2d.setEnabled(True)
             if len(self.selectedTsnaps) >= 2:
@@ -409,6 +550,18 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def pqabrowse(self):
+        """Updates the UI options for PQA and SCA directories based on the selected LFA directory.
+
+        This function clears the current PQA/SCA options, lists the contents of the selected LFA directory,
+        and updates the options for PQA and SCA directories based on the contents. It also enables or disables
+        the relevant UI elements based on the availability of PQA and SCA directories.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
+        
         self.pqa_scaoptions.clear()
         dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
         scadirectoriesToShow = []
@@ -447,6 +600,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def pqa_sca_connect(self):
+        """Configures the UI elements and loads data based on the selected PQA or SCA option.
+
+        This function updates the status of various UI elements and loads the necessary data from the selected
+        directory based on whether the SCA radio button or the PQA radio button is checked. It enables or disables
+        relevant options for time and frequency plotting and handles the IA options if the IA button is checked.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         if (self.scaradio.isChecked()):
             self.timelist.clear()
             self.timeoptions.setEnabled(False)
@@ -525,6 +689,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def selectAll(self):
+        """Toggles the selection of all available time snapshots or frequencies.
+
+        This function checks the sender to determine whether to select or deselect all time snapshots or frequencies.
+        It updates the `selectedTsnaps`, `selectedTsnapValue`, `selectedFrequency`, and `selectedFrequencyValue` lists,
+        and modifies the respective UI elements accordingly.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         sender = self.sender()
         if sender == self.selectAllTime:
             if len(self.selectedTsnaps) <= 1:
@@ -565,6 +740,18 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def removeListOptions(self):
+        """Removes the selected option from the timelist or frequencyList and updates the UI.
+
+        This function checks the sender to determine whether the timelist or frequencyList item was removed.
+        It updates the `selectedTsnaps`, `selectedTsnapValue`, `selectedFrequency`, and `selectedFrequencyValue` lists,
+        and modifies the respective UI elements accordingly. It also calls the `radiostatus` function to update
+        the status of related UI elements.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         sender = self.sender()
         if (sender == self.timelist):
             for i in range(0, len(self.selectedTsnapValue)):
@@ -626,6 +813,16 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def lfaconnect(self):
+        """Configures the UI elements and updates the LFA options based on the selected directories.
+
+        This function disables various UI elements and clears the current selections and lists. It then updates
+        the LFA options based on the available directories, enabling the selection of appropriate directories.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         self.tsnap = np.array([])
         self.selectedTsnaps.clear()
         self.selectedTsnapValue.clear()
@@ -690,6 +887,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def activated(self, index):
+        """Handles the activation of an item in the time or frequency options.
+
+        This function checks whether the PQA radio button is checked to determine if the frequency options should
+        be updated. It adds the selected item to the appropriate list, updates the selected values, removes the item
+        from the options, and calls the `radiostatus` function to update the status of related UI elements.
+
+        Parameters:
+        index (int): The index of the activated item.
+
+        Returns:
+        None"""
         if (self.pqaradio.isChecked()):
             for i in range(len(self.frequencyAvailable)):
                 if (self.frequencyoptions.itemText(index) == self.frequencyAvailable[i]):
@@ -709,6 +917,16 @@ class MainWindow(QDialog, Ui_Dialog):
             return
 
     def LFA_PQA_SCA(self):
+        """Identifies and categorizes directories containing LFA, SCA, and PQA data.
+
+        This function scans the final output directory for subdirectories containing "LFA", "SCA", or "PQA" in their names.
+        It then categorizes these directories into `lfadirectories`, `scadirectories`, and `pqadirectories` lists.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         res = self.final_output_directories[0]
         r1 = os.listdir(res)
         for i in range(len(r1)):
@@ -721,6 +939,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def showCheckBoxOpt(self):
+        """Configures and enables various UI elements and directories based on the folder paths.
+
+        This function enables radio buttons and plots options, clears file names, and iterates through the specified
+        folder paths to find input and output directories. It checks for the presence of specific files to enable
+        related UI elements. It also calls the `LFA_PQA_SCA` function to categorize LFA, PQA, and SCA directories.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         self.lfaradio.setEnabled(True)
         self.scaradio.setEnabled(True)
         self.pqaradio.setEnabled(True)
@@ -779,6 +1008,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def MTMM(self):
+        """Configures the UI elements and updates the MTMMList based on the selected train plots.
+
+        This function clears the MTMM list and the trains list, checks if the Trainplots option is selected,
+        and populates the MTMM list with train data if available. It enables or disables various UI elements
+        based on the presence of train data.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         self.MTMMList.clear()
         self.trains = []
         if (self.Trainplots.isChecked()):
@@ -813,6 +1053,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def getTrainNumberData(self):
+        """Retrieves train number data from input directories and filters based on output data.
+
+        This function iterates through the final input directories, extracting train number data from the 
+        time table data. It then cross-references this data with the output data to ensure that only valid 
+        train numbers are retained in the `trains` list.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         for i in range(0, len(self.final_input_directories)):
             if ("MTMM" in self.final_input_directories[i]):
                 data = timeTableData(self.final_input_directories[i])
@@ -838,6 +1089,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return text
 
     def counter(self):
+        """Updates the state of plot buttons based on the checked status of certain UI elements.
+
+        This function manages the `checkedButtons` list, which contains references to buttons that have been checked.
+        It enables or disables plot-related buttons (`plotbtn`, `subplotbtn`, `mergeplotbtn`) based on the number of
+        checked buttons in the `checkedButtons` list.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         sender = self.sender()
         if (sender in self.checkedButtons):
             self.checkedButtons.remove(sender)
@@ -858,6 +1120,18 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def clickEvent(self):
+        """Handles the click event for plotting data based on selected options.
+
+        This function retrieves train number data and then checks which data options (Voltage, Current, Active Power,
+        Reactive Power, Tractive Effort, Braking Effort, Velocity) are selected. It collects the corresponding data
+        from the output directories, and then calls the appropriate plotting function (plot, subplot, or mergeplot)
+        based on the sender of the event.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         self.trains = []
         self.getTrainNumberData()
         X_axis = []
@@ -950,6 +1224,20 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def plot(self, X_axis, Y_axis, keys, timeflag):
+        """Plots the data on separate figures based on the provided X and Y axis data.
+
+        This function iterates through the Y_axis data and creates separate figures for each dataset.
+        It sets the x-axis label based on the timeflag, adds titles and legends, and configures the plot with
+        gridlines and cursors for better visualization.
+
+        Parameters:
+        X_axis (list): List of lists containing X-axis data.
+        Y_axis (list): List of lists containing Y-axis data.
+        keys (list): List of strings representing the titles and y-axis labels for the plots.
+        timeflag (bool): Flag to determine whether the x-axis should represent time (True) or distance (False).
+
+        Returns:
+        None"""
         for i in range(0, len(Y_axis)):
             for j in range(0, len(Y_axis[i])):
                 plt.figure()
@@ -968,6 +1256,21 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def subplot(self, X_axis, Y_axis, keys, timeflag):
+        """Plots the data on subplots within a single figure based on the provided X and Y axis data.
+
+        This function creates subplots for each dataset in Y_axis. If there is only one dataset, it calls the
+    `   plot` function to plot it on a single figure. For multiple datasets, it creates subplots within a single
+        figure, sets appropriate labels, titles, and legends, and configures the plots with gridlines and cursors
+        for better visualization.
+
+        Parameters:
+        X_axis (list): List of lists containing X-axis data.
+        Y_axis (list): List of lists containing Y-axis data.
+        keys (list): List of strings representing the titles and y-axis labels for the plots.
+        timeflag (bool): Flag to determine whether the x-axis should represent time (True) or distance (False).
+
+        Returns:
+        None"""
         if (len(Y_axis) == 1):
             self.plot(X_axis, Y_axis, keys, timeflag)
             return
@@ -988,6 +1291,19 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def mergeplot(self, X_axis, Y_axis, keys, timeflag):
+        """Plots two datasets on a single figure with dual y-axes for comparison.
+
+        This function creates a plot with two datasets sharing the same x-axis but having separate y-axes.
+        It configures the labels, legends, and gridlines for the plot, and adds interactive cursors for better visualization.
+
+        Parameters:
+        X_axis (list): List of lists containing X-axis data.
+        Y_axis (list): List of lists containing Y-axis data.
+        keys (list): List of strings representing the titles and y-axis labels for the plots.
+        timeflag (bool): Flag to determine whether the x-axis should represent time (True) or distance (False).
+
+        Returns:
+        None  """
         fig, ax1 = plt.subplots()
         if (timeflag == True):
             plt.xlabel("Time in Minutes", fontsize=15, fontweight='bold')
@@ -1009,6 +1325,18 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def PQA(self):
+        """Handles the Power Quality Analysis (PQA) based on the selected options.
+
+        This function determines the analysis parameters based on the selected radio buttons and options,
+        and calls the appropriate analysis function (`powerQualityAnalysis` or `D3Plot_TA_LFA`) with the 
+        correct arguments. It supports both 3D frequency analysis and other analyses with or without IA/TA flags.
+        It also plots the results based on the sender of the event (plot, subplot, or mergeplot).
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         radioflag = 0
         if self.branchCurrRadio.isChecked():
             radioflag = 1
@@ -1119,6 +1447,18 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def LFA(self):
+        """Handles the Load Flow Analysis (LFA) based on the selected options.
+
+        This function determines the analysis parameters based on the selected radio buttons and options,
+        and calls the appropriate analysis function (`loadFlowAnalysis`, `D3Plot_TA_LFA`, or `ShortCircuitAnalysis`) 
+        with the correct arguments. It supports both 3D time analysis and other analyses with or without IA/TA flags.
+        It also plots the results based on the sender of the event (plot, subplot, or mergeplot).
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         if (self.pqaradio.isChecked()):
             self.PQA()
             return
@@ -1263,6 +1603,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def getStringLineData(self):
+        """Generates a string line diagram based on train data from input and output directories.
+
+        This function retrieves train data from the final input directories, filters it based on the presence in the
+        output directories, and generates a string line diagram. It plots the distance vs. time for each train,
+        inverts the y-axis, sets custom ticks, and configures the plot with legends, labels, and interactive cursors.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         for i in range(0, len(self.final_input_directories)):
             if ("MTMM" in self.final_input_directories[i]):
                 x_axis = []
@@ -1328,6 +1679,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def showdialog(self):
+        """Toggles the visibility of the timetable dialog and populates it with train data.
+
+        This function toggles the visibility of the timetable dialog and, if the dialog is to be shown,
+        it populates the table with train timetable data from the input directories. It sets the table's
+        column and row counts, headers, and fills the table with arrival, dwell, and departure times for each station.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         self.timetableflag = not (self.timetableflag)
         if self.timetableflag:
             for i in range(len(self.final_input_directories)):
@@ -1380,6 +1742,18 @@ class MainWindow(QDialog, Ui_Dialog):
             return
 
     def stringLinePlotClick(self):
+        """Handles the click event for plotting string line and route altitude data.
+
+        This function checks if the Stringline or Routealtitude options are selected.
+        If Stringline is selected, it calls the `getStringLineData` function to plot the string line data.
+        If Routealtitude is selected, it iterates over the input directories and calls the `routeAltitudeData` 
+        function to plot the route altitude data.
+
+        Parameters:
+        None
+
+        Returns:
+        None"""
         if (self.Stringline.isChecked()):
             plt.figure()
             self.getStringLineData()
@@ -1391,6 +1765,17 @@ class MainWindow(QDialog, Ui_Dialog):
         return
 
     def findFolders(self, start_dir):
+        """Finds directories containing 'output' in their name within a starting directory.
+
+        This function walks through the given starting directory and its subdirectories to find directories
+        that contain 'output' in their name. It collects the absolute paths of the parent directories of these
+        'output' directories and returns them.
+
+        Parameters:
+        start_dir (str): The starting directory to begin the search.
+
+        Returns:
+        list: A list of absolute paths to the parent directories of found 'output' directories."""
         directory_results = []
         for root, dirs, files in os.walk(start_dir):
             for dir in dirs:
@@ -1402,6 +1787,16 @@ class MainWindow(QDialog, Ui_Dialog):
         return directory_results
 
     def findFiles(self, start_dir):
+        """Finds files with specific extensions within a starting directory.
+
+        This function walks through the given starting directory and its subdirectories to find files with
+        extensions '.xlsx', '.mat', and '.csv'. It collects the absolute paths of these files and returns them.
+
+        Parameters:
+        start_dir (str): The starting directory to begin the search.
+
+        Returns:
+        list: A list of absolute paths to the found files"""
         file_extension = [".xlsx", ".mat", ".csv"]
         file_results_path = []
         for ext in file_extension:
@@ -1413,10 +1808,10 @@ class MainWindow(QDialog, Ui_Dialog):
         return file_results_path
 
 
-app = QApplication(sys.argv)
-font = QtGui.QFont()
-font.setPointSize(12)
-app.setFont(font)
-mainwindow = MainWindow()
-mainwindow.showMaximized()
-sys.exit(app.exec_())
+# app = QApplication(sys.argv)
+# font = QtGui.QFont()
+# font.setPointSize(12)
+# app.setFont(font)
+# mainwindow = MainWindow()
+# mainwindow.showMaximized()
+# sys.exit(app.exec_())

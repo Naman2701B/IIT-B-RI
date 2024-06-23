@@ -1,3 +1,33 @@
+"""ReportGenerator.py
+
+This module is responsible for generating PDF reports for the railway simulation software. 
+It uses the FPDF library for creating PDF documents and matplotlib for creating plots that are included in the reports.
+
+Imports:
+    - fpdf: Used for creating PDF documents.
+    - matplotlib.backends.backend_agg: FigureCanvas for rendering matplotlib figures.
+    - numpy: Used for numerical operations.
+    - PIL: Python Imaging Library for image processing.
+    - pandas: Used for data manipulation and analysis.
+    - matplotlib.pyplot: Used for creating static, animated, and interactive visualizations.
+    - datetime: Used for manipulating dates and times.
+    - re: Provides regular expression matching operations.
+    - os: Provides a way of using operating system dependent functionality.
+
+Functions:
+    - hist_report(outputFolder): Generates histogram reports for train results.
+    - generate_summary(pdf, data): Generates a summary section in the PDF report.
+    - add_plot_to_pdf(pdf, fig, x, y, w, h): Adds a matplotlib plot to the PDF at specified position and size.
+    - create_voltage_plots(outputFolder, pdf): Creates voltage plots and adds them to the PDF.
+    - create_current_plots(outputFolder, pdf): Creates current plots and adds them to the PDF.
+    - create_power_plots(outputFolder, pdf): Creates power plots and adds them to the PDF.
+    - startReport(outputFolder): Main function to generate the full report including all sections.
+
+Usage:
+    This module is designed to be used as part of a larger railway simulation software. 
+    It provides functions for creating detailed PDF reports of the simulation results."""
+
+
 from fpdf import FPDF
 from matplotlib.backends.backend_agg import FigureCanvasAgg as FigureCanvas
 import numpy as np
@@ -9,6 +39,17 @@ import re
 import os
         
 def hist_report(outputFolder):
+    """Generates historical voltage distribution plots from train results data.
+
+    This function reads the train results data from a specified output folder, extracts average zonal voltage
+    columns, and generates plots for each train's voltage distribution along the distance. The plots are
+    saved as images and returned in a list.
+
+    Parameters:
+    outputFolder (str): The path to the folder containing the "TrainResults.csv" file.
+
+    Returns:
+    list: A list of images containing the generated plots."""
     file = pd.read_csv(outputFolder+"/TrainResults.csv")
     columns = []
     for c in file.columns:
@@ -48,6 +89,18 @@ def hist_report(outputFolder):
 
 
 def startReport(outputFolder, data):
+    """Generates a PDF report from substation and train results data.
+
+    This function reads the substation and train results data from specified output folders, creates
+    tables and plots for the data, and compiles them into a PDF report. The report includes tables
+    with current and voltage data, pie charts of energy distribution, and historical voltage plots.
+
+    Parameters:
+    outputFolder (str): The path to the folder containing the results files.
+    data (list): A list of dictionaries containing additional train data.
+
+    Returns:
+    str: The name of the generated PDF report file."""
     name = os.path.basename(outputFolder).split("/")[-1][0:-7]
     file = pd.read_csv(outputFolder+"/SubstationResults.csv")
     file2 = pd.read_csv(outputFolder+"/TrainResults.csv")
