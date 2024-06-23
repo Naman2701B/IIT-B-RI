@@ -1,3 +1,25 @@
+"""
+TemperatureAnalysis.py
+
+This module is part of the railway simulation software and provides functionalities for analyzing temperature data and generating 3D plots for load flow analysis (LFA) and short circuit analysis (SCA). It uses various libraries for data processing and visualization.
+
+Imports:
+    - scipy.io: Used for reading and writing MATLAB files.
+    - matplotlib.pyplot: Used for creating static, animated, and interactive visualizations.
+    - cm: Colormap from matplotlib.
+    - datetime: Used for manipulating dates and times.
+    - numpy: Used for numerical operations.
+    - os: Provides a way of using operating system dependent functionality.
+
+Global Variables:
+    - outputfolder: The path to the folder containing the output files.
+
+Functions:
+    - calculateTime(time): Converts time in HH:MM:SS format to total seconds.
+    - D3Plot_TA_LFA(outputfolder, selectedtsnapindex, selectedconductor, scaflag, TACondutors): Generates a 3D plot for load flow analysis (LFA).
+    - D3Plot_TA_SCA(outputfolder, selectedtsnapindex, selectedconductor, scaflag, TACondutors): Generates a 3D plot for short circuit analysis (SCA).
+"""
+
 from scipy import io
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -8,12 +30,37 @@ import os
 outputfolder = "C:/Users/ashok/Desktop/IIT RESEARCH/Task 4/eTPSS/Traction_Power_Supply_System_Modules/HSRIC_00_Projects/Case_2_P0.25B/Case_2_P0.25B_Output/OLFA_110134_20-05-2024_R_T"
 
 def calculateTime(time):
+    """Converts a time string in "HH:MM:SS" format to the total number of seconds.
+
+    This function parses the given time string, extracts the hours, minutes, and seconds,
+    and calculates the total number of seconds.
+
+    Parameters:
+    time (str): A string representing time in "HH:MM:SS" format.
+
+    Returns:
+    int: The total number of seconds."""
     hours = datetime.strptime(time, "%H:%M:%S").hour
     mins = datetime.strptime(time, "%H:%M:%S").minute
     seconds = datetime.strptime(time, "%H:%M:%S").second
     return (hours*3600+mins*60+seconds)
 
 def D3Plot_TA_LFA(outputfolder,selectedtsnapindex,selectedconductor,scaflag,TACondutors):
+    """Generates a 3D plot for thermal analysis in load flow analysis.
+
+    This function loads thermal analysis data from MATLAB files, processes the data, and generates
+    a 3D surface plot to visualize the temperature distribution over time and distance for the selected
+    conductor and time snapshots.
+
+    Parameters:
+    outputfolder (str): The path to the folder containing the thermal analysis data.
+    selectedtsnapindex (list): A list of indices for the selected time snapshots.
+    selectedconductor (int): The index of the selected conductor.
+    scaflag (int): Flag indicating if the analysis is for SCA (1) or not (0).
+    TACondutors (list): A list of conductor names.
+
+    Returns:
+    None"""
     fig, ax = plt.subplots(figsize=(20,15),subplot_kw={"projection": "3d"})
     fig.set_figheight(20)
     fig.set_figwidth(25)
@@ -65,6 +112,20 @@ def D3Plot_TA_LFA(outputfolder,selectedtsnapindex,selectedconductor,scaflag,TACo
     plt.show()
 
 def D3Plot_TA_SCA (outputfolder,selectedconductor,scaflag,TACondutors):
+    """Generates a 3D plot for thermal analysis in short circuit analysis (SCA).
+
+    This function loads thermal analysis data and time snapshot data from MATLAB files, processes the data, 
+    and calls the `D3Plot_TA_LFA` function to generate a 3D surface plot. The plot visualizes the temperature 
+    distribution over time and distance for the selected conductor.
+
+    Parameters:
+    outputfolder (str): The path to the folder containing the thermal analysis data.
+    selectedconductor (int): The index of the selected conductor.
+    scaflag (int): Flag indicating if the analysis is for SCA (1) or not (0).
+    TACondutors (list): A list of conductor names.
+
+    Returns:
+    None"""
     file1 = io.loadmat(file_name = os.path.join(outputfolder,"../data_ntwrk.mat"))
     file3 = io.loadmat(file_name= os.path.join(outputfolder,"IA_linesummary.mat"))
     sc_tsnap = file3['timesnap']

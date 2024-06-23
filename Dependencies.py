@@ -1,3 +1,38 @@
+"""Dependencies.py
+
+This module contains functions and definitions used for processing railway simulation data. 
+It includes functionality for reading timetable data, plotting various graphs related to train operations, 
+and handling multiple data formats for in-depth analysis. The key components of this module are described below:
+
+Imports:
+    - pandas: Used for data manipulation and analysis.
+    - matplotlib.pyplot: Used for creating static, animated, and interactive visualizations.
+    - cm: Colormap from matplotlib.
+    - datetime, timedelta: Used for manipulating dates and times.
+    - numpy: Used for numerical operations.
+    - mplcursors: Used for interactive data cursors in matplotlib.
+    - scipy.io: Used for reading and writing MATLAB files.
+    - os: Provides a way of using operating system dependent functionality.
+
+Global Variables:
+    - conductors: A list of conductor names used in the railway simulation.
+
+Functions:
+    - timeTableData(basefolderinput): Reads timetable data from CSV files and processes it into various data structures.
+    - routeAltitudeData(basefolder): Reads and processes route altitude data from CSV files.
+    - ShortCircuitAnalysis_IA(outputfolder, selectedconductor, conductors, radioflag): Plots the short circuit analysis.
+    - calculateTime(time): Converts time in HH:MM:SS format to hours in decimal.
+
+Usage:
+    This module is designed to be used as part of a larger railway simulation software. 
+    Functions in this module are typically called to process and visualize data related to train operations.
+
+Example:
+    basefolderinput = '/path/to/data/folder'
+    data = timeTableData(basefolderinput)"""
+
+
+
 import pandas as pd
 import matplotlib.pyplot as plt
 from matplotlib import cm
@@ -10,7 +45,18 @@ import os
 conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)", "Rail1 (Downtrack)",
                            "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
 
+
 def timeTableData(basefolderinput):
+    """ Reads and processes timetable data from CSV files.
+
+    Parameters:
+    basefolderinput (str): The path to the folder containing the input CSV files.
+
+    Returns:
+    dict: A dictionary containing processed data for timetable and graphs.
+          - calculativeData: List of dictionaries with train data.
+          - plottingData: List containing timing graph, time in minutes, distance graph, and distance to replace.
+    """
     df = pd.read_csv(os.path.join(basefolderinput,"TimeTableData.csv"), header=None)
     df2 = pd.read_csv(os.path.join(basefolderinput,"AllStationData.csv"))
     rows = []
@@ -70,7 +116,19 @@ def timeTableData(basefolderinput):
     return dataToBeSent
 
 
+
 def routeAltitudeData(basefolder):
+    """Reads and processes route altitude data from CSV files.
+
+    Parameters:
+    basefolder (str): The path to the folder containing the input CSV files.
+
+    Returns:
+    dict: A dictionary containing X-axis and Y-axis data for plotting, along with markers for stations.
+
+    Example:
+    data = routeAltitudeData('/path/to/data/folder')"""
+    
     df2 = pd.read_csv(os.path.join(basefolder ,"RouteAltitudeData.csv"))
     df3 = pd.read_csv(os.path.join(basefolder , "AllStationData.csv"))
     X_axis = df2["DistanceKM"]
@@ -98,6 +156,18 @@ def routeAltitudeData(basefolder):
 
 
 def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
+    """Extracts and processes tractive effort data for a selected train from CSV files.
+
+    Parameters:
+    basefolderoutput (str): The base folder path where the output CSV files are located.
+    selected_trains (int): The identifier for the selected train.
+    timeFlag (int): A flag indicating whether to use time (1) or distance (0) for the X-axis.
+
+    Returns:
+    tuple: A tuple containing two lists:
+        X_axis (list): The list containing the time or distance data for the selected train.
+        Y_axis (list): The list containing the tractive effort data for the selected train."""
+        
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
     X_axis = []
@@ -118,6 +188,18 @@ def TractiveEffortData(basefolderoutput, selected_trains, timeFlag):
 
 
 def BrakingEffortData(basefolderoutput, selected_trains, timeFlag):
+    """Extracts and processes braking effort data for a selected train from CSV files.
+
+    Parameters:
+    basefolderoutput (str): The base folder path where the output CSV files are located.
+    selected_trains (int): The identifier for the selected train.
+    timeFlag (int): A flag indicating whether to use time (1) or distance (0) for the X-axis.
+
+    Returns:
+    tuple: A tuple containing two lists:
+        X_axis (list): The list containing the time or distance data for the selected train.
+        Y_axis (list): The list containing the braking effort data for the selected train."""
+        
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
     X_axis = []
@@ -138,6 +220,19 @@ def BrakingEffortData(basefolderoutput, selected_trains, timeFlag):
 
 
 def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFlag):
+    """Extracts and processes reactive power data for a selected train from CSV files.
+
+    Parameters:
+    basefolderinput (str): The base folder path where the input CSV files are located.
+    basefolderoutput (str): The base folder path where the output CSV files are located.
+    selected_trains (int): The identifier for the selected train.
+    timeFlag (int): A flag indicating whether to use time (1) or distance (0) for the X-axis.
+
+    Returns:
+    tuple: A tuple containing two lists:
+        X_axis (list): The list containing the time or distance data for the selected train.
+        Y_axis (list): The list containing the reactive power data for the selected train."""
+        
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     df_p = pd.read_csv(os.path.join(basefolderinput,"TrainElectricalData.csv"), header=1)
     X_axis = []
@@ -163,6 +258,18 @@ def ReactivePowerData(basefolderinput, basefolderoutput, selected_trains, timeFl
 
 
 def ActivePowerData(basefolderoutput, selected_trains, timeFlag):
+    """Extracts and processes active power data for a selected train from CSV files.
+
+    Parameters:
+    basefolderoutput (str): The base folder path where the output CSV files are located.
+    selected_trains (int): The identifier for the selected train.
+    timeFlag (int): A flag indicating whether to use time (1) or distance (0) for the X-axis.
+
+    Returns:
+    tuple: A tuple containing two lists:
+        X_axis (list): The list containing the time or distance data for the selected train.
+        Y_axis (list): The list containing the active power data for the selected train."""
+        
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     X_axis = []
     Y_axis = []
@@ -182,6 +289,13 @@ def ActivePowerData(basefolderoutput, selected_trains, timeFlag):
 
 
 def CurrentData(basefolderoutput, selected_trains, timeFlag):
+    """Extracts and processes current data for a selected train from CSV files and plots the data.
+
+    Parameters:
+    basefolderoutput (str): The base folder path where the output CSV files are located.
+    selected_trains (int): The identifier for the selected train.
+    timeFlag (int): A flag indicating whether to use time (1) or distance (0) for the X-axis."""
+    
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
     X_axis = []
@@ -203,6 +317,13 @@ def CurrentData(basefolderoutput, selected_trains, timeFlag):
 
 
 def VoltageData(basefolderoutput, selected_trains, timeFlag):
+    """Extracts and processes voltage data for a selected train from CSV files and plots the data.
+
+    Parameters:
+    basefolderoutput (str): The base folder path where the output CSV files are located.
+    selected_trains (int): The identifier for the selected train.
+    timeFlag (int): A flag indicating whether to use time (1) or distance (0) for the X-axis."""
+    
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
     df_y = pd.read_csv(os.path.join(basefolderoutput,"EffortOutput.csv"))
     X_axis = []
@@ -224,6 +345,18 @@ def VoltageData(basefolderoutput, selected_trains, timeFlag):
 
 
 def VelocityData(basefolderoutput, selected_trains, timeFlag):
+    """Extracts and processes velocity data for a selected train from CSV files.
+
+    Parameters:
+    basefolderoutput (str): The base folder path where the output CSV files are located.
+    selected_trains (int): The identifier for the selected train.
+    timeFlag (int): A flag indicating whether to use time (1) or distance (0) for the X-axis.
+
+    Returns:
+    tuple: A tuple containing two lists:
+        X_axis (list): The list containing the time or distance data for the selected train.
+        Y_axis (list): The list containing the velocity data for the selected train."""
+    
     X_axis = []
     Y_axis = []
     df_x = pd.read_csv(os.path.join(basefolderoutput,"TrainModuleOutput.csv"))
@@ -242,6 +375,17 @@ def VelocityData(basefolderoutput, selected_trains, timeFlag):
     return X_axis, Y_axis
 
 def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,conductors):
+    """ Plots a 3D surface plot for load flow analysis or power quality analysis.
+
+    Parameters:
+    xvalues (array-like): The x-axis values representing distance in km.
+    super_y_axis (array-like): The y-axis values representing time in hours or frequencies in Hz.
+    zvalue (array-like): The z-axis values representing voltage or current data.
+    radioflag (int): A flag indicating whether the data represents voltage (0) or current (1).
+    pqa_lfa (int): A flag indicating whether the plot is for power quality analysis (1) or load flow analysis (0).
+    selectedconductors (int): The index of the selected conductor.
+    conductors (list): A list of conductor names."""
+    
     ax = plt.figure().add_subplot(projection='3d')
     plt.tight_layout()
     plt.subplots_adjust(left=0, right=1, top=1, bottom=0)
@@ -280,6 +424,23 @@ def D3plot(xvalues, super_y_axis, zvalue, radioflag, pqa_lfa,selectedconductors,
 
 
 def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radioflag, flag_3d, IAflag):
+    """Perform load flow analysis by extracting data from specified MAT files and prepare it for plotting.
+    
+    Parameters:
+    outputfolder (str): Path to the folder containing the output MAT files.
+    selectedtsnapindex (list): List of selected time snapshot indices.
+    selectedconductor (int): Index of the selected conductor.
+    radioflag (int): Flag indicating whether to analyze currents (1) or voltages (0).
+    flag_3d (int): Flag indicating whether to generate 3D plots (1) or 2D plots (0).
+    IAflag (int): Flag indicating whether to use IA_Output data (1) or data_ntwrk data (0).
+    
+    Returns:
+    tuple: If flag_3d is 0, returns:
+        - super_x_axis (list): List of x-axis values for plotting.
+        - super_y_axis (list): List of y-axis values for plotting.
+        - TSS (dict): Dictionary containing TSS names and distances (only if IAflag is 0).
+    Otherwise, calls the D3plot function with the computed data."""
+    
     if IAflag == 1:
         file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
     else:
@@ -346,6 +507,22 @@ def loadFlowAnalysis(outputfolder, selectedtsnapindex, selectedconductor, radiof
         D3plot(super_x_axis, super_y_axis, z_values, radioflag,0,selectedconductor,conductors)
 
 def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radioflag, flag_3d,IAflag):
+    """Perform power quality analysis by extracting data from specified MAT files and prepare it for plotting.
+    
+    Parameters:
+    outputfolder (str): Path to the folder containing the output MAT files.
+    selectedfrequency (list): List of selected frequency indices.
+    selectedconductor (int): Index of the selected conductor.
+    radioflag (int): Flag indicating whether to analyze currents (1) or voltages (0).
+    flag_3d (int): Flag indicating whether to generate 3D plots (1) or 2D plots (0).
+    IAflag (int): Flag indicating whether to use IA_Output data (1) or IA_linesummary data (0).
+    
+    Returns:
+    tuple: If flag_3d is 0, returns:
+        - super_x_axis (list): List of x-axis values for plotting.
+        - super_y_axis (list): List of y-axis values for plotting.
+    Otherwise, calls the D3plot function with the computed data."""
+    
     if IAflag==0:
         file = io.loadmat(file_name=os.path.join(outputfolder,"IA_linesummary.mat"))
     else:
@@ -403,6 +580,20 @@ def powerQualityAnalysis(outputfolder, selectedfrequency,selectedconductor, radi
         D3plot(super_x_axis, super_y_axis, z_values, radioflag,1,selectedconductor,conductors)
 
 def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
+    """Plots the short circuit analysis for the selected conductor.
+
+    Parameters:
+    outputfolder (str): The path to the folder containing the output MAT files.
+    selectedconductor (int): Index of the selected conductor.
+    conductors (list): List of conductor names.
+    radioflag (int): Flag to determine the type of analysis (1 for current, 0 for voltage).
+
+    Returns:
+    None
+
+    Example:
+    ShortCircuitAnalysis_IA('/path/to/output/folder', 2, conductors, 1)"""
+    
     file = io.loadmat(file_name=os.path.join(outputfolder,"line_summary_SCA.mat"))
     file2 = io.loadmat(file_name = os.path.join(outputfolder,"IA_linesummary.mat"))
     x_axis = [{"label":file2["dev_seqn"][0][0][0],"data":float(file2["dev_seqn"][0][3][0][0])}]
@@ -431,6 +622,14 @@ def ShortCircuitAnalysis(outputfolder, selectedconductor,conductors, radioflag):
     plt.show(block = False)
 
 def ShortCircuitAnalysis_IA(outputfolder, selectedconductor,conductors, radioflag):
+    """Perform short circuit analysis by extracting data from the IA_Output MAT file and generating a plot.
+    
+    Parameters:
+    outputfolder (str): Path to the folder containing the IA_Output MAT file.
+    selectedconductor (int): Index of the selected conductor.
+    conductors (list): List of conductor names.
+    radioflag (int): Flag indicating whether to analyze currents (1) or voltages (0)."""
+    
     file = io.loadmat(file_name=os.path.join(outputfolder,"IA_Output.mat"))
     x_axis = []
     xvalues=[]
@@ -456,6 +655,14 @@ def ShortCircuitAnalysis_IA(outputfolder, selectedconductor,conductors, radiofla
 
 
 def calculateTime(time):
+    """ Convert a time string in the format "HH:MM:SS" to a decimal representation of hours.
+    
+    Parameters:
+    time (str): A string representing the time in "HH:MM:SS" format.
+    
+    Returns:
+    float: The time converted to decimal hours."""
+    
     hours = datetime.strptime(time, "%H:%M:%S").hour
     mins = datetime.strptime(time, "%H:%M:%S").minute
     seconds = datetime.strptime(time, "%H:%M:%S").second
