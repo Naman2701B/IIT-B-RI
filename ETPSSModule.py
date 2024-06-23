@@ -672,11 +672,12 @@ class MainWindow(QDialog, Ui_Dialog):
         self.timeoptions.activated.connect(self.activated)
         self.isConnectedTime = True
 
-        dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
+        iadirectorytouse = os.path.join(self.final_output_directories[0],self.lfaoptions.currentText())
+        dir = os.listdir(iadirectorytouse)
         self.iadirectories = []
         for i in range(0, len(dir)):
             if 'IA' in dir[i] and '.' not in dir[i]:
-                self.iadirectories.append(os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()], dir[i]))
+                self.iadirectories.append(os.path.join(iadirectorytouse, dir[i]))
         if self.IAButton.isChecked():
             self.ia_options.clear()
             for i in range(0, len(self.iadirectories)):
