@@ -198,9 +198,9 @@ class MainWindow(QDialog, Ui_Dialog):
         self.iadirectories = []
         self.tadirectories = []
         self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)",
-                           "Rail1 (Downtrack)",
-                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)",
-                           "Protective Wire (Downtrack)"]
+                        "Rail1 (Downtrack)",
+                        "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)",
+                        "Protective Wire (Downtrack)"]
         self.isConnectedTime = False
         self.isConnectedFrequency = False
         return
@@ -271,47 +271,57 @@ class MainWindow(QDialog, Ui_Dialog):
         self.iadirectories = []
         self.tadirectories = []
         self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)",
-                           "Rail1 (Downtrack)",
-                           "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)",
-                           "Protective Wire (Downtrack)"]
+                        "Rail1 (Downtrack)",
+                        "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)", "Protective Wire (Uptrack)",
+                        "Protective Wire (Downtrack)"]
         self.showCheckBoxOpt()
         return
 
+    def errorHandler(self, message):
+        self.msg = QMessageBox()
+        self.msg.setWindowTitle("Error Notification")
+        self.msg.setText(message)
+        self.msg.exec()
+        return
+    
     def IACheck(self, radiobutton):
         """Handles the selection of an IA (Insulation Assessment) option from a set of radio buttons.
     
-         This function ensures that only the selected radio button remains checked, updates UI elements
-         visibility based on the selection, and modifies internal variables and texts based on whether the
-         IA option is selected or not.
+        This function ensures that only the selected radio button remains checked, updates UI elements
+        visibility based on the selection, and modifies internal variables and texts based on whether the
+        IA option is selected or not.
     
-         Parameters:
-         radiobutton (QRadioButton): The radio button that was selected.
+        Parameters:
+        radiobutton (QRadioButton): The radio button that was selected.
 
         Returns:
         None"""
-        
-        for button in self.IARadioOptions.buttons():
-            if button is not radiobutton:
-                button.setChecked(False)
-        self.ia_options.setHidden(False)
-        self.ia_select.setHidden(False)
-        if (not self.IAButton.isChecked()):
-            self.ia_options.setHidden(True)
-            self.ia_select.setHidden(True)
-            self.nodeVoltRadio.setText("Node Voltage")
-            self.branchCurrRadio.setText("Branch Current")
-            self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)",
-                               "Rail1 (Downtrack)",
-                               "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)",
-                               "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
-        if (self.IAButton.isChecked()):
-            for i in range(len(self.final_input_directories)):
-                if "IA" in self.final_input_directories[i]:
-                    file = pd.read_csv(self.final_input_directories[i] + "/Cable_Data.csv")
-                    self.cablelist = file["name "].to_list()
-                    self.nodeVoltRadio.setText("Cable Voltage")
-                    self.branchCurrRadio.setText("Cable Current")
-                    self.conductors = self.cablelist
+        try:
+            for button in self.IARadioOptions.buttons():
+                if button is not radiobutton:
+                    button.setChecked(False)
+            self.ia_options.setHidden(False)
+            self.ia_select.setHidden(False)
+            if (not self.IAButton.isChecked()):
+                self.ia_options.setHidden(True)
+                self.ia_select.setHidden(True)
+                self.nodeVoltRadio.setText("Node Voltage")
+                self.branchCurrRadio.setText("Branch Current")
+                self.conductors = ["Catenary (Uptrack)", "Rail1 (Uptrack)", "Rail2 (Uptrack)", "Catenary (Downtrack)",
+                                "Rail1 (Downtrack)",
+                                "Rail2 (Downtrack)", "Feeder (Uptrack)", "Feeder (Downtrack)",
+                                "Protective Wire (Uptrack)", "Protective Wire (Downtrack)"]
+            if (self.IAButton.isChecked()):
+                for i in range(len(self.final_input_directories)):
+                    if "IA" in self.final_input_directories[i]:
+                        file = pd.read_csv(self.final_input_directories[i] + "/Cable_Data.csv")
+                        self.cablelist = file["name "].to_list()
+                        self.nodeVoltRadio.setText("Cable Voltage")
+                        self.branchCurrRadio.setText("Cable Current")
+                        self.conductors = self.cablelist
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def open_pdf(self):
@@ -343,68 +353,74 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        
-        sender = self.sender()
-        if(sender == self.trainStat):
-            self.trainstatflag = not (self.trainstatflag)
-            if(self.trainstatflag):
-                data = timeTableData(self.final_input_directories[0])
-                file = pd.read_csv(self.final_output_directories[0]+"/TrainResults.csv",header=None)
-                self.timetable_trainstat.setColumnCount(len(file[0]))
-                self.timetable_trainstat.setRowCount(6)
-                self.timetable_trainstat.setHorizontalHeaderLabels(file[0])
-                self.timetable_trainstat.setColumnWidth(0,250)
-                self.timetable_trainstat.setHidden(False)
-                for j in range(len(data["calculativeData"])):
-                    item = QtWidgets.QTableWidgetItem("Start Time (HH:MM)")
-                    self.timetable_trainstat.setItem(0,0,item)
-                    item = QtWidgets.QTableWidgetItem(data["calculativeData"][j]["startTime"])
-                    self.timetable_trainstat.setItem(0,j+1,item)
-                for i in range(1,len(file[0])):
-                    item = QtWidgets.QTableWidgetItem("Travel Time (HH:MM:SS)")
-                    self.timetable_trainstat.setItem(4,0,item)
-                    temp = int(file[1][i])
-                    h = temp // 3600
-                    m = (temp % 3600) // 60
-                    s = temp % 60
-                    item = QtWidgets.QTableWidgetItem(str(timedelta(hours=h, minutes=m, seconds=s)))
-                    self.timetable_trainstat.setItem(4,i,item)
-                    item = QtWidgets.QTableWidgetItem("End Time (HH:MM:SS)")
-                    self.timetable_trainstat.setItem(5,0,item)
-                    temp1 = data["calculativeData"][i-1]["startTime"].split(":")
-                    hours = int(temp1[0])
-                    minutes = int(temp1[1])
-                    item = QtWidgets.QTableWidgetItem(str(timedelta(hours=hours, minutes=minutes)+timedelta(hours= h, minutes=m,seconds=s)))
-                    self.timetable_trainstat.setItem(5,i,item)
-                for i in range(1, len(file[0])):
-                    item = QtWidgets.QTableWidgetItem("Maximum Voltage (kV)")
-                    self.timetable_trainstat.setItem(1,0,item)
-                    item = QtWidgets.QTableWidgetItem(str(round(float(file[4][i])/1000,2)))
-                    self.timetable_trainstat.setItem(1,i,item)
-                    item = QtWidgets.QTableWidgetItem("Minimum Voltage (kV)")
-                    self.timetable_trainstat.setItem(2,0,item)
-                    item = QtWidgets.QTableWidgetItem(str(round(float(file[3][i])/1000,2)))
-                    self.timetable_trainstat.setItem(2,i,item)
-                    item = QtWidgets.QTableWidgetItem("Mean Useful Voltage (kV)")
-                    self.timetable_trainstat.setItem(3,0,item)
-                    item = QtWidgets.QTableWidgetItem(str(round(float(file[2][i])/1000,2)))
-                    self.timetable_trainstat.setItem(3,i,item)
-                self.showTimeTable.setText("Show Time Table")
-                self.trainStat.setText("Hide Train Statistics")
-                self.timetableflag = False
+        try:
+            sender = self.sender()
+            if(sender == self.trainStat):
+                self.trainstatflag = not (self.trainstatflag)
+                if(self.trainstatflag):
+                    data = timeTableData(self.final_input_directories[0])
+                    file = pd.read_csv(self.final_output_directories[0]+"/TrainResults.csv",header=None)
+                    self.timetable_trainstat.setColumnCount(0)
+                    self.timetable_trainstat.setRowCount(0)
+                    self.timetable_trainstat.setColumnCount(len(file[0]))
+                    self.timetable_trainstat.setRowCount(6)
+                    self.timetable_trainstat.setHorizontalHeaderLabels(file[0])
+                    self.timetable_trainstat.setColumnWidth(0,250)
+                    self.timetable_trainstat.setHidden(False)
+                    for j in range(len(data["calculativeData"])):
+                        item = QtWidgets.QTableWidgetItem("Start Time (HH:MM)")
+                        self.timetable_trainstat.setItem(0,0,item)
+                        item = QtWidgets.QTableWidgetItem(data["calculativeData"][j]["startTime"])
+                        self.timetable_trainstat.setItem(0,j+1,item)
+                    for i in range(1,len(file[0])):
+                        item = QtWidgets.QTableWidgetItem("Travel Time (HH:MM:SS)")
+                        self.timetable_trainstat.setItem(4,0,item)
+                        temp = int(file[1][i])
+                        h = temp // 3600
+                        m = (temp % 3600) // 60
+                        s = temp % 60
+                        item = QtWidgets.QTableWidgetItem(str(timedelta(hours=h, minutes=m, seconds=s)))
+                        self.timetable_trainstat.setItem(4,i,item)
+                        item = QtWidgets.QTableWidgetItem("End Time (HH:MM:SS)")
+                        self.timetable_trainstat.setItem(5,0,item)
+                        temp1 = data["calculativeData"][i-1]["startTime"].split(":")
+                        hours = int(temp1[0])
+                        minutes = int(temp1[1])
+                        item = QtWidgets.QTableWidgetItem(str(timedelta(hours=hours, minutes=minutes)+timedelta(hours= h, minutes=m,seconds=s)))
+                        self.timetable_trainstat.setItem(5,i,item)
+                    for i in range(1, len(file[0])):
+                        item = QtWidgets.QTableWidgetItem("Maximum Voltage (kV)")
+                        self.timetable_trainstat.setItem(1,0,item)
+                        item = QtWidgets.QTableWidgetItem(str(round(float(file[4][i])/1000,2)))
+                        self.timetable_trainstat.setItem(1,i,item)
+                        item = QtWidgets.QTableWidgetItem("Minimum Voltage (kV)")
+                        self.timetable_trainstat.setItem(2,0,item)
+                        item = QtWidgets.QTableWidgetItem(str(round(float(file[3][i])/1000,2)))
+                        self.timetable_trainstat.setItem(2,i,item)
+                        item = QtWidgets.QTableWidgetItem("Mean Useful Voltage (kV)")
+                        self.timetable_trainstat.setItem(3,0,item)
+                        item = QtWidgets.QTableWidgetItem(str(round(float(file[2][i])/1000,2)))
+                        self.timetable_trainstat.setItem(3,i,item)
+                    self.timetable_trainstat.setEditTriggers(QtWidgets.QTableWidget.NoEditTriggers)
+                    self.showTimeTable.setText("Show Time Table")
+                    self.trainStat.setText("Hide Train Statistics")
+                    self.timetableflag = False
+                else:
+                    self.trainStat.setText("Show Train Statistics")
+                    self.timetable_trainstat.setHidden(True)
             else:
-                self.trainStat.setText("Show Train Statistics")
-                self.timetable_trainstat.setHidden(True)
-        else:
-            data = timeTableData(self.final_input_directories[0])
-            self.reportName = startReport(self.final_output_directories[0], data["calculativeData"])
-            self.msg = QMessageBox()
-            self.msg.setWindowTitle("PDF Notification")
-            button = QPushButton("Open PDF", self.msg)
-            button.setGeometry(15, 60, 110, 30)
-            button.clicked.connect(self.open_pdf)
-            self.msg.setText("PDF Successfully Created.")
-            self.msg.exec()
+                data = timeTableData(self.final_input_directories[0])
+                self.reportName = startReport(self.final_output_directories[0], data["calculativeData"])
+                self.msg = QMessageBox()
+                self.msg.setWindowTitle("PDF Notification")
+                button = QPushButton("Open PDF", self.msg)
+                button.setGeometry(15, 60, 110, 30)
+                button.clicked.connect(self.open_pdf)
+                self.msg.setText("PDF Successfully Created.")
+                self.msg.exec()
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def browsefiles(self):
@@ -561,42 +577,46 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        
-        self.pqa_scaoptions.clear()
-        dir = os.listdir(self.lfadirectories[self.lfaoptions.currentIndex()])
-        scadirectoriesToShow = []
-        pqadirectoriesToShow = []
-        self.locationDirectories = []
-        for i in range(0, len(dir)):
-            if "SCA" in dir[i]:
-                self.locationDirectories.append(os.path.join(
-                    self.lfadirectories[self.lfaoptions.currentIndex()], dir[i]))
-                scadirectoriesToShow.append(dir[i])
-            if "PQA" in dir[i]:
-                self.locationDirectories.append(os.path.join(
-                    self.lfadirectories[self.lfaoptions.currentIndex()], dir[i]))
-                pqadirectoriesToShow.append(dir[i])
-        if (self.scaradio.isChecked()):
-            self.selectAllFrequency.setEnabled(False)
-            self.selectAllTime.setEnabled(False)
-            if len(scadirectoriesToShow) == 0:
-                self.pqa_sca_select.setEnabled(False)
-                self.pqa_scaoptions.setEnabled(False)
-                self.pltlfa_pqa_sca.setEnabled(False)
-            else:
-                self.pqa_scaoptions.addItems(scadirectoriesToShow)
-                self.pqa_sca_select.setEnabled(True)
-                self.pqa_scaoptions.setEnabled(True)
+        try:
+            self.pqa_scaoptions.clear()
+            pqa_scadirectorytouse = os.path.join(self.final_output_directories[0],self.lfaoptions.currentText())
+            dir = os.listdir(pqa_scadirectorytouse)
+            scadirectoriesToShow = []
+            pqadirectoriesToShow = []
+            self.locationDirectories = []
+            for i in range(0, len(dir)):
+                if "SCA" in dir[i]:
+                    self.locationDirectories.append(os.path.join(
+                        pqa_scadirectorytouse, dir[i]))
+                    scadirectoriesToShow.append(dir[i])
+                if "PQA" in dir[i]:
+                    self.locationDirectories.append(os.path.join(
+                        pqa_scadirectorytouse, dir[i]))
+                    pqadirectoriesToShow.append(dir[i])
+            if (self.scaradio.isChecked()):
+                self.selectAllFrequency.setEnabled(False)
+                self.selectAllTime.setEnabled(False)
+                if len(scadirectoriesToShow) == 0:
+                    self.pqa_sca_select.setEnabled(False)
+                    self.pqa_scaoptions.setEnabled(False)
+                    self.pltlfa_pqa_sca.setEnabled(False)
+                else:
+                    self.pqa_scaoptions.addItems(scadirectoriesToShow)
+                    self.pqa_sca_select.setEnabled(True)
+                    self.pqa_scaoptions.setEnabled(True)
 
-        if (self.pqaradio.isChecked()):
-            self.selectAllTime.setEnabled(False)
-            if len(pqadirectoriesToShow) == 0:
-                self.pqa_sca_select.setEnabled(False)
-                self.pqa_scaoptions.setEnabled(False)
-            else:
-                self.pqa_scaoptions.addItems(pqadirectoriesToShow)
-                self.pqa_sca_select.setEnabled(True)
-                self.pqa_scaoptions.setEnabled(True)
+            if (self.pqaradio.isChecked()):
+                self.selectAllTime.setEnabled(False)
+                if len(pqadirectoriesToShow) == 0:
+                    self.pqa_sca_select.setEnabled(False)
+                    self.pqa_scaoptions.setEnabled(False)
+                else:
+                    self.pqa_scaoptions.addItems(pqadirectoriesToShow)
+                    self.pqa_sca_select.setEnabled(True)
+                    self.pqa_scaoptions.setEnabled(True)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def pqa_sca_connect(self):
@@ -611,81 +631,87 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        if (self.scaradio.isChecked()):
-            self.timelist.clear()
-            self.timeoptions.setEnabled(False)
-            self.frequencyoptions.setEnabled(False)
-            self.timelist.setEnabled(False)
-            self.frequencyList.setEnabled(False)
-            self.time_2d.setEnabled(False)
-            self.time_3d.setEnabled(False)
-            self.frequency_2d.setEnabled(False)
-            self.frequency_3d.setEnabled(False)
-            self.frequency_2d.setChecked(True)
-            self.time_2d.setChecked(True)
-            self.pltlfa_pqa_sca.setEnabled(True)
-            file = io.loadmat(
-                os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
-            self.timelist.addItem(file["timesnap"][0])
-            self.frequencyList.clear()
-            self.frequencyList.addItem("50")
-            self.subpltlfa_pqa_sca.setEnabled(False)
-            self.mergepltlfa_pqa_sca.setEnabled(False)
-            dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
-            self.iadirectories = []
-            for i in range(0, len(dir)):
-                if 'IA' in dir[i] and '.' not in dir[i]:
-                    self.iadirectories.append(
-                        os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], dir[i]))
-            if self.IAButton.isChecked():
-                self.ia_options.clear()
-                for i in range(0, len(self.iadirectories)):
-                    dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
-                    self.ia_options.addItem(dispName)
-                if(len(self.iadirectories)==0):
-                    self.ia_options.setEnabled(False)
-                    self.ia_select.setEnabled(False)
-        else:
-            self.selectAllFrequency.setEnabled(True)
-            self.lfaoptions.setEnabled(True)
-            self.pqa_scaoptions.setEnabled(True)
-            self.frequencyoptions.setEnabled(True)
-            self.frequencyList.setEnabled(True)
-            self.frequency_2d.setEnabled(True)
-            self.frequency_3d.setEnabled(True)
-            self.timeoptions.setEnabled(False)
-            self.timelist.setEnabled(False)
-            self.time_2d.setEnabled(False)
-            self.time_3d.setEnabled(False)
-            file = io.loadmat(
-                os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
-            self.frequencyAvailable = []
-            for i in range(len(file["fh"][0])):
-                self.frequencyAvailable.append(str(file["fh"][0][i] * 50))
-            self.frequencyoptions.clear()
-            self.frequencyoptions.insertItems(0, self.frequencyAvailable)
-            if(self.isConnectedFrequency):
-                self.frequencyoptions.activated.disconnect(self.activated)
-                self.isConnectedFrequency=False
-            self.frequencyoptions.activated.connect(self.activated)
-            self.isConnectedFrequency = True
-            self.frequencyoptions.setCurrentIndex(0)
-            dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
-            self.iadirectories = []
-            for i in range(0, len(dir)):
-                if 'IA' in dir[i] and '.' not in dir[i]:
-                    self.iadirectories.append(
-                        os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], dir[i]))
-            if self.IAButton.isChecked():
-                self.ia_options.clear()
-                for i in range(0, len(self.iadirectories)):
-                    self.ia_options.setEnabled(True)
-                    self.ia_select.setEnabled(True)
-                    dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
-                    self.ia_options.addItem(dispName)
-                if(len(self.iadirectories)==0):
-                    self.ia_options.setEnabled(False)
-                    self.ia_select.setEnabled(False)
+        try:
+            if (self.scaradio.isChecked()):
+                self.timelist.clear()
+                self.timeoptions.setEnabled(False)
+                self.frequencyoptions.setEnabled(False)
+                self.timelist.setEnabled(False)
+                self.frequencyList.setEnabled(False)
+                self.time_2d.setEnabled(False)
+                self.time_3d.setEnabled(False)
+                self.frequency_2d.setEnabled(False)
+                self.frequency_3d.setEnabled(False)
+                self.frequency_2d.setChecked(True)
+                self.time_2d.setChecked(True)
+                self.pltlfa_pqa_sca.setEnabled(True)
+                file = io.loadmat(
+                    os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
+                self.timelist.addItem(file["timesnap"][0])
+                self.frequencyList.clear()
+                self.frequencyList.addItem("50")
+                self.subpltlfa_pqa_sca.setEnabled(False)
+                self.mergepltlfa_pqa_sca.setEnabled(False)
+                dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
+                self.iadirectories = []
+                for i in range(0, len(dir)):
+                    if 'IA' in dir[i] and '.' not in dir[i]:
+                        self.iadirectories.append(
+                            os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], dir[i]))
+                if self.IAButton.isChecked():
+                    self.ia_options.clear()
+                    for i in range(0, len(self.iadirectories)):
+                        dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
+                        self.ia_options.addItem(dispName)
+                        self.ia_options.setEnabled(True)
+                        self.ia_select.setEnabled(True)
+                    if(len(self.iadirectories)==0):
+                        self.ia_options.setEnabled(False)
+                        self.ia_select.setEnabled(False)
+            else:
+                self.selectAllFrequency.setEnabled(True)
+                self.lfaoptions.setEnabled(True)
+                self.pqa_scaoptions.setEnabled(True)
+                self.frequencyoptions.setEnabled(True)
+                self.frequencyList.setEnabled(True)
+                self.frequency_2d.setEnabled(True)
+                self.frequency_3d.setEnabled(True)
+                self.timeoptions.setEnabled(False)
+                self.timelist.setEnabled(False)
+                self.time_2d.setEnabled(False)
+                self.time_3d.setEnabled(False)
+                file = io.loadmat(
+                    os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], "IA_linesummary.mat"))
+                self.frequencyAvailable = []
+                for i in range(len(file["fh"][0])):
+                    self.frequencyAvailable.append(str(file["fh"][0][i] * 50))
+                self.frequencyoptions.clear()
+                self.frequencyoptions.insertItems(0, self.frequencyAvailable)
+                if(self.isConnectedFrequency):
+                    self.frequencyoptions.activated.disconnect(self.activated)
+                    self.isConnectedFrequency=False
+                self.frequencyoptions.activated.connect(self.activated)
+                self.isConnectedFrequency = True
+                self.frequencyoptions.setCurrentIndex(0)
+                dir = os.listdir(self.locationDirectories[self.pqa_scaoptions.currentIndex()])
+                self.iadirectories = []
+                for i in range(0, len(dir)):
+                    if 'IA' in dir[i] and '.' not in dir[i]:
+                        self.iadirectories.append(
+                            os.path.join(self.locationDirectories[self.pqa_scaoptions.currentIndex()], dir[i]))
+                if self.IAButton.isChecked():
+                    self.ia_options.clear()
+                    for i in range(0, len(self.iadirectories)):
+                        self.ia_options.setEnabled(True)
+                        self.ia_select.setEnabled(True)
+                        dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
+                        self.ia_options.addItem(dispName)
+                    if(len(self.iadirectories)==0):
+                        self.ia_options.setEnabled(False)
+                        self.ia_select.setEnabled(False)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def selectAll(self):
@@ -700,43 +726,47 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        sender = self.sender()
-        if sender == self.selectAllTime:
-            if len(self.selectedTsnaps) <= 1:
-                for i in range(0, (len(self.tsnap) - len(self.selectedTsnaps))):
-                    self.selectedTsnaps.append(i)
-                    self.timelist.addItem(self.timeoptions.itemText(0))
-                    self.selectedTsnapValue.append(self.timeoptions.itemText(0))
-                    self.timeoptions.removeItem(0)
-                    # self.timeoptions.setCurrentIndex(0)
-                self.radiostatus(0)
-                self.selectAllTime.setText("Deselect All")
+        try:
+            sender = self.sender()
+            if sender == self.selectAllTime:
+                if len(self.selectedTsnaps) <= 1:
+                    for i in range(0, (len(self.tsnap) - len(self.selectedTsnaps))):
+                        self.selectedTsnaps.append(i)
+                        self.timelist.addItem(self.timeoptions.itemText(0))
+                        self.selectedTsnapValue.append(self.timeoptions.itemText(0))
+                        self.timeoptions.removeItem(0)
+                        # self.timeoptions.setCurrentIndex(0)
+                    self.radiostatus(0)
+                    self.selectAllTime.setText("Deselect All")
+                else:
+                    for i in range(len(self.selectedTsnapValue) - 1, -1, -1):
+                        self.timeoptions.insertItem(self.selectedTsnaps[i], self.selectedTsnapValue[i])
+                        self.selectedTsnaps.remove(self.selectedTsnaps[i])
+                        self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
+                    self.timelist.clear()
+                    self.selectAllTime.setText("Select All")
+                    self.radiostatus(0)
             else:
-                for i in range(len(self.selectedTsnapValue) - 1, -1, -1):
-                    self.timeoptions.insertItem(self.selectedTsnaps[i], self.selectedTsnapValue[i])
-                    self.selectedTsnaps.remove(self.selectedTsnaps[i])
-                    self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
-                self.timelist.clear()
-                self.selectAllTime.setText("Select All")
-                self.radiostatus(0)
-        else:
-            if len(self.selectedFrequency) <= 1:
-                for i in range(0, (len(self.frequencyAvailable) - len(self.selectedFrequency))):
-                    self.selectedFrequency.append(i)
-                    self.frequencyList.addItem(self.frequencyoptions.itemText(0))
-                    self.selectedFrequencyValue.append(self.frequencyoptions.itemText(0))
-                    self.frequencyoptions.removeItem(0)
-                    # self.timeoptions.setCurrentIndex(0)
-                self.radiostatus(1)
-                self.selectAllFrequency.setText("Deselect All")
-            else:
-                for i in range(len(self.selectedFrequencyValue) - 1, -1, -1):
-                    self.frequencyoptions.insertItem(self.selectedFrequency[i], self.selectedFrequencyValue[i])
-                    self.selectedFrequency.remove(self.selectedFrequency[i])
-                    self.selectedFrequencyValue.remove(self.selectedFrequencyValue[i])
-                self.frequencyList.clear()
-                self.selectAllFrequency.setText("Select All")
-                self.radiostatus(1)
+                if len(self.selectedFrequency) <= 1:
+                    for i in range(0, (len(self.frequencyAvailable) - len(self.selectedFrequency))):
+                        self.selectedFrequency.append(i)
+                        self.frequencyList.addItem(self.frequencyoptions.itemText(0))
+                        self.selectedFrequencyValue.append(self.frequencyoptions.itemText(0))
+                        self.frequencyoptions.removeItem(0)
+                        # self.timeoptions.setCurrentIndex(0)
+                    self.radiostatus(1)
+                    self.selectAllFrequency.setText("Deselect All")
+                else:
+                    for i in range(len(self.selectedFrequencyValue) - 1, -1, -1):
+                        self.frequencyoptions.insertItem(self.selectedFrequency[i], self.selectedFrequencyValue[i])
+                        self.selectedFrequency.remove(self.selectedFrequency[i])
+                        self.selectedFrequencyValue.remove(self.selectedFrequencyValue[i])
+                    self.frequencyList.clear()
+                    self.selectAllFrequency.setText("Select All")
+                    self.radiostatus(1)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def removeListOptions(self):
@@ -752,64 +782,72 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        sender = self.sender()
-        if (sender == self.timelist):
-            for i in range(0, len(self.selectedTsnapValue)):
-                if self.selectedTsnapValue[i] == self.timelist.currentItem().text():
-                    self.timeoptions.insertItem(
-                        self.selectedTsnaps[i], self.selectedTsnapValue[i])
-                    self.selectedTsnaps.remove(self.selectedTsnaps[i])
-                    self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
-                    break
-            self.timelist.takeItem(self.timelist.currentRow())
-            self.radiostatus(0)
-        if (sender == self.frequencyList):
-            for i in range(0, len(self.selectedFrequencyValue)):
-                if self.selectedFrequencyValue[i] == self.frequencyList.currentItem().text():
-                    self.frequencyoptions.insertItem(
-                        self.selectedFrequency[i], self.selectedFrequencyValue[i])
-                    self.selectedFrequency.remove(self.selectedFrequency[i])
-                    self.selectedFrequencyValue.remove(self.selectedFrequencyValue[i])
-                    break
-            self.frequencyList.takeItem(self.frequencyList.currentRow())
-            self.radiostatus(1)
+        try:
+            sender = self.sender()
+            if (sender == self.timelist):
+                for i in range(0, len(self.selectedTsnapValue)):
+                    if self.selectedTsnapValue[i] == self.timelist.currentItem().text():
+                        self.timeoptions.insertItem(
+                            self.selectedTsnaps[i], self.selectedTsnapValue[i])
+                        self.selectedTsnaps.remove(self.selectedTsnaps[i])
+                        self.selectedTsnapValue.remove(self.selectedTsnapValue[i])
+                        break
+                self.timelist.takeItem(self.timelist.currentRow())
+                self.radiostatus(0)
+            if (sender == self.frequencyList):
+                for i in range(0, len(self.selectedFrequencyValue)):
+                    if self.selectedFrequencyValue[i] == self.frequencyList.currentItem().text():
+                        self.frequencyoptions.insertItem(
+                            self.selectedFrequency[i], self.selectedFrequencyValue[i])
+                        self.selectedFrequency.remove(self.selectedFrequency[i])
+                        self.selectedFrequencyValue.remove(self.selectedFrequencyValue[i])
+                        break
+                self.frequencyList.takeItem(self.frequencyList.currentRow())
+                self.radiostatus(1)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def lfabrowse(self):
-        self.selectAllTime.setEnabled(False)
-        self.selectAllFrequency.setEnabled(False)
-        self.time_2d.setEnabled(False)
-        self.time_3d.setEnabled(False)
-        self.time_2d.setChecked(False)
-        self.frequency_2d.setEnabled(False)
-        self.frequency_3d.setEnabled(False)
-        self.timeoptions.setEnabled(False)
-        self.conductorlist.clear()
-        self.timelist.clear()
-        self.selectedTsnaps.clear()
-        self.selectedTsnapValue.clear()
-        self.frequencyoptions.setEnabled(False)
-        self.conductorlist.setEnabled(False)
-        self.nodeVoltRadio.setEnabled(False)
-        self.branchCurrRadio.setEnabled(False)
-        self.frequencyList.clear()
-        self.frequencyList.setEnabled(False)
-        self.lfaselect.setEnabled(True)
-        self.lfaoptions.clear()
-        self.pqa_scaoptions.clear()
-        self.lfaoptions.setEnabled(True)
-        self.pqa_scaoptions.setEnabled(False)
-        for i in range(0, len(self.lfadirectories)):
-            dispName = os.path.basename(self.lfadirectories[i]).split('/')[-1]
-            if ("_T" in dispName and self.TAButton.isChecked()):
-                self.tadirectories.append(self.lfadirectories[i])
-                self.lfaoptions.addItem(dispName)
-            else:
-                if not (self.TAButton.isChecked()): 
-                    if not ("_T" in dispName):
-                        self.lfaoptions.addItem(dispName)
-        if (len(self.lfaoptions) == 0):
-            self.lfaselect.setEnabled(False)
+        try:
+            self.selectAllTime.setEnabled(False)
+            self.selectAllFrequency.setEnabled(False)
+            self.time_2d.setEnabled(False)
+            self.time_3d.setEnabled(False)
+            self.time_2d.setChecked(False)
+            self.frequency_2d.setEnabled(False)
+            self.frequency_3d.setEnabled(False)
+            self.timeoptions.setEnabled(False)
+            self.conductorlist.clear()
+            self.timelist.clear()
+            self.selectedTsnaps.clear()
+            self.selectedTsnapValue.clear()
+            self.frequencyoptions.setEnabled(False)
+            self.conductorlist.setEnabled(False)
+            self.nodeVoltRadio.setEnabled(False)
+            self.branchCurrRadio.setEnabled(False)
+            self.frequencyList.clear()
+            self.frequencyList.setEnabled(False)
+            self.lfaselect.setEnabled(True)
+            self.lfaoptions.clear()
+            self.pqa_scaoptions.clear()
+            self.lfaoptions.setEnabled(True)
+            self.pqa_scaoptions.setEnabled(False)
+            for i in range(0, len(self.lfadirectories)):
+                dispName = os.path.basename(self.lfadirectories[i]).split('/')[-1]
+                if ("_T" in dispName and self.TAButton.isChecked()):
+                    self.tadirectories.append(self.lfadirectories[i])
+                    self.lfaoptions.addItem(dispName)
+                else:
+                    if not (self.TAButton.isChecked()): 
+                        if not ("_T" in dispName):
+                            self.lfaoptions.addItem(dispName)
+            if (len(self.lfaoptions) == 0):
+                self.lfaselect.setEnabled(False)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def lfaconnect(self):
@@ -823,68 +861,72 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        self.tsnap = np.array([])
-        self.selectedTsnaps.clear()
-        self.selectedTsnapValue.clear()
-        self.timelist.clear()
-        self.timeoptions.clear()
-        self.conductorlist.clear()
-        self.conductorlist.setEnabled(True)
-        self.nodeVoltRadio.setEnabled(True)
-        self.branchCurrRadio.setEnabled(True)
-        self.time_2d.setChecked(True)
-        self.selectAllFrequency.setEnabled(False)
-        self.selectAllTime.setEnabled(True)
-        if (self.IAButton.isChecked()):
-            self.conductorlist.insertItems(0, self.cablelist)
-        elif (self.TAButton.isChecked()):
-            self.TA_conductors = ["Contact Up-track", "Contact Down-track", "Contact Up-track Difference",
-                                  "Contact Down-track Difference"]
-            self.conductorlist.insertItems(0, self.TA_conductors)
-            self.nodeVoltRadio.setEnabled(False)
-            self.branchCurrRadio.setEnabled(False)
-            self.time_2d.setChecked(False)
-            self.time_2d.setEnabled(False)
-        else:
-            self.conductorlist.insertItems(0, self.conductors)
-        if (self.pqaradio.isChecked() or self.scaradio.isChecked()):
-            self.pqabrowse()
-            return
-        self.timeoptions.setEnabled(True)
-        self.timelist.setEnabled(True)
-        self.frequencyoptions.setEnabled(False)
-        self.frequencyList.setEnabled(False)
-        self.frequency_2d.setEnabled(False)
-        self.frequency_3d.setEnabled(False)
-        if (self.TAButton.isChecked()):
-            self.location = os.path.join(self.tadirectories[self.lfaoptions.currentIndex()], "data_ntwrk.mat")
-        else:
-            self.location = os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()], "data_ntwrk.mat")
-        file = io.loadmat(self.location)
-        self.tsnap = file["tsnap"]
-        self.timeoptions.addItems(self.tsnap)
-        if self.isConnectedTime:
-            self.timeoptions.activated.disconnect(self.activated)
-            self.isConnectedTime = False
-        self.timeoptions.activated.connect(self.activated)
-        self.isConnectedTime = True
+        try:
+            self.tsnap = np.array([])
+            self.selectedTsnaps.clear()
+            self.selectedTsnapValue.clear()
+            self.timelist.clear()
+            self.timeoptions.clear()
+            self.conductorlist.clear()
+            self.conductorlist.setEnabled(True)
+            self.nodeVoltRadio.setEnabled(True)
+            self.branchCurrRadio.setEnabled(True)
+            self.time_2d.setChecked(True)
+            self.selectAllFrequency.setEnabled(False)
+            self.selectAllTime.setEnabled(True)
+            if (self.IAButton.isChecked()):
+                self.conductorlist.insertItems(0, self.cablelist)
+            elif (self.TAButton.isChecked()):
+                self.TA_conductors = ["Contact Up-track", "Contact Down-track", "Contact Up-track Difference",
+                                    "Contact Down-track Difference"]
+                self.conductorlist.insertItems(0, self.TA_conductors)
+                self.nodeVoltRadio.setEnabled(False)
+                self.branchCurrRadio.setEnabled(False)
+                self.time_2d.setChecked(False)
+                self.time_2d.setEnabled(False)
+            else:
+                self.conductorlist.insertItems(0, self.conductors)
+            if (self.pqaradio.isChecked() or self.scaradio.isChecked()):
+                self.pqabrowse()
+                return
+            self.timeoptions.setEnabled(True)
+            self.timelist.setEnabled(True)
+            self.frequencyoptions.setEnabled(False)
+            self.frequencyList.setEnabled(False)
+            self.frequency_2d.setEnabled(False)
+            self.frequency_3d.setEnabled(False)
+            if (self.TAButton.isChecked()):
+                self.location = os.path.join(self.tadirectories[self.lfaoptions.currentIndex()], "data_ntwrk.mat")
+            else:
+                self.location = os.path.join(self.lfadirectories[self.lfaoptions.currentIndex()], "data_ntwrk.mat")
+            file = io.loadmat(self.location)
+            self.tsnap = file["tsnap"]
+            self.timeoptions.addItems(self.tsnap)
+            if self.isConnectedTime:
+                self.timeoptions.activated.disconnect(self.activated)
+                self.isConnectedTime = False
+            self.timeoptions.activated.connect(self.activated)
+            self.isConnectedTime = True
 
-        iadirectorytouse = os.path.join(self.final_output_directories[0],self.lfaoptions.currentText())
-        dir = os.listdir(iadirectorytouse)
-        self.iadirectories = []
-        for i in range(0, len(dir)):
-            if 'IA' in dir[i] and '.' not in dir[i]:
-                self.iadirectories.append(os.path.join(iadirectorytouse, dir[i]))
-        if self.IAButton.isChecked():
-            self.ia_options.clear()
-            for i in range(0, len(self.iadirectories)):
-                dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
-                self.ia_select.setEnabled(True)
-                self.ia_options.setEnabled(True)
-                self.ia_options.addItem(dispName)
-            if(len(self.iadirectories)==0):
-                self.ia_options.setEnabled(False)
-                self.ia_select.setEnabled(False)
+            iadirectorytouse = os.path.join(self.final_output_directories[0],self.lfaoptions.currentText())
+            dir = os.listdir(iadirectorytouse)
+            self.iadirectories = []
+            for i in range(0, len(dir)):
+                if 'IA' in dir[i] and '.' not in dir[i]:
+                    self.iadirectories.append(os.path.join(iadirectorytouse, dir[i]))
+            if self.IAButton.isChecked():
+                self.ia_options.clear()
+                for i in range(0, len(self.iadirectories)):
+                    dispName = os.path.basename(self.iadirectories[i]).split('/')[-1]
+                    self.ia_select.setEnabled(True)
+                    self.ia_options.setEnabled(True)
+                    self.ia_options.addItem(dispName)
+                if(len(self.iadirectories)==0):
+                    self.ia_options.setEnabled(False)
+                    self.ia_select.setEnabled(False)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def activated(self, index):
@@ -899,23 +941,27 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        if (self.pqaradio.isChecked()):
-            for i in range(len(self.frequencyAvailable)):
-                if (self.frequencyoptions.itemText(index) == self.frequencyAvailable[i]):
-                    self.selectedFrequency.append(i)
-            self.frequencyList.addItem(self.frequencyoptions.itemText(index))
-            self.selectedFrequencyValue.append(self.frequencyoptions.itemText(index))
-            self.frequencyoptions.removeItem(index)
-            self.radiostatus(1)
-        else:
-            for i in range(len(self.tsnap)):
-                if (self.timeoptions.itemText(index) == self.tsnap[i]):
-                    self.selectedTsnaps.append(i)
-            self.timelist.addItem(self.timeoptions.itemText(index))
-            self.selectedTsnapValue.append(self.timeoptions.itemText(index))
-            self.timeoptions.removeItem(index)
-            self.radiostatus(0)
+        try:
+            if (self.pqaradio.isChecked()):
+                for i in range(len(self.frequencyAvailable)):
+                    if (self.frequencyoptions.itemText(index) == self.frequencyAvailable[i]):
+                        self.selectedFrequency.append(i)
+                self.frequencyList.addItem(self.frequencyoptions.itemText(index))
+                self.selectedFrequencyValue.append(self.frequencyoptions.itemText(index))
+                self.frequencyoptions.removeItem(index)
+                self.radiostatus(1)
+            else:
+                for i in range(len(self.tsnap)):
+                    if (self.timeoptions.itemText(index) == self.tsnap[i]):
+                        self.selectedTsnaps.append(i)
+                self.timelist.addItem(self.timeoptions.itemText(index))
+                self.selectedTsnapValue.append(self.timeoptions.itemText(index))
+                self.timeoptions.removeItem(index)
+                self.radiostatus(0)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
             return
+        return
 
     def LFA_PQA_SCA(self):
         """Identifies and categorizes directories containing LFA, SCA, and PQA data.
@@ -951,61 +997,65 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        self.lfaradio.setEnabled(True)
-        self.scaradio.setEnabled(True)
-        self.pqaradio.setEnabled(True)
-        self.file_names.clear()
-        self.Trainplots.setEnabled(True)
-        self.Substationplots.setEnabled(True)
-        self.Time_radio.setChecked(True)
-        self.analysistab.setTabEnabled(0, True)
-        output_directory_results = []
-        input_directory_results = []
-        for path in self.folder_paths:
-            for root, dirs, files in os.walk(path):
-                for dir in dirs:
-                    if "output" in dir.lower():
-                        output_directory_results.append(
-                            os.path.abspath(os.path.join(root, dir)))
-                    if "input" in dir.lower():
-                        input_directory_results.append(
-                            os.path.abspath(os.path.join(root, dir)))
-            for directories in input_directory_results:
-                for root, dirs, files in os.walk(directories):
-                    if (len(files) > 0):
-                        self.final_input_directories.append(directories)
-            for directories in output_directory_results:
-                for root, dirs, files in os.walk(directories):
-                    if (len(files) > 0):
-                        self.final_output_directories.append(directories)
-                        break
-        for i in range(len(self.final_input_directories)):
-            if 'TimeTableData.csv' in os.listdir(self.final_input_directories[i]) and (
-                    'TrainModuleOutput.csv' in os.listdir(self.final_output_directories[0])):
-                self.Stringline.setEnabled(True)
-                break
-        for i in range(len(self.final_input_directories)):
-            if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and (
-                    'TimeTableData.csv' in os.listdir(self.final_input_directories[i])):
-                self.Routealtitude.setEnabled(True)
-                break
-        for i in range(len(self.final_input_directories)):
-            if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and (
-                    'RouteAltitudeData.csv' in os.listdir(self.final_input_directories[i])):
-                self.showTimeTable.setEnabled(True)
-                break
-        if (self.Stringline.isEnabled() or self.Routealtitude.isEnabled()):
-            self.stringlineplot.setEnabled(True)
-        self.LFA_PQA_SCA()
-        for i in range(len(self.final_output_directories)):
-            if 'TrainResults.csv' in os.listdir(
-                    self.final_output_directories[i]) and 'SubstationResults.csv' in os.listdir(
-                    self.final_output_directories[i]):
-                self.trainStat.setEnabled(True)
-                self.reportGenerate.setEnabled(True)
-            else:
-                self.trainStat.setEnabled(False)
-                self.reportGenerate.setEnabled(False)
+        try:
+            self.lfaradio.setEnabled(True)
+            self.scaradio.setEnabled(True)
+            self.pqaradio.setEnabled(True)
+            self.file_names.clear()
+            self.Trainplots.setEnabled(True)
+            self.Substationplots.setEnabled(True)
+            self.Time_radio.setChecked(True)
+            self.analysistab.setTabEnabled(0, True)
+            output_directory_results = []
+            input_directory_results = []
+            for path in self.folder_paths:
+                for root, dirs, files in os.walk(path):
+                    for dir in dirs:
+                        if "output" in dir.lower():
+                            output_directory_results.append(
+                                os.path.abspath(os.path.join(root, dir)))
+                        if "input" in dir.lower():
+                            input_directory_results.append(
+                                os.path.abspath(os.path.join(root, dir)))
+                for directories in input_directory_results:
+                    for root, dirs, files in os.walk(directories):
+                        if (len(files) > 0):
+                            self.final_input_directories.append(directories)
+                for directories in output_directory_results:
+                    for root, dirs, files in os.walk(directories):
+                        if (len(files) > 0):
+                            self.final_output_directories.append(directories)
+                            break
+            for i in range(len(self.final_input_directories)):
+                if 'TimeTableData.csv' in os.listdir(self.final_input_directories[i]) and (
+                        'TrainModuleOutput.csv' in os.listdir(self.final_output_directories[0])):
+                    self.Stringline.setEnabled(True)
+                    break
+            for i in range(len(self.final_input_directories)):
+                if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and (
+                        'TimeTableData.csv' in os.listdir(self.final_input_directories[i])):
+                    self.Routealtitude.setEnabled(True)
+                    break
+            for i in range(len(self.final_input_directories)):
+                if 'AllStationData.csv' in os.listdir(self.final_input_directories[i]) and (
+                        'RouteAltitudeData.csv' in os.listdir(self.final_input_directories[i])):
+                    self.showTimeTable.setEnabled(True)
+                    break
+            if (self.Stringline.isEnabled() or self.Routealtitude.isEnabled()):
+                self.stringlineplot.setEnabled(True)
+            self.LFA_PQA_SCA()
+            for i in range(len(self.final_output_directories)):
+                if 'TrainResults.csv' in os.listdir(
+                        self.final_output_directories[i]) and 'SubstationResults.csv' in os.listdir(
+                        self.final_output_directories[i]):
+                    self.trainStat.setEnabled(True)
+                    self.reportGenerate.setEnabled(True)
+                else:
+                    self.trainStat.setEnabled(False)
+                    self.reportGenerate.setEnabled(False)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def MTMM(self):
@@ -1175,10 +1225,10 @@ class MainWindow(QDialog, Ui_Dialog):
             for i in range(0, len(self.final_output_directories)):
                 if (self.Time_radio.isChecked()):
                     x, y = ReactivePowerData(self.final_input_directories[0],
-                                             self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
+                                            self.final_output_directories[i], self.MTMMList.currentItem().text(), 1)
                 else:
                     x, y = ReactivePowerData(self.final_input_directories[0],
-                                             self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
+                                            self.final_output_directories[i], self.MTMMList.currentItem().text(), 0)
             keys.append("Reactive Power (kVar)")
             X_axis.append(x)
             Y_axis.append(y)
@@ -1248,7 +1298,7 @@ class MainWindow(QDialog, Ui_Dialog):
                     plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                 plt.title(keys[i], fontsize=15, fontweight='bold')
                 plt.plot(X_axis[i][j], Y_axis[i][j],
-                         label=str(self.MTMMList.currentItem().text()))
+                        label=str(self.MTMMList.currentItem().text()))
                 plt.legend()
                 plt.ylabel(keys[i], fontsize=15, fontweight='bold')
                 cursor = mplcursors.cursor(hover=True)
@@ -1283,7 +1333,7 @@ class MainWindow(QDialog, Ui_Dialog):
                 plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
             for j in range(0, len(Y_axis[i])):
                 axis[i].plot(X_axis[i][j], Y_axis[i][j],
-                             label=str(self.MTMMList.currentItem().text()))
+                            label=str(self.MTMMList.currentItem().text()))
                 axis[i].set_ylabel(keys[i])
                 axis[i].legend()
                 axis[i].grid(alpha=0.3)
@@ -1338,113 +1388,129 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        radioflag = 0
-        if self.branchCurrRadio.isChecked():
-            radioflag = 1
-        sender = self.sender()
-        if self.frequency_3d.isChecked():
-            powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,
-                                 self.conductorlist.currentRow(), radioflag, 1, 0)
-            return
-        else:
-            IAFlag = 0
-            if (self.IAButton.isChecked()):
-                IAFlag = 1
-                X, Y = powerQualityAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedFrequency,
-                                            self.conductorlist.currentRow(), radioflag, 0, IAFlag)
-            elif (self.TAButton.isChecked()):
-                D3Plot_TA_LFA(self.tadirectories[self.pqa_scaoptions.currentIndex()], self.selectedTsnaps,
-                              (self.conductorlist.currentRow()), radioflag, self.TA_conductors)
+        try:
+            radioflag = 0
+            if self.branchCurrRadio.isChecked():
+                radioflag = 1
+            sender = self.sender()
+            if self.frequency_3d.isChecked():
+                if(len(self.locationDirectories)==0):
+                    self.errorHandler("PQA File not found/selected.")
+                    return
+                powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()], self.selectedFrequency,
+                                    self.conductorlist.currentRow(), radioflag, 1, 0)
                 return
             else:
-                X, Y = powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
-                                            self.selectedFrequency, self.conductorlist.currentRow(), radioflag, 0,
-                                            IAFlag)
+                IAFlag = 0
+                if (self.IAButton.isChecked()):
+                    IAFlag = 1
+                    if not (self.iadirectories[self.ia_options.currentIndex()]):
+                        self.errorHandler("IA file not selected")
+                        return
+                    X, Y = powerQualityAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedFrequency,
+                                                self.conductorlist.currentRow(), radioflag, 0, IAFlag)
+                elif (self.TAButton.isChecked()):
+                    if(len(self.tadirectories) == 0):
+                        self.errorHandler("TA Files not found.")
+                        return
+                    D3Plot_TA_LFA(self.tadirectories[self.pqa_scaoptions.currentIndex()], self.selectedTsnaps,
+                                (self.conductorlist.currentRow()), radioflag, self.TA_conductors)
+                    return
+                else:
+                    if(len(self.locationDirectories)==0):
+                        self.errorHandler("PQA File not found.")
+                        return
+                    X, Y = powerQualityAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
+                                                self.selectedFrequency, self.conductorlist.currentRow(), radioflag, 0,
+                                                IAFlag)
 
-        if sender == self.pltlfa_pqa_sca:
-            if self.frequency_3d.isChecked() == False:
+            if sender == self.pltlfa_pqa_sca:
+                if self.frequency_3d.isChecked() == False:
+                    for i in range(0, len(Y)):
+                        plt.figure()
+                        plt.title("Power Quality Analysis 2D" if IAFlag == 0 else "Interference Analysis", fontsize=15,
+                                fontweight='bold')
+                        plt.plot(X[i], Y[i], label=self.selectedFrequencyValue[i])
+                        plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
+                        if radioflag == 1:
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=12,
+                                    fontweight='bold')
+                        else:
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=12,
+                                    fontweight='bold')
+                        plt.xlim(left=min(X[i]), right=max(X[i]))
+                        plt.grid(alpha=0.3)
+                        plt.legend()
+                        for j in range(len(X[i])):
+                                if (j%6==0):
+                                    plt.scatter(X[i][j],Y[i][j],c="red",marker='x')
+                        plt.show(block=False)
+            if (sender == self.subpltlfa_pqa_sca):
+                t = len(Y)
+                while (t > 0):
+                    if (t // 3 > 0):
+                        j = 3
+                    else:
+                        j = t
+                    if (j == 1):
+                        plt.figure()
+                        plt.title("Power Quality Analysis 2D" if not self.IAButton.isChecked() else (
+                            "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                                fontsize=15, fontweight='bold')
+                        plt.plot(X[t - 1], Y[t - 1], label=self.selectedFrequencyValue[t - 1])
+                        plt.xlabel("Distance (km)", fontsize=12, fontweight='bold')
+                        if radioflag == 1:
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                                    fontweight='bold')
+                        else:
+                            plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                                    fontweight='bold')
+                        plt.xlim(left=min(X[t - 1]), right=max(X[t - 1]))
+                        plt.grid(alpha=0.3)
+                        plt.legend()
+                        plt.show(block=False)
+                        break
+                    else:
+                        figure, axis = plt.subplots(j)
+                        plt.suptitle("Power Quality Analysis 2D" if not self.IAButton.isChecked() else (
+                            "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                                fontsize=15, fontweight='bold')
+                        for i in range(0, len(Y)):
+                            axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedFrequencyValue[t - 1])
+                            if radioflag == 1:
+                                axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)",
+                                                fontsize=12, fontweight='bold')
+                            else:
+                                axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)",
+                                                fontsize=12, fontweight='bold')
+                            axis[i].set_xlabel("Distance (km)", fontsize=12, fontweight='bold')
+                            axis[i].legend()
+                            axis[i].set_xlim(left=min(X[t - 1]), right=max(X[t - 1]))
+                            axis[i].grid(alpha=0.3)
+                            t -= 1
+                            if (t == 0):
+                                break
+                        plt.show(block=False)
+            if (sender == self.mergepltlfa_pqa_sca):
                 for i in range(0, len(Y)):
-                    plt.figure()
-                    plt.title("Power Quality Analysis 2D" if IAFlag == 0 else "Interference Analysis", fontsize=15,
-                              fontweight='bold')
+                    plt.title("Power Quality Analysis 2D" if IAFlag == 0 else (
+                        "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                            fontsize=15, fontweight='bold')
                     plt.plot(X[i], Y[i], label=self.selectedFrequencyValue[i])
                     plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                     if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=12,
-                                   fontweight='bold')
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                                fontweight='bold')
                     else:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=12,
-                                   fontweight='bold')
+                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                                fontweight='bold')
                     plt.xlim(left=min(X[i]), right=max(X[i]))
                     plt.grid(alpha=0.3)
                     plt.legend()
-                    for j in range(len(X[i])):
-                            if (j%6==0):
-                                plt.scatter(X[i][j],Y[i][j],c="red",marker='x')
                     plt.show(block=False)
-        if (sender == self.subpltlfa_pqa_sca):
-            t = len(Y)
-            while (t > 0):
-                if (t // 3 > 0):
-                    j = 3
-                else:
-                    j = t
-                if (j == 1):
-                    plt.figure()
-                    plt.title("Power Quality Analysis 2D" if not self.IAButton.isChecked() else (
-                        "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
-                              fontsize=15, fontweight='bold')
-                    plt.plot(X[t - 1], Y[t - 1], label=self.selectedFrequencyValue[t - 1])
-                    plt.xlabel("Distance (km)", fontsize=12, fontweight='bold')
-                    if radioflag == 1:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
-                                   fontweight='bold')
-                    else:
-                        plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
-                                   fontweight='bold')
-                    plt.xlim(left=min(X[t - 1]), right=max(X[t - 1]))
-                    plt.grid(alpha=0.3)
-                    plt.legend()
-                    plt.show(block=False)
-                    break
-                else:
-                    figure, axis = plt.subplots(j)
-                    plt.suptitle("Power Quality Analysis 2D" if not self.IAButton.isChecked() else (
-                        "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
-                              fontsize=15, fontweight='bold')
-                    for i in range(0, len(Y)):
-                        axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedFrequencyValue[t - 1])
-                        if radioflag == 1:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)",
-                                               fontsize=12, fontweight='bold')
-                        else:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)",
-                                               fontsize=12, fontweight='bold')
-                        axis[i].set_xlabel("Distance (km)", fontsize=12, fontweight='bold')
-                        axis[i].legend()
-                        axis[i].set_xlim(left=min(X[t - 1]), right=max(X[t - 1]))
-                        axis[i].grid(alpha=0.3)
-                        t -= 1
-                        if (t == 0):
-                            break
-                    plt.show(block=False)
-        if (sender == self.mergepltlfa_pqa_sca):
-            for i in range(0, len(Y)):
-                plt.title("Power Quality Analysis 2D" if IAFlag == 0 else (
-                    "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
-                          fontsize=15, fontweight='bold')
-                plt.plot(X[i], Y[i], label=self.selectedFrequencyValue[i])
-                plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
-                if radioflag == 1:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
-                               fontweight='bold')
-                else:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
-                               fontweight='bold')
-                plt.xlim(left=min(X[i]), right=max(X[i]))
-                plt.grid(alpha=0.3)
-                plt.legend()
-                plt.show(block=False)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def LFA(self):
@@ -1460,147 +1526,172 @@ class MainWindow(QDialog, Ui_Dialog):
 
         Returns:
         None"""
-        if (self.pqaradio.isChecked()):
-            self.PQA()
-            return
-        sender = self.sender()
-        radioflag = 0
-        if self.branchCurrRadio.isChecked():
-            radioflag = 1
-        if (self.lfaradio.isChecked()):
-            if self.time_3d.isChecked() and not (self.TAButton.isChecked()):
-                loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
-                                 self.conductorlist.currentRow(), radioflag, 1, 0)
-            else:
-                IAFlag = 0
+        try:
+            if (self.pqaradio.isChecked()):
+                self.PQA()
+                return
+            sender = self.sender()
+            radioflag = 0
+            if self.branchCurrRadio.isChecked():
+                radioflag = 1
+            if (self.lfaradio.isChecked()):
+                if self.time_3d.isChecked() and not (self.TAButton.isChecked()):
+                    if(len(self.lfadirectories)==0):
+                        self.errorHandler("LFA Files not found.")
+                        return
+                    loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
+                                    self.conductorlist.currentRow(), radioflag, 1, 0)
+                else:
+                    IAFlag = 0
+                    if (self.IAButton.isChecked()):
+                        IAFlag = 1
+                        if (len(self.iadirectories)==0):
+                            self.errorHandler("IA file not selected")
+                            return
+                        X, Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps,
+                                                (self.conductorlist.currentRow()), radioflag, 0, IAFlag)
+                    elif (self.TAButton.isChecked()):
+                        if(len(self.tadirectories)==0):
+                            self.errorHandler("TA File not found.")
+                            return
+                        D3Plot_TA_LFA(self.tadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
+                                    (self.conductorlist.currentRow()), radioflag, self.TA_conductors)
+                        return
+                    else:
+                        if(len(self.lfadirectories)==0):
+                            self.errorHandler("LFA File not found.")
+                            return
+                        X, Y, TSS = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
+                                                (self.conductorlist.currentRow()), radioflag, 0, IAFlag)
+                if (sender == self.pltlfa_pqa_sca):
+                    if self.time_3d.isChecked() == False:
+                        for i in range(0, len(Y)):
+                            plt.figure()
+                            plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
+                                "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                                    fontsize=15, fontweight='bold')
+                            plt.plot(X[i], Y[i], label=self.selectedTsnapValue[i])
+                            if not(self.IAButton.isChecked()):
+                                for j in range (0, len(TSS['distance'])):
+                                    xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
+                                    plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
+                                    plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
+                            plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
+                            if radioflag == 1:
+                                plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
+                                        fontweight='bold')
+                            else:
+                                plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
+                                        fontweight='bold')
+                            plt.xlim(left=min(X[i]), right=max(X[i]))
+                            plt.grid(alpha=0.3)
+                            plt.legend()
+                            for j in range(len(X[i])):
+                                if (j%6==0):
+                                    plt.scatter(X[i][j],Y[i][j],c="red",marker='x')
+                            plt.show(block=False)
+            if self.scaradio.isChecked():
                 if (self.IAButton.isChecked()):
-                    IAFlag = 1
-                    X, Y = loadFlowAnalysis(self.iadirectories[self.ia_options.currentIndex()], self.selectedTsnaps,
-                                            (self.conductorlist.currentRow()), radioflag, 0, IAFlag)
+                    if(len(self.iadirectories)==0):
+                        self.errorHandler("IA File not found.")
+                        return
+                    ShortCircuitAnalysis_IA(self.iadirectories[self.ia_options.currentIndex()],
+                                            self.conductorlist.currentRow(), self.conductors, radioflag)
                 elif (self.TAButton.isChecked()):
-                    D3Plot_TA_LFA(self.tadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
-                                  (self.conductorlist.currentRow()), radioflag, self.TA_conductors)
+                    if(len(self.locationDirectories)==0):
+                        self.errorHandler("TA with SCA not found.")
+                        return
+                    D3Plot_TA_SCA(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
+                                self.conductorlist.currentRow(), 1, self.conductors)
                     return
                 else:
-                    X, Y, TSS = loadFlowAnalysis(self.lfadirectories[self.lfaoptions.currentIndex()], self.selectedTsnaps,
-                                            (self.conductorlist.currentRow()), radioflag, 0, IAFlag)
-            if (sender == self.pltlfa_pqa_sca):
-                if self.time_3d.isChecked() == False:
-                    for i in range(0, len(Y)):
+                    if(len(self.locationDirectories)==0):
+                        self.errorHandler("SCA files not found.")
+                        return
+                    ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
+                                        self.conductorlist.currentRow(), self.conductors, radioflag)
+            if (sender == self.subpltlfa_pqa_sca):
+                t = len(Y)
+                while (t > 0):
+                    if (t // 3 > 0):
+                        j = 3
+                    else:
+                        j = t
+                    if (j == 1):
                         plt.figure()
                         plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
                             "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
-                                  fontsize=15, fontweight='bold')
-                        plt.plot(X[i], Y[i], label=self.selectedTsnapValue[i])
+                                fontsize=15, fontweight='bold')
+                        plt.plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
                         if not(self.IAButton.isChecked()):
                             for j in range (0, len(TSS['distance'])):
-                                xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
-                                plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
-                                plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
+                                    xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
+                                    plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
+                                    plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
                         plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                         if radioflag == 1:
                             plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
-                                       fontweight='bold')
+                                    fontweight='bold')
                         else:
                             plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
-                                       fontweight='bold')
-                        plt.xlim(left=min(X[i]), right=max(X[i]))
+                                    fontweight='bold')
+                        plt.xlim(left=min(X[t - 1]), right=max(X[t - 1]))
                         plt.grid(alpha=0.3)
                         plt.legend()
-                        for j in range(len(X[i])):
-                            if (j%6==0):
-                                plt.scatter(X[i][j],Y[i][j],c="red",marker='x')
                         plt.show(block=False)
-        if self.scaradio.isChecked():
-            if (self.IAButton.isChecked()):
-                ShortCircuitAnalysis_IA(self.iadirectories[self.ia_options.currentIndex()],
-                                        self.conductorlist.currentRow(), self.conductors, radioflag)
-            elif (self.TAButton.isChecked()):
-                D3Plot_TA_SCA(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
-                              self.conductorlist.currentRow(), 1, self.conductors)
-                return
-            else:
-                ShortCircuitAnalysis(self.locationDirectories[self.pqa_scaoptions.currentIndex()],
-                                     self.conductorlist.currentRow(), self.conductors, radioflag)
-        if (sender == self.subpltlfa_pqa_sca):
-            t = len(Y)
-            while (t > 0):
-                if (t // 3 > 0):
-                    j = 3
-                else:
-                    j = t
-                if (j == 1):
-                    plt.figure()
+                        break
+                    else:
+                        figure, axis = plt.subplots(j)
+                        plt.suptitle("Load Flow Analysis 2D" if IAFlag == 0 else (
+                            "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
+                                fontsize=15, fontweight='bold')
+                        for i in range(0, j):
+                            if not(self.IAButton.isChecked()):
+                                for k in range (0, len(TSS['distance'])):
+                                    xcoord = float(TSS['distance'][k][0][0])/max(X[i]) +0.005
+                                    axis[i].text(xcoord, 0.97, TSS['name'][k][0],transform=plt.gca().transAxes)
+                                    axis[i].axvline(x = float(TSS['distance'][k][0][0]), linestyle = '--',color = 'b')
+                            
+                            axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
+                            if radioflag == 1:
+                                axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)",
+                                                fontweight='bold')
+                            else:
+                                axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)",
+                                                fontweight='bold')
+                            axis[i].set_xlabel("Distance (km)", fontweight='bold')
+                            axis[i].legend()
+                            axis[i].set_xlim(left=min(X[t - 1]), right=max(X[t - 1]))
+                            axis[i].grid(alpha=0.3)
+                            t -= 1
+                            if (t == 0):
+                                break
+                        plt.show(block=False)
+            if (sender == self.mergepltlfa_pqa_sca):
+                for i in range(0, len(Y)):
                     plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
                         "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
-                              fontsize=15, fontweight='bold')
-                    plt.plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
+                            fontsize=15, fontweight='bold')
                     if not(self.IAButton.isChecked()):
                         for j in range (0, len(TSS['distance'])):
-                                xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
-                                plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
-                                plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
+                            xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
+                            plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
+                            plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
+                    plt.plot(X[i], Y[i], label=self.selectedTsnapValue[i])
                     plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
                     if radioflag == 1:
                         plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
-                                   fontweight='bold')
+                                fontweight='bold')
                     else:
                         plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
-                                   fontweight='bold')
-                    plt.xlim(left=min(X[t - 1]), right=max(X[t - 1]))
+                                fontweight='bold')
+                    plt.xlim(left=min(X[i]), right=max(X[i]))
                     plt.grid(alpha=0.3)
                     plt.legend()
                     plt.show(block=False)
-                    break
-                else:
-                    figure, axis = plt.subplots(j)
-                    plt.suptitle("Load Flow Analysis 2D" if IAFlag == 0 else (
-                        "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
-                              fontsize=15, fontweight='bold')
-                    for i in range(0, j):
-                        if not(self.IAButton.isChecked()):
-                            for k in range (0, len(TSS['distance'])):
-                                xcoord = float(TSS['distance'][k][0][0])/max(X[i]) +0.005
-                                axis[i].text(xcoord, 0.97, TSS['name'][k][0],transform=plt.gca().transAxes)
-                                axis[i].axvline(x = float(TSS['distance'][k][0][0]), linestyle = '--',color = 'b')
-                        
-                        axis[i].plot(X[t - 1], Y[t - 1], label=self.selectedTsnapValue[t - 1])
-                        if radioflag == 1:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)",
-                                               fontweight='bold')
-                        else:
-                            axis[i].set_ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)",
-                                               fontweight='bold')
-                        axis[i].set_xlabel("Distance (km)", fontweight='bold')
-                        axis[i].legend()
-                        axis[i].set_xlim(left=min(X[t - 1]), right=max(X[t - 1]))
-                        axis[i].grid(alpha=0.3)
-                        t -= 1
-                        if (t == 0):
-                            break
-                    plt.show(block=False)
-        if (sender == self.mergepltlfa_pqa_sca):
-            for i in range(0, len(Y)):
-                plt.title("Load Flow Analysis 2D" if IAFlag == 0 else (
-                    "Current in Signalling Cables" if radioflag == 1 else "Terminal Voltage in Signalling Cables"),
-                          fontsize=15, fontweight='bold')
-                if not(self.IAButton.isChecked()):
-                    for j in range (0, len(TSS['distance'])):
-                        xcoord = float(TSS['distance'][j][0][0])/max(X[i]) +0.005
-                        plt.text(xcoord, 0.97, TSS['name'][j][0],transform=plt.gca().transAxes)
-                        plt.axvline(x = float(TSS['distance'][j][0][0]), linestyle = '--',color = 'b')
-                plt.plot(X[i], Y[i], label=self.selectedTsnapValue[i])
-                plt.xlabel("Distance (km)", fontsize=15, fontweight='bold')
-                if radioflag == 1:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Current (A)", fontsize=15,
-                               fontweight='bold')
-                else:
-                    plt.ylabel(self.conductors[self.conductorlist.currentRow()] + " Voltage (kV)", fontsize=15,
-                               fontweight='bold')
-                plt.xlim(left=min(X[i]), right=max(X[i]))
-                plt.grid(alpha=0.3)
-                plt.legend()
-                plt.show(block=False)
+        except:
+            self.errorHandler("Uh Oh! Something went wrong.")
+            return
         return
 
     def getStringLineData(self):
@@ -1662,14 +1753,14 @@ class MainWindow(QDialog, Ui_Dialog):
                     y_axis.append(
                         (output_data['Time_' + partstr + '_' + str(trains[j]) + '_0'][start:end]) * 60)
                     plt.plot(x_axis[j], y_axis[j],
-                             label=trains[j])
+                            label=trains[j])
                 plt.gca().invert_yaxis()
                 plt.yticks(data["plottingData"][1], data["plottingData"][0])
                 plt.xticks(data["plottingData"][3], data["plottingData"][2])
                 plt.xlim(left=min(data["plottingData"][3]), right=max(data["plottingData"][3]))
                 plt.legend(loc='center left', bbox_to_anchor=(1, 1))
                 plt.xlabel("Distance from Starting Point (km)",
-                           fontsize=15, fontweight='bold')
+                        fontsize=15, fontweight='bold')
                 plt.ylabel("Time", fontsize=15, fontweight='bold')
                 plt.title("String Line Diagram", fontsize=15, fontweight='bold')
                 plt.get_current_fig_manager().resize(950, 500)
@@ -1692,6 +1783,8 @@ class MainWindow(QDialog, Ui_Dialog):
         Returns:
         None"""
         self.timetableflag = not (self.timetableflag)
+        self.timetable_trainstat.setRowCount(0)
+        self.timetable_trainstat.setColumnCount(0)
         if self.timetableflag:
             for i in range(len(self.final_input_directories)):
                 if ("MTMM" in self.final_input_directories[i]):
@@ -1788,31 +1881,30 @@ class MainWindow(QDialog, Ui_Dialog):
         return directory_results
 
     def findFiles(self, start_dir):
-        """Finds files with specific extensions within a starting directory.
+            """Finds files with specific extensions within a starting directory.
 
-        This function walks through the given starting directory and its subdirectories to find files with
-        extensions '.xlsx', '.mat', and '.csv'. It collects the absolute paths of these files and returns them.
+            This function walks through the given starting directory and its subdirectories to find files with
+            extensions '.xlsx', '.mat', and '.csv'. It collects the absolute paths of these files and returns them.
 
-        Parameters:
-        start_dir (str): The starting directory to begin the search.
+            Parameters:
+            start_dir (str): The starting directory to begin the search.
 
-        Returns:
-        list: A list of absolute paths to the found files"""
-        file_extension = [".xlsx", ".mat", ".csv"]
-        file_results_path = []
-        for ext in file_extension:
-            for root, dirs, files in os.walk(start_dir):
-                for file in files:
-                    if file.endswith(ext):
-                        file_path = os.path.join(root, file)
-                        file_results_path.append(file_path)
-        return file_results_path
+            Returns:
+            list: A list of absolute paths to the found files"""
+            file_extension = [".xlsx", ".mat", ".csv"]
+            file_results_path = []
+            for ext in file_extension:
+                for root, dirs, files in os.walk(start_dir):
+                    for file in files:
+                        if file.endswith(ext):
+                            file_path = os.path.join(root, file)
+                            file_results_path.append(file_path)
+            return file_results_path
 
-
-# app = QApplication(sys.argv)
-# font = QtGui.QFont()
-# font.setPointSize(12)
-# app.setFont(font)
-# mainwindow = MainWindow()
-# mainwindow.showMaximized()
-# sys.exit(app.exec_())
+app = QApplication(sys.argv)
+font = QtGui.QFont()
+font.setPointSize(12)
+app.setFont(font)
+mainwindow = MainWindow()
+mainwindow.showMaximized()
+sys.exit(app.exec_())
