@@ -1008,24 +1008,28 @@ class MainWindow(QDialog, Ui_Dialog):
             self.analysistab.setTabEnabled(0, True)
             output_directory_results = []
             input_directory_results = []
-            for path in self.folder_paths:
-                for root, dirs, files in os.walk(path):
-                    for dir in dirs:
-                        if "output" in dir.lower():
-                            output_directory_results.append(
-                                os.path.abspath(os.path.join(root, dir)))
-                        if "input" in dir.lower():
-                            input_directory_results.append(
-                                os.path.abspath(os.path.join(root, dir)))
-                for directories in input_directory_results:
-                    for root, dirs, files in os.walk(directories):
-                        if (len(files) > 0):
-                            self.final_input_directories.append(directories)
-                for directories in output_directory_results:
-                    for root, dirs, files in os.walk(directories):
-                        if (len(files) > 0):
-                            self.final_output_directories.append(directories)
-                            break
+            # print(self.options.currentText())
+            # for path in self.folder_paths:
+            for i in range(len(self.folder_paths)):
+                if (self.options.currentText() in self.folder_paths[i]):
+                    path = os.path.join(self.folder_paths[i])
+                    for root, dirs, files in os.walk(path):
+                        for dir in dirs:
+                            if "output" in dir.lower():
+                                output_directory_results.append(
+                                    os.path.abspath(os.path.join(root, dir)))
+                            if "input" in dir.lower():
+                                input_directory_results.append(
+                                    os.path.abspath(os.path.join(root, dir)))
+                    for directories in input_directory_results:
+                        for root, dirs, files in os.walk(directories):
+                            if (len(files) > 0):
+                                self.final_input_directories.append(directories)
+                    for directories in output_directory_results:
+                        for root, dirs, files in os.walk(directories):
+                            if (len(files) > 0):
+                                self.final_output_directories.append(directories)
+                                break
             for i in range(len(self.final_input_directories)):
                 if 'TimeTableData.csv' in os.listdir(self.final_input_directories[i]) and (
                         'TrainModuleOutput.csv' in os.listdir(self.final_output_directories[0])):

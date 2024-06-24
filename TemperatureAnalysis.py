@@ -110,7 +110,7 @@ def D3Plot_TA_LFA(outputfolder,selectedtsnapindex,selectedconductor,scaflag,TACo
     ax.set_box_aspect(aspect = (10,8,6))
     surf = ax.plot_surface(super_x_axis,final_z, super_y_axis,cmap = cm.YlOrRd, rstride=1, cstride=1, linewidth=0, antialiased=False, shade=False, alpha = 0.3)
     fig.colorbar(surf, ax=ax,shrink=0.5, aspect=5,pad=0.2)
-    ax.set_xlabel('Disrance (km)', fontdict = font)
+    ax.set_xlabel('Distance (km)', fontdict = font)
     ax.set_ylabel('Time (Hours)', fontdict = font)
     ax.set_zlabel("Temperature (Degree C)"if (selectedconductor==0 or selectedconductor==1) else "Temperature Difference (Degree C)", fontdict = font)
     # ax.set(xlabel='Distance (km)', ylabel='Time (Hours)',zlabel="Temperature (Degree C)"if (selectedconductor==0 or selectedconductor==1) else "Temperature Difference (Degree C)")
