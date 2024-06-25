@@ -1,11 +1,17 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
-
 class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.setWindowTitle("ETPSS Output Module")
         Dialog.resize(817, 599)
+        labelImage = QtWidgets.QLabel(Dialog)
+        pixmap = QtGui.QPixmap("IITB.png")
+        pixmap = pixmap.scaled(100, 100, QtCore.Qt.KeepAspectRatio)
+        labelImage.setPixmap(pixmap)
+        labelImage.move(1765,800)
+        namelabel = QtWidgets.QLabel("Made By Naman Badlani, Onam Sarode, Allen Andrew",Dialog)
+        namelabel.move(20,960)
         self.filename = QtWidgets.QLineEdit(Dialog)
         self.filename.setGeometry(QtCore.QRect(20, 10, 601, 31))
         self.filename.setObjectName("filename")
