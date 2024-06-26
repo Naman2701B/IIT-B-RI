@@ -1,14 +1,22 @@
 from PyQt5 import QtCore, QtGui, QtWidgets
 
 class Ui_Dialog(object):
+    def resource_path(self,relative_path):
+        import sys, os
+        try:
+            base_path = sys._MEIPASS
+        except Exception:
+            base_path = os.path.abspath(".")
+        return os.path.join(base_path, relative_path)
+    
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.setWindowTitle("ETPSS Output Module")
-        icon = QtGui.QIcon(QtGui.QPixmap("Logo.jpeg"))
+        icon = QtGui.QIcon(QtGui.QPixmap(self.resource_path("Logo.jpeg")))
         Dialog.setWindowIcon(icon)
         Dialog.resize(817, 599)
         labelImage = QtWidgets.QLabel(Dialog)
-        pixmap = QtGui.QPixmap("IITB.png")
+        pixmap = QtGui.QPixmap(self.resource_path("IITB.png"))
         pixmap = pixmap.scaled(100, 100, QtCore.Qt.KeepAspectRatio)
         labelImage.setPixmap(pixmap)
         labelImage.move(1765,800)
