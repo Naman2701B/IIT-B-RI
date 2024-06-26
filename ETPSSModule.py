@@ -65,14 +65,12 @@ import mplcursors
 from ReportGenerator import startReport
 from TemperatureAnalysis import D3Plot_TA_LFA, D3Plot_TA_SCA
 from UIFile import Ui_Dialog
-# from PyQt5.uic import loadUi
 from datetime import timedelta
 
 class MainWindow(QDialog, Ui_Dialog):
     def __init__(self, parent=None):
         super(MainWindow, self).__init__(parent)
         self.setupUi(self)
-        # loadUi("gui.ui", self)
         flagsWindow = QtCore.Qt.WindowFlags()
         self.setWindowFlags(flagsWindow)
         self.timetable_trainstat.setHidden(True)
@@ -285,7 +283,7 @@ class MainWindow(QDialog, Ui_Dialog):
         return
     
     def IACheck(self, radiobutton):
-        """Handles the selection of an IA (Insulation Assessment) option from a set of radio buttons.
+        """Handles the selection of an IA (Interference Analysis) option from a set of radio buttons.
     
         This function ensures that only the selected radio button remains checked, updates UI elements
         visibility based on the selection, and modifies internal variables and texts based on whether the
@@ -735,7 +733,6 @@ class MainWindow(QDialog, Ui_Dialog):
                         self.timelist.addItem(self.timeoptions.itemText(0))
                         self.selectedTsnapValue.append(self.timeoptions.itemText(0))
                         self.timeoptions.removeItem(0)
-                        # self.timeoptions.setCurrentIndex(0)
                     self.radiostatus(0)
                     self.selectAllTime.setText("Deselect All")
                 else:
@@ -753,7 +750,6 @@ class MainWindow(QDialog, Ui_Dialog):
                         self.frequencyList.addItem(self.frequencyoptions.itemText(0))
                         self.selectedFrequencyValue.append(self.frequencyoptions.itemText(0))
                         self.frequencyoptions.removeItem(0)
-                        # self.timeoptions.setCurrentIndex(0)
                     self.radiostatus(1)
                     self.selectAllFrequency.setText("Deselect All")
                 else:
@@ -1008,8 +1004,6 @@ class MainWindow(QDialog, Ui_Dialog):
             self.analysistab.setTabEnabled(0, True)
             output_directory_results = []
             input_directory_results = []
-            # print(self.options.currentText())
-            # for path in self.folder_paths:
             for i in range(len(self.folder_paths)):
                 if (self.options.currentText() in self.folder_paths[i]):
                     path = os.path.join(self.folder_paths[i])
@@ -1373,7 +1367,6 @@ class MainWindow(QDialog, Ui_Dialog):
         ax2.set_ylabel(str(keys[1]))
         ax1.legend(bbox_to_anchor=(1, 0.95))
         ax2.legend(bbox_to_anchor=(1, 1))
-        # plt.legend()
         plt.grid(alpha=0.3)
         cursor = mplcursors.cursor(hover=True)
         plt.show(block=False)
@@ -1770,7 +1763,6 @@ class MainWindow(QDialog, Ui_Dialog):
                 plt.get_current_fig_manager().resize(950, 500)
                 plt.grid(alpha=0.3)
                 cursor = mplcursors.cursor(hover=True)
-                # binding_id = plt.connect('motion_notify_event', on_move)
                 plt.show(block=False)
         return
 
