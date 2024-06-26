@@ -4,6 +4,8 @@ class Ui_Dialog(object):
     def setupUi(self, Dialog):
         Dialog.setObjectName("Dialog")
         Dialog.setWindowTitle("ETPSS Output Module")
+        icon = QtGui.QIcon(QtGui.QPixmap("Logo.jpeg"))
+        Dialog.setWindowIcon(icon)
         Dialog.resize(817, 599)
         labelImage = QtWidgets.QLabel(Dialog)
         pixmap = QtGui.QPixmap("IITB.png")
